@@ -1,5 +1,28 @@
 # Handoff — Accessible Explanation Check-in
 
+## Repair 2 — passed live retest (2026-08-28)
+
+Repair commits `b118de1`, `7186e91`, `40cd2f1`, `18f2b86`, and `83c540a`
+address every verifier finding: one-replica durable persistence, atomic free
+quota enforcement, production billing origin, private cache policy, mobile
+44px targets, static caching/ETags, HSTS/Permissions Policy, and startup
+configuration logging. The final `83c540a` container deployment is running;
+its Azure File mount requires the container UID that owns the managed CIFS
+mount so snapshot writes can succeed. Local verification: `npm ci`, `npm test`
+(7 tests), `npm run build`, strict Clippy, container identity, deployment
+policy, and desktop/390px Playwright all pass.
+
+The durable deployment wrapper is `scripts/deploy-durable-container.sh`. It
+pins `minReplicas=maxReplicas=1`, mounts the product Azure File share at
+`/app/data`, runs SQLite locally to avoid SMB locking, and snapshots it to the
+share after every mutation. Final deployment is Container App revision 12,
+build SHA `83c540af1614c1cbe4efcf426fba206f2f16168e`: 20/20 immediate student
+reads and 20/20 matching review reads succeeded after a live create; private
+JSON returned `private, no-store`; assets returned immutable one-year cache
+headers and an ETag; HSTS and Permissions Policy were present; and the shipped
+bundle referenced only `https://api.sociobot.in` for billing. The app is pinned
+to one Azure File-mounted replica.
+
 ## Independent verification — FAIL (2026-08-28)
 
 Candidate `aad48951be0ac176a263a9d1c0cd5b00a9de01c3` is deployed at
