@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /c/
+Disallow: /review/
+Disallow: /receipt/
+Sitemap: https://accessible-explanation-checkin.sociobot.in/sitemap.xml
+

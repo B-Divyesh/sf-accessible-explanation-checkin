@@ -1,0 +1,23 @@
+{
+  "name": "accessible-explanation-checkin",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k \"vite --config frontend/vite.config.ts\" \"cargo run\"",
+    "build": "vite build --config frontend/vite.config.ts",
+    "test": "tsc --noEmit -p frontend/tsconfig.json && vitest run --config frontend/vite.config.ts && cargo test",
+    "test:e2e": "playwright test --config frontend/playwright.config.ts",
+    "preview": "vite preview --config frontend/vite.config.ts --host 0.0.0.0",
+    "start": "cargo run --release"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^24.3.0",
+    "concurrently": "^9.2.1",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.3",
+    "vitest": "^3.2.4"
+  }
+}
