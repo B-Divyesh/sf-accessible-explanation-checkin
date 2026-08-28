@@ -23,6 +23,8 @@ pub struct AppState {
     pub billing_base: String,
     pub http: reqwest::Client,
     pub build_sha: String,
+    pub database_file: Option<PathBuf>,
+    pub persistence_dir: Option<PathBuf>,
 }
 
 #[derive(Debug)]
@@ -139,6 +141,7 @@ async fn create_checkin(
         .bind(id).bind(&student_token).bind(&review_token).bind(title).bind(prompt)
         .bind(now()).bind(input.voice_retention_days).bind(max_submissions)
         .execute(&state.pool).await?;
+    persist_database(&state).await?;
     Ok((
         StatusCode::CREATED,
         Json(CreatedCheckin {
@@ -301,6 +304,7 @@ async fn create_submission(
                 .into(),
         ));
     }
+    persist_database(&state).await?;
     Ok((
         StatusCode::CREATED,
         Json(CreatedSubmission {
@@ -413,6 +417,7 @@ async fn update_submission(
     if result.rows_affected() == 0 {
         return Err(not_found());
     }
+    persist_database(&state).await?;
     Ok(Json(json!({"saved": true})))
 }
 
@@ -464,6 +469,7 @@ async fn delete_voice(
         let _ = fs::remove_file(state.uploads_dir.join(filename)).await;
     }
     sqlx::query("UPDATE submissions SET voice_file=NULL, voice_mime=NULL, voice_delete_at=NULL WHERE id=? AND checkin_id=(SELECT id FROM checkins WHERE review_token=?)").bind(id).bind(review_token).execute(&state.pool).await?;
+    persist_database(&state).await?;
     Ok(Json(json!({"deleted": true})))
 }
 
@@ -532,7 +538,23 @@ pub async fn cleanup_expired_voice(state: &AppState) -> Result<u64, sqlx::Error>
         sqlx::query("UPDATE submissions SET voice_file=NULL, voice_mime=NULL, voice_delete_at=NULL WHERE id=?").bind(row.get::<String,_>("id")).execute(&state.pool).await?;
         deleted += 1;
     }
+    if deleted > 0 {
+        if let Err(error) = persist_database(state).await {
+            tracing::error!(?error, "database snapshot failed after voice cleanup");
+        }
+    }
     Ok(deleted)
+}
+
+async fn persist_database(state: &AppState) -> Result<(), ApiError> {
+    if let (Some(database_file), Some(persistence_dir)) =
+        (&state.database_file, &state.persistence_dir)
+    {
+        crate::db::save_snapshot(database_file, persistence_dir)
+            .await
+            .map_err(io_error)?;
+    }
+    Ok(())
 }
 
 fn clean(value: &str, min: usize, max: usize, label: &str) -> Result<String, ApiError> {
@@ -608,6 +630,8 @@ mod tests {
             billing_base: "http://127.0.0.1:1".into(),
             http: reqwest::Client::new(),
             build_sha: "test".into(),
+            database_file: None,
+            persistence_dir: None,
         });
         (router(state), temp)
     }

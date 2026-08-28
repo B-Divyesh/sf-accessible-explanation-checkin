@@ -2,13 +2,53 @@ use sqlx::{
     sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions},
     SqlitePool,
 };
-use std::{path::Path, str::FromStr, time::Duration};
+use std::{
+    path::{Path, PathBuf},
+    str::FromStr,
+    time::Duration,
+};
+use tokio::fs;
+
+pub fn sqlite_path(database_url: &str) -> Option<PathBuf> {
+    database_url
+        .strip_prefix("sqlite:")
+        .filter(|path| !path.starts_with(":memory:"))
+        .map(|path| PathBuf::from(path.split('?').next().unwrap_or(path)))
+}
+
+pub async fn restore_snapshot(
+    database_file: &Path,
+    persistence_dir: &Path,
+) -> Result<(), std::io::Error> {
+    let snapshot = persistence_dir.join("checkins.db");
+    let usable_snapshot = fs::metadata(&snapshot)
+        .await
+        .map(|metadata| metadata.len() > 0)
+        .unwrap_or(false);
+    if usable_snapshot {
+        if let Some(parent) = database_file.parent() {
+            fs::create_dir_all(parent).await?;
+        }
+        fs::copy(snapshot, database_file).await?;
+    }
+    Ok(())
+}
+
+pub async fn save_snapshot(
+    database_file: &Path,
+    persistence_dir: &Path,
+) -> Result<(), std::io::Error> {
+    fs::create_dir_all(persistence_dir).await?;
+    let pending = persistence_dir.join("checkins.db.next");
+    let snapshot = persistence_dir.join("checkins.db");
+    fs::copy(database_file, &pending).await?;
+    fs::rename(pending, snapshot).await
+}
 
 pub async fn connect(database_url: &str) -> Result<SqlitePool, sqlx::Error> {
     if database_url.starts_with("sqlite:") && !database_url.contains(":memory:") {
-        if let Some(path) = database_url.strip_prefix("sqlite:") {
-            let path = path.split('?').next().unwrap_or(path);
-            if let Some(parent) = Path::new(path).parent() {
+        if let Some(path) = sqlite_path(database_url) {
+            if let Some(parent) = path.parent() {
                 std::fs::create_dir_all(parent).ok();
             }
         }
@@ -56,4 +96,28 @@ pub async fn connect(database_url: &str) -> Result<SqlitePool, sqlx::Error> {
 
 fn is_locked(error: &sqlx::Error) -> bool {
     error.to_string().contains("database is locked")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn durable_snapshot_round_trips_a_local_database_file() {
+        let temp = tempfile::tempdir().unwrap();
+        let database_file = temp.path().join("runtime/checkins.db");
+        let persistence_dir = temp.path().join("durable");
+        fs::create_dir_all(database_file.parent().unwrap())
+            .await
+            .unwrap();
+        fs::write(&database_file, b"sqlite snapshot").await.unwrap();
+        save_snapshot(&database_file, &persistence_dir)
+            .await
+            .unwrap();
+        fs::remove_file(&database_file).await.unwrap();
+        restore_snapshot(&database_file, &persistence_dir)
+            .await
+            .unwrap();
+        assert_eq!(fs::read(database_file).await.unwrap(), b"sqlite snapshot");
+    }
 }

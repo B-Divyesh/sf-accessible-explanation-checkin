@@ -37,14 +37,27 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (billing_base, billing_supplied) =
         config_value("BILLING_BASE_URL", "https://api.sociobot.in");
     let (build_sha, build_sha_supplied) = config_value("BUILD_SHA", "development");
+    let persistence_dir = std::env::var("PERSISTENCE_DIR")
+        .ok()
+        .filter(|value| !value.trim().is_empty())
+        .map(PathBuf::from);
     tracing::info!(
         database = config_source(database_supplied),
         uploads = config_source(uploads_supplied),
         dist = config_source(dist_supplied),
         billing = config_source(billing_supplied),
         build_sha = config_source(build_sha_supplied),
+        persistence = if persistence_dir.is_some() {
+            "supplied"
+        } else {
+            "generated_default"
+        },
         "runtime configuration initialized"
     );
+    let database_file = db::sqlite_path(&database_url);
+    if let (Some(database_file), Some(persistence_dir)) = (&database_file, &persistence_dir) {
+        db::restore_snapshot(database_file, persistence_dir).await?;
+    }
     let state = Arc::new(AppState {
         pool: db::connect(&database_url).await?,
         uploads_dir: PathBuf::from(uploads_dir),
@@ -53,6 +66,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .timeout(Duration::from_secs(8))
             .build()?,
         build_sha,
+        database_file,
+        persistence_dir,
     });
     if let Ok(count) = routes::cleanup_expired_voice(&state).await {
         tracing::info!(count, "expired voice cleanup complete");
