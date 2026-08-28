@@ -7,6 +7,7 @@
     "dev": "concurrently -k \"vite --config frontend/vite.config.ts\" \"cargo run\"",
     "build": "vite build --config frontend/vite.config.ts",
     "test": "tsc --noEmit -p frontend/tsconfig.json && vitest run --config frontend/vite.config.ts && cargo test",
+    "test:deploy-helper": "bash scripts/test-deploy-container-name.sh",
     "test:e2e": "playwright test --config frontend/playwright.config.ts",
     "preview": "vite preview --config frontend/vite.config.ts --host 0.0.0.0",
     "start": "cargo run --release"

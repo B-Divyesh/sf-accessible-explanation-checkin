@@ -3,6 +3,42 @@
 Build work order: `accessible-explanation-checkin-build-1`
 Completed: 2026-08-28
 
+## Repair — `accessible-explanation-checkin-repair-1`
+
+The failed deployment was reproduced as a fleet naming fault, not a product
+fault: the original `sf-accessible-explanation-checkin` Container App name is
+35 characters, above Azure's 32-character limit. The current fleet helper now
+uses the deterministic 32-character name
+`sf-accessible-explanation-9c1a54` while keeping the public hostname
+`accessible-explanation-checkin.sociobot.in` unchanged.
+
+No production application behavior or assets changed because a fresh local
+product run did not reproduce a product-level failure. This repository adds
+`npm run test:deploy-helper`, a focused regression harness that invokes the
+current fleet helper with mocked Azure/DNS boundaries. It asserts the exact
+name above, its length, and successful completion of the custom-domain probe.
+
+Repair verification before deployment:
+
+- `npm ci`: passed (0 vulnerabilities reported).
+- `npm test`: passed — TypeScript, 3 Vitest tests, and 3 Rust route/unit and
+  integration-flow tests.
+- `npm run build`: passed — `dist/` produced; 32.28 KB JavaScript and 17.68 KB
+  CSS before compression.
+- `cargo build --release --locked`: passed.
+- `npm run test:e2e`: passed — teacher/student journey on desktop and 390×844
+  mobile Chromium projects, with axe serious/critical checks, dark theme and
+  reduced-motion coverage.
+- `npm run test:deploy-helper`: passed — exact deterministic 32-character app
+  name and mocked custom-domain `200` probe.
+- Production binary local smoke: `/` returned 200 and factory `verify-url.sh`
+  passed at 690 ms with no console errors, a title, `lang=en`, one `<h1>`, one
+  `<main>`, no images missing `alt`, and no unlabelled buttons. `/health`
+  returned `200 {"build_sha":"development","status":"ok"}`.
+
+Deployment and custom-domain `/` plus `/health` evidence is appended after the
+container deployment completes.
+
 ## What shipped
 
 - A production-shaped teacher/student workflow served by one Axum container:
