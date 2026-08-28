@@ -11,6 +11,7 @@
     "test:container-identity": "bash scripts/test-container-build-identity.sh",
     "test:deployment-policy": "bash scripts/test-durable-deploy.sh",
     "test:e2e": "playwright test --config frontend/playwright.config.ts",
+    "test:claims": "playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts",
     "preview": "vite preview --config frontend/vite.config.ts --host 0.0.0.0",
     "start": "cargo run --release"
   },

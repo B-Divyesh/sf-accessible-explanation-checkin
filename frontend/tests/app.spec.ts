@@ -12,7 +12,7 @@ test('landing and legal screens are semantic and console-clean', async ({ page }
   const errors:string[]=[];
   page.on('console', message => { if (message.type() === 'error') errors.push(`${message.text()} ${message.location().url}`); });
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('Hear the thinking');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Collect student reasoning');
   await expectAccessible(page);
   await page.goto('/privacy');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Privacy');
@@ -21,6 +21,24 @@ test('landing and legal screens are semantic and console-clean', async ({ page }
   await page.goto('/create');
   await expectAccessible(page);
   expect(errors).toEqual([]);
+});
+
+test('navigation moves focus to the new heading and updates route metadata', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Create' }).click();
+  await expect(page).toHaveURL(/\/create$/);
+  await expect(page.getByRole('heading', { level: 1 })).toBeFocused();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://accessible-explanation-checkin.sociobot.in/create');
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', 'Create a check-in — Accessible Explanation Check-in');
+  await page.goBack();
+  await expect(page.getByRole('heading', { level: 1 })).toBeFocused();
+});
+
+test('unknown paths return the designed 404 with an HTTP 404 status', async ({ request, page }) => {
+  const response = await request.get('/no-such-page');
+  expect(response.status()).toBe(404);
+  await page.goto('/no-such-page');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('That page is not available');
 });
 
 test('mobile theme and legal controls meet the 44px touch-target contract', async ({ page }, testInfo) => {

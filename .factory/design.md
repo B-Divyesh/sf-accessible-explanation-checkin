@@ -106,10 +106,12 @@ The hero image itself is still.
 - License/provenance: generated specifically for this product on 2026-08-28;
   original project asset. Source PNG and prompt sidecar live in `assets/src/`.
   WebP/AVIF derivatives are build assets. The footer discloses generated art.
+  The social preview (`frontend/public/assets/social-classroom.jpg`) is a
+  1200×630 crop derived from that original classroom asset. The authored
+  doorway mark is rasterized as `apple-touch-icon.png` for device shortcuts.
 
 ### Authored motifs
 
 The doorway mark, dotted reasoning trail, confidence gauge and status symbols
 are original inline SVG/CSS shapes authored in this repository. They use
 `currentColor`, inherit forced-color modes and are not standalone image files.
-

@@ -7,29 +7,53 @@ const licenseKey = `sb_license:${PRODUCT}`;
 const licenseCacheKey = `${licenseKey}:verdict`;
 let currentRecording: Blob | null = null;
 let recorder: MediaRecorder | null = null;
+let focusOnRouteChange = false;
+const SITE_ORIGIN = 'https://accessible-explanation-checkin.sociobot.in';
+const demoStorageKey = 'demo:accessible-explanation-checkin:review';
 
 type Checkin = { title:string; prompt:string; voice_retention_days:number; open:boolean; submissions:number; max_submissions:number };
 type Submission = { id:string; student_name:string; explanation_text:string|null; confidence:number; has_voice:boolean; voice_delete_at:string|null; created_at:string; teacher_tags:string[]; teacher_note:string; follow_up:boolean; receipt_token:string };
 type Review = { title:string; prompt:string; voice_retention_days:number; submissions:Submission[] };
 
-captureLicense();
-render();
-window.addEventListener('popstate', render);
-window.addEventListener('online', () => setNetwork(true));
-window.addEventListener('offline', () => setNetwork(false));
-if ('serviceWorker' in navigator && import.meta.env.PROD) navigator.serviceWorker.register('/sw.js').catch(() => undefined);
-
 function shell(content:string, active='') {
-  app.innerHTML = `<header class="site-header"><a class="brand" href="/" data-link aria-label="Explanation Check-in home"><span class="door-mark" aria-hidden="true"></span><span>Explanation<br><em>Check-in</em></span></a><nav aria-label="Primary"><a href="/create" data-link ${active==='create'?'aria-current="page"':''}>Create</a><a href="/pricing" data-link ${active==='pricing'?'aria-current="page"':''}>Plans</a><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Change color theme"><span aria-hidden="true">◐</span><span class="theme-label">Theme</span></button></nav></header><div class="network-banner" id="network" role="status" hidden><strong>Offline.</strong> You can keep writing; submission needs a connection.</div><main id="main" tabindex="-1">${content}</main><footer><div><span class="door-mark small" aria-hidden="true"></span><p><strong>A reasoning ritual, not a detector.</strong><br>No AI scoring, surveillance or biometric identity.</p></div><nav aria-label="Legal"><a href="/privacy" data-link>Privacy</a><a href="/terms" data-link>Terms</a></nav><p class="art-credit">Original generated classroom art · Param Factory, 2026</p></footer><div id="announcer" class="sr-only" aria-live="polite"></div>`;
-  wireLinks(); wireTheme(); setNetwork(navigator.onLine);
+  const demo = isDemo();
+  setMetadata(document.title, routeDescription(), demo ? '/demo' : location.pathname);
+  app.innerHTML = `<header class="site-header"><a class="brand" href="/" data-link aria-label="Explanation Check-in home"><span class="door-mark" aria-hidden="true"></span><span>Explanation<br><em>Check-in</em></span></a><nav aria-label="Primary"><a href="/demo" data-link ${demo?'aria-current="page"':''}>Demo</a><a href="/create" data-link ${active==='create'?'aria-current="page"':''}>Create</a><a href="/pricing" data-link ${active==='pricing'?'aria-current="page"':''}>Plans</a><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Change color theme"><span aria-hidden="true">◐</span><span class="theme-label">Theme</span></button></nav></header>${demo?`<aside class="demo-banner" aria-label="Demo controls"><strong>Demo — sample data, nothing is saved</strong><span>Try the teacher review with three sample explanations.</span><button class="text-button" id="reset-demo" type="button">Reset demo</button><a href="/create" class="text-button" data-link>Start for real</a></aside>`:''}<div class="network-banner" id="network" role="status" hidden><strong>Offline.</strong> You can keep writing; submission needs a connection.</div><main id="main" tabindex="-1">${content}</main><footer><div><span class="door-mark small" aria-hidden="true"></span><p><strong>Student explanation check-ins for teachers.</strong><br>No automated grading or identity checks.</p></div><nav aria-label="Legal"><a href="/privacy" data-link>Privacy</a><a href="/terms" data-link>Terms</a></nav><p class="art-credit">Original generated classroom art · Param Factory, 2026</p></footer><div id="announcer" class="sr-only" aria-live="polite"></div>`;
+  wireLinks(); wireTheme(); setNetwork(navigator.onLine); wireDemoControls(); focusAndAnnounceRoute();
+}
+
+function routeDescription() {
+  const path=location.pathname;
+  if (isDemo()) return 'Try a populated teacher review with isolated sample student explanations.';
+  if (path==='/create') return 'Create a private text or voice explanation check-in for students.';
+  if (path==='/pricing') return 'Compare free and Classroom Plus limits for explanation check-ins.';
+  if (path==='/privacy') return 'Read what this check-in stores, who can see it, and how voice is deleted.';
+  if (path==='/terms') return 'Read classroom use and purchase terms for Accessible Explanation Check-in.';
+  if (path.startsWith('/review/')) return 'Review student explanations in a private teacher workspace.';
+  if (path.startsWith('/receipt/')) return 'View a private record of a submitted student explanation.';
+  if (path.startsWith('/c/')) return 'Submit a private student explanation by text or voice.';
+  if (path!=='/') return 'Find a working explanation check-in link or return to the home page.';
+  return 'Collect student reasoning with a low-stakes text or voice check-in for teachers.';
 }
 
 function routeParts() { return location.pathname.split('/').filter(Boolean); }
+function isDemo() { return location.pathname === '/demo' || new URLSearchParams(location.search).get('demo') === '1'; }
+function setMetadata(title:string, description:string, path=location.pathname) {
+  document.title=title;
+  const canonical=`${SITE_ORIGIN}${path === '/' ? '/' : path}`;
+  setMeta('meta[name="description"]','content',description); setMeta('link[rel="canonical"]','href',canonical);
+  setMeta('meta[property="og:title"]','content',title); setMeta('meta[property="og:description"]','content',description); setMeta('meta[property="og:image"]','content',`${SITE_ORIGIN}/assets/social-classroom.jpg`);
+  setMeta('meta[name="twitter:title"]','content',title); setMeta('meta[name="twitter:description"]','content',description); setMeta('meta[name="twitter:image"]','content',`${SITE_ORIGIN}/assets/social-classroom.jpg`);
+}
+function setMeta(selector:string, attribute:string, value:string) { document.querySelector(selector)?.setAttribute(attribute,value); }
+function focusAndAnnounceRoute() { if(!focusOnRouteChange)return; focusOnRouteChange=false; requestAnimationFrame(()=>{ const heading=document.querySelector<HTMLElement>('main h1'); if(heading){ heading.tabIndex=-1; heading.focus({preventScroll:true}); announce(`Opened ${heading.textContent?.trim()||document.title}.`); } }); }
 async function render() {
   currentRecording=null; if (recorder?.state === 'recording') recorder.stop(); recorder=null;
   const [route, token] = routeParts();
   window.scrollTo({top:0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto':'smooth'});
+  if (!route && isDemo()) return demoPage();
   if (!route) return home();
+  if (route==='demo') return demoPage();
   if (route==='create') return createPage();
   if (route==='c' && token) return studentPage(token);
   if (route==='review' && token) return reviewPage(token);
@@ -41,9 +65,28 @@ async function render() {
 }
 
 function home() {
-  document.title='Accessible Explanation Check-in — Hear the thinking';
-  shell(`<section class="hero"><picture><source type="image/avif" srcset="/assets/hero-classroom-768.avif 768w, /assets/hero-classroom-1536.avif 1536w" sizes="100vw"><source type="image/webp" srcset="/assets/hero-classroom-768.webp 768w, /assets/hero-classroom-1536.webp 1536w" sizes="100vw"><img src="/assets/hero-classroom-768.jpg" width="768" height="512" alt="An empty accessible classroom at blue hour, with a clear aisle leading toward a warmly lit open doorway" fetchpriority="high" decoding="async"></picture><div class="hero-shade"></div><div class="hero-copy"><p class="eyebrow">A two-minute reasoning ritual</p><h1>Hear the thinking.<br><em>Skip the detector.</em></h1><p>Invite every student to explain one choice in text or voice. Review what they understood, tag what to revisit, and keep a student-controlled receipt.</p><div class="button-row"><a class="button primary" href="/create" data-link>Create a check-in</a><a class="button ghost" href="#how">See how it works</a></div></div><p class="scene-note"><span aria-hidden="true">↘</span> A clear path from finished work to a teacher’s next question.</p></section><section id="how" class="how section"><div><p class="eyebrow">One prompt, three signals</p><h2>Evidence without accusation</h2><p class="lead">A student’s own explanation, their confidence, and an optional voice note give you something concrete to follow up—without pretending software can read intent.</p></div><ol class="trail"><li><span>01</span><div><h3>Ask one useful question</h3><p>“What choice mattered most?” works better than another quiz.</p></div></li><li><span>02</span><div><h3>Let students choose their mode</h3><p>Text, voice, or both. Keyboard and screen-reader paths are first-class.</p></div></li><li><span>03</span><div><h3>Mark the next conversation</h3><p>Use plain review tags and private notes. Nothing is automatically graded.</p></div></li></ol></section><section class="principle-band"><p>Built for uncertainty, not suspicion.</p><ul><li>No AI detection</li><li>No proctoring</li><li>No biometric identity</li><li>Voice auto-deletes</li></ul></section>`);
+  setMetadata('Accessible Explanation Check-in — Collect student reasoning','Collect student reasoning with a low-stakes text or voice check-in for teachers.','/');
+  shell(`<section class="hero"><picture><source type="image/avif" srcset="/assets/hero-classroom-768.avif 768w, /assets/hero-classroom-1536.avif 1536w" sizes="100vw"><source type="image/webp" srcset="/assets/hero-classroom-768.webp 768w, /assets/hero-classroom-1536.webp 1536w" sizes="100vw"><img src="/assets/hero-classroom-768.jpg" width="768" height="512" alt="An empty accessible classroom at blue hour, with a clear aisle leading toward a warmly lit open doorway" fetchpriority="high" decoding="async"></picture><div class="hero-shade"></div><div class="hero-copy"><p class="eyebrow">Student explanation check-ins for teachers</p><h1>Collect student reasoning</h1><p>For teachers who need a low-stakes check-in, students explain one choice by text or voice.</p><div class="button-row"><a class="button primary" href="/demo" data-link>Try it with sample data</a><span class="hero-action-note">Open a populated teacher review; nothing is saved.</span><a class="button ghost" href="#how">Read the three steps</a></div><ul class="hero-facts"><li>No accounts</li><li>Voice deletes on your schedule</li><li>Free check-ins accept 35 responses</li></ul></div></section><section id="how" class="how section"><div><p class="eyebrow">What a teacher receives</p><h2>How the check-in works</h2><p class="lead">Review a student’s explanation, confidence, and optional voice note. Use them to plan a follow-up conversation.</p></div><ol class="trail"><li><span>01</span><div><h3>Create one check-in</h3><p>Ask one question about a choice or step.</p></div></li><li><span>02</span><div><h3>Students explain their reasoning</h3><p>Students can complete every step with a keyboard or screen reader.</p></div></li><li><span>03</span><div><h3>Review each explanation</h3><p>Add tags and notes for your next conversation.</p></div></li></ol></section><section class="principle-band"><div><h2>What this tool does not do</h2><p>It does not grade, detect AI use, proctor, or verify identity.</p></div><div><h2>Privacy limits</h2><p>Voice deletes on the selected schedule. Keep private review links secure.</p></div></section>`);
 }
+
+type DemoSubmission = { name:string; explanation:string; confidence:number; tags:string[]; note:string; followUp:boolean };
+const demoSeed:DemoSubmission[] = [
+  {name:'Maya Chen',explanation:'I changed my model after comparing how water moved across the paved and planted surfaces.',confidence:4,tags:['Clear reasoning'],note:'Ask Maya to connect the model to the class data.',followUp:true},
+  {name:'Jordan Ellis',explanation:'I chose the planted surface because roots slow the water and leave less runoff.',confidence:5,tags:['Uses evidence'],note:'',followUp:false},
+  {name:'Sam Rivera',explanation:'I first thought both paths were the same. The soil layer changed my answer.',confidence:3,tags:['Needs follow-up'],note:'Invite Sam to explain the soil layer in the next discussion.',followUp:true},
+];
+function demoSubmissions():DemoSubmission[] { try { return JSON.parse(localStorage.getItem(demoStorageKey)||'null') || structuredClone(demoSeed); } catch { return structuredClone(demoSeed); } }
+function saveDemo(submissions:DemoSubmission[]) { localStorage.setItem(demoStorageKey,JSON.stringify(submissions)); }
+function demoPage() {
+  setMetadata('Demo — Accessible Explanation Check-in','Try a populated teacher review with isolated sample student explanations.','/demo');
+  const submissions=demoSubmissions();
+  shell(`<div class="review-page demo-review"><header class="review-header"><div><p class="eyebrow">Sample teacher review</p><h1>Watershed reasoning</h1><p class="lead">Which step changed your conclusion about runoff, and why?</p></div><div class="review-actions"><button class="button secondary" id="demo-export" type="button">Download sample CSV</button></div></header><div class="review-summary" aria-label="Sample response summary" tabindex="0"><p><strong>${submissions.length}</strong><span>sample responses</span></p><p><strong>${submissions.filter(s=>s.followUp).length}</strong><span>marked for follow-up</span></p><p><strong>0</strong><span>voice notes</span></p></div><div class="submissions">${submissions.map((s,index)=>`<article class="submission"><header><div><p class="submission-number">Sample response ${index+1}</p><h2>${e(s.name)}</h2><p>Confidence ${s.confidence}/5</p></div>${s.followUp?'<span class="follow-badge">Follow up</span>':''}</header><div class="response-body"><h3>Student explanation</h3><p class="student-words">${e(s.explanation)}</p></div><form class="review-form demo-review-form" data-index="${index}"><fieldset><legend>Review tags</legend><div class="tag-list">${TAGS.map(tag=>`<label><input type="checkbox" name="tag" value="${e(tag)}" ${s.tags.includes(tag)?'checked':''}><span>${e(tag)}</span></label>`).join('')}</div></fieldset><label>Private teacher note<textarea name="teacher_note" maxlength="1000" rows="3">${e(s.note)}</textarea></label><label class="check-row"><input type="checkbox" name="follow_up" ${s.followUp?'checked':''}><span><strong>Mark for follow-up</strong><small>Stored only in this demo browser space.</small></span></label><button class="button secondary" type="submit">Save sample review</button><span class="save-status" role="status"></span></form></article>`).join('')}</div></div>`,'demo');
+  document.querySelectorAll<HTMLFormElement>('.demo-review-form').forEach(form=>form.addEventListener('submit',event=>{ event.preventDefault(); const data=new FormData(form); const items=demoSubmissions(); const item=items[Number(form.dataset.index)]; item.tags=data.getAll('tag').map(String); item.note=String(data.get('teacher_note')||''); item.followUp=data.get('follow_up')==='on'; saveDemo(items); const status=form.querySelector<HTMLElement>('.save-status')!; status.textContent='Saved in demo'; announce('Sample review saved in the isolated demo.'); }));
+  document.querySelector<HTMLButtonElement>('#demo-export')?.addEventListener('click',downloadDemoCsv);
+}
+function wireDemoControls() { document.querySelector<HTMLButtonElement>('#reset-demo')?.addEventListener('click',()=>{ localStorage.removeItem(demoStorageKey); render(); announce('Demo reset to the original sample data.'); }); }
+function downloadDemoCsv() { const lines=['student_name,confidence,explanation']; for(const s of demoSubmissions()) lines.push([s.name,s.confidence,s.explanation].map(csvCell).join(',')); const url=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv'})); const link=document.createElement('a'); link.href=url; link.download='sample-explanation-checkin.csv'; link.click(); URL.revokeObjectURL(url); }
+function csvCell(value:string|number) { return `"${String(value).replaceAll('"','""')}"`; }
 
 async function createPage() {
   document.title='Create a check-in — Accessible Explanation Check-in';
@@ -100,7 +143,7 @@ async function submitStudent(event:SubmitEvent,token:string,draftKey:string) {
   if(!String(data.get('explanation_text')||'').trim() && !currentRecording) { showError('Add a text explanation, a voice explanation, or both.'); return; }
   if(!navigator.onLine){ showError('You are offline. Your writing is saved on this device; reconnect and send again.'); return; }
   button.disabled=true; button.textContent='Sending securely…';
-  try { const voice_data=currentRecording?await blobBase64(currentRecording):null; const result=await api<{receipt_token:string}>(`/api/checkins/${encodeURIComponent(token)}/submissions`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({student_name:data.get('student_name'),explanation_text:data.get('explanation_text'),confidence:Number(data.get('confidence')),voice_data,voice_mime:currentRecording?.type})}); localStorage.removeItem(draftKey); history.pushState({},'',`/receipt/${result.receipt_token}`); render(); }
+  try { const voice_data=currentRecording?await blobBase64(currentRecording):null; const result=await api<{receipt_token:string}>(`/api/checkins/${encodeURIComponent(token)}/submissions`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({student_name:data.get('student_name'),explanation_text:data.get('explanation_text'),confidence:Number(data.get('confidence')),voice_data,voice_mime:currentRecording?.type})}); localStorage.removeItem(draftKey); history.pushState({},'',`/receipt/${result.receipt_token}`); focusOnRouteChange=true; render(); }
   catch(error){showError(errorMessage(error));button.disabled=false;button.textContent='Send my explanation';}
 }
 
@@ -138,7 +181,7 @@ function errorMessage(error:unknown){return error instanceof Error?error.message
 function showError(message:string){const box=document.querySelector<HTMLElement>('#form-error');if(!box)return;if(!message){box.hidden=true;box.textContent='';return;}box.hidden=false;box.innerHTML=`<strong>Please check your response.</strong><p>${e(message)}</p>`;box.focus();}
 function announce(message:string){const live=document.querySelector('#announcer');if(live)live.textContent=message;}
 function setNetwork(online:boolean){const banner=document.querySelector<HTMLElement>('#network');if(banner)banner.hidden=online;}
-function wireLinks(){document.querySelectorAll<HTMLAnchorElement>('a[data-link]').forEach(link=>link.addEventListener('click',ev=>{if(ev.metaKey||ev.ctrlKey||ev.shiftKey||link.target)return;ev.preventDefault();history.pushState({},'',link.href);render();}));}
+function wireLinks(){document.querySelectorAll<HTMLAnchorElement>('a[data-link]').forEach(link=>link.addEventListener('click',ev=>{if(ev.metaKey||ev.ctrlKey||ev.shiftKey||link.target)return;ev.preventDefault();history.pushState({},'',link.href);focusOnRouteChange=true;render();}));}
 function wireCopy(){document.querySelectorAll<HTMLButtonElement>('.copy').forEach(button=>button.addEventListener('click',()=>{const input=document.querySelector<HTMLInputElement>(`#${button.dataset.copy}`)!;copyText(input.value,'Link copied.');button.textContent='Copied';}));}
 async function copyText(text:string,message:string){try{await navigator.clipboard.writeText(text);announce(message);}catch{prompt('Copy this link:',text);}}
 function saveDraft(form:HTMLFormElement,key:string){const data=new FormData(form);localStorage.setItem(key,JSON.stringify({student_name:data.get('student_name'),explanation_text:data.get('explanation_text'),confidence:data.get('confidence')}));announce('Draft saved on this device.');}
@@ -148,3 +191,14 @@ function blobBase64(blob:Blob):Promise<string>{return new Promise((resolve,rejec
 function captureLicense(){const params=new URLSearchParams(location.search);const license=params.get('license');if(license){localStorage.setItem(licenseKey,license);params.delete('license');history.replaceState({},'',`${location.pathname}${params.size?`?${params}`:''}${location.hash}`);paidStatus(true);}}
 async function paidStatus(force:boolean):Promise<boolean>{const token=localStorage.getItem(licenseKey);if(!token)return false;const cached=JSON.parse(localStorage.getItem(licenseCacheKey)||'null');if(!force&&cached?.valid&&Date.now()-cached.checked<86400000)return true;try{const response=await fetch(`${BILLING}/api/v1/products/${PRODUCT}/verify?license=${encodeURIComponent(token)}`);const data=await response.json();const valid=Boolean(data.valid);localStorage.setItem(licenseCacheKey,JSON.stringify({valid,checked:Date.now()}));if(!valid)announce('Classroom Plus license is no longer active; free features remain available.');return valid;}catch{return Boolean(cached?.valid);}}
 function wireTheme(){const button=document.querySelector<HTMLButtonElement>('#theme-toggle');const stored=localStorage.getItem('theme');if(stored)document.documentElement.dataset.theme=stored;button?.addEventListener('click',()=>{const current=document.documentElement.dataset.theme|| (matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');const next=current==='dark'?'light':'dark';document.documentElement.dataset.theme=next;localStorage.setItem('theme',next);announce(`${next} theme active.`);});}
+
+captureLicense();
+render();
+document.querySelector<HTMLAnchorElement>('.skip-link')?.addEventListener('click', event => {
+  event.preventDefault();
+  document.querySelector<HTMLElement>('#main')?.focus();
+});
+window.addEventListener('popstate', () => { focusOnRouteChange=true; render(); });
+window.addEventListener('online', () => setNetwork(true));
+window.addEventListener('offline', () => setNetwork(false));
+if ('serviceWorker' in navigator && import.meta.env.PROD) navigator.serviceWorker.register('/sw.js').catch(() => undefined);

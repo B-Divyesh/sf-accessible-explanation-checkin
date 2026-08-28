@@ -6,7 +6,8 @@ use axum::{
     extract::Request,
     http::{header, HeaderName, HeaderValue},
     middleware,
-    response::Response,
+    response::{Html, IntoResponse, Response},
+    routing::{get, get_service},
     Router,
 };
 use routes::AppState;
@@ -84,8 +85,43 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
     let request_id = HeaderName::from_static("x-request-id");
     let dist_dir = PathBuf::from(dist_dir);
-    let static_service =
-        ServeDir::new(&dist_dir).fallback(ServeFile::new(dist_dir.join("index.html")));
+    let index_file = ServeFile::new(dist_dir.join("index.html"));
+    let static_files = Router::new()
+        .nest_service("/assets", ServeDir::new(dist_dir.join("assets")))
+        .route_service(
+            "/doorway.svg",
+            get_service(ServeFile::new(dist_dir.join("doorway.svg"))),
+        )
+        .route_service(
+            "/apple-touch-icon.png",
+            get_service(ServeFile::new(dist_dir.join("apple-touch-icon.png"))),
+        )
+        .route_service(
+            "/manifest.webmanifest",
+            get_service(ServeFile::new(dist_dir.join("manifest.webmanifest"))),
+        )
+        .route_service(
+            "/robots.txt",
+            get_service(ServeFile::new(dist_dir.join("robots.txt"))),
+        )
+        .route_service(
+            "/sitemap.xml",
+            get_service(ServeFile::new(dist_dir.join("sitemap.xml"))),
+        )
+        .route_service(
+            "/sw.js",
+            get_service(ServeFile::new(dist_dir.join("sw.js"))),
+        );
+    let spa = Router::new()
+        .route_service("/", get_service(index_file.clone()))
+        .route_service("/create", get_service(index_file.clone()))
+        .route_service("/demo", get_service(index_file.clone()))
+        .route_service("/pricing", get_service(index_file.clone()))
+        .route_service("/privacy", get_service(index_file.clone()))
+        .route_service("/terms", get_service(index_file.clone()))
+        .route_service("/c/:token", get_service(index_file.clone()))
+        .route_service("/review/:token", get_service(index_file.clone()))
+        .route_service("/receipt/:token", get_service(index_file));
     let rate_limit = Arc::new(
         GovernorConfigBuilder::default()
             .per_second(1)
@@ -94,9 +130,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .expect("valid rate limit"),
     );
     let cache_build_sha = state.build_sha.clone();
-    let app = Router::new().merge(routes::router(state)).fallback_service(static_service)
+    let api = routes::router(state).layer(GovernorLayer { config: rate_limit });
+    let app = Router::new().merge(api).merge(static_files).merge(spa).fallback(get(not_found_page))
         .layer(middleware::from_fn_with_state(cache_build_sha, response_policy))
-        .layer(GovernorLayer { config: rate_limit })
         .layer(SetResponseHeaderLayer::if_not_present(header::X_CONTENT_TYPE_OPTIONS, HeaderValue::from_static("nosniff")))
         .layer(SetResponseHeaderLayer::if_not_present(header::REFERRER_POLICY, HeaderValue::from_static("no-referrer")))
         .layer(SetResponseHeaderLayer::if_not_present(header::STRICT_TRANSPORT_SECURITY, HeaderValue::from_static("max-age=31536000; includeSubDomains")))
@@ -117,6 +153,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     .with_graceful_shutdown(shutdown())
     .await?;
     Ok(())
+}
+
+async fn not_found_page() -> Response {
+    (
+        axum::http::StatusCode::NOT_FOUND,
+        Html(include_str!("../frontend/public/404.html")),
+    )
+        .into_response()
 }
 
 fn config_value(name: &str, default: &str) -> (String, bool) {
