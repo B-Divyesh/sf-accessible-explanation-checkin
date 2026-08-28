@@ -39,10 +39,11 @@ pub async fn save_snapshot(
     persistence_dir: &Path,
 ) -> Result<(), std::io::Error> {
     fs::create_dir_all(persistence_dir).await?;
-    let pending = persistence_dir.join("checkins.db.next");
     let snapshot = persistence_dir.join("checkins.db");
-    fs::copy(database_file, &pending).await?;
-    fs::rename(pending, snapshot).await
+    // Azure Files does not permit the POSIX rename operation used for an
+    // atomic promotion. A single replica means no peer can read this snapshot
+    // while it is refreshed, and `copy` keeps the active SQLite file local.
+    fs::copy(database_file, snapshot).await.map(|_| ())
 }
 
 pub async fn connect(database_url: &str) -> Result<SqlitePool, sqlx::Error> {
