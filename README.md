@@ -72,19 +72,24 @@ npx autocannon -c 10 -a 100 http://localhost:8080/health
 | `UPLOADS_DIR` | `data/uploads` | Ephemeral voice-file directory |
 | `DIST_DIR` | `dist` | Built frontend directory |
 | `BUILD_SHA` | `development` | Value returned from `/health` |
-| `BILLING_BASE_URL` | `https://pilot-api.sociobot.in` | Server-side license verifier |
-| `VITE_BILLING_BASE_URL` | `https://pilot-api.sociobot.in` | Checkout/browser verifier at build time |
+| `BILLING_BASE_URL` | `https://api.sociobot.in` | Server-side license verifier |
+| `VITE_BILLING_BASE_URL` | `https://api.sociobot.in` | Checkout/browser verifier at build time |
 
-The factory should set both billing base variables to `https://api.sociobot.in`
-for production. The product slug is used in URLs; no product ID is hardcoded.
+The product defaults to the production Sociobot billing service. A staging build
+may explicitly supply `https://pilot-api.sociobot.in` for both variables. The
+product slug is used in URLs; no product ID is hardcoded.
 
 ## Privacy and operations
 
 There is no analytics SDK, advertising, remote font, or third-party runtime
 script. Private links are bearer secrets and must be protected. Back up the
 SQLite database and the voice directory together. Mount `/app/data` on durable
-storage. Deploy behind TLS; the application sends a strict CSP, no-sniff and
-no-referrer headers, applies a burst rate limit, and logs structured JSON.
+storage. For the factory Container Apps deployment, use
+`scripts/deploy-durable-container.sh`: it creates/uses a product-specific
+Azure File share, mounts it at `/app/data`, and pins the SQLite service to one
+replica. Deploy behind TLS; the application sends CSP, HSTS, Permissions
+Policy, no-sniff, no-referrer and cache-policy headers, applies a burst rate
+limit, and logs structured JSON.
 
 See [`/privacy`](https://accessible-explanation-checkin.sociobot.in/privacy),
 [`/terms`](https://accessible-explanation-checkin.sociobot.in/terms),

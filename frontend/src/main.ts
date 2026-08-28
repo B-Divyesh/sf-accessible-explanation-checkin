@@ -1,9 +1,8 @@
 import './styles.css';
 import { escapeHtml as e, formatDate } from './utils';
+import { BILLING_BASE_URL as BILLING, PRODUCT_SLUG as PRODUCT } from './config';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
-const PRODUCT = 'accessible-explanation-checkin';
-const BILLING = import.meta.env.VITE_BILLING_BASE_URL || 'https://pilot-api.sociobot.in';
 const licenseKey = `sb_license:${PRODUCT}`;
 const licenseCacheKey = `${licenseKey}:verdict`;
 let currentRecording: Blob | null = null;

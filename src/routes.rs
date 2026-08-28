@@ -227,16 +227,11 @@ async fn create_submission(
             "Add a text explanation, a voice explanation, or both.".into(),
         ));
     }
-    let checkin = sqlx::query("SELECT id, voice_retention_days, max_submissions, (SELECT COUNT(*) FROM submissions WHERE checkin_id=checkins.id) AS submission_count FROM checkins WHERE student_token=?")
-        .bind(student_token).fetch_optional(&state.pool).await?.ok_or_else(not_found)?;
-    let count: i64 = checkin.get("submission_count");
-    if count >= checkin.get::<i64, _>("max_submissions") {
-        return Err(ApiError(
-            StatusCode::CONFLICT,
-            "This check-in has reached its submission limit. Ask your teacher for a new link."
-                .into(),
-        ));
-    }
+    let checkin = sqlx::query("SELECT voice_retention_days FROM checkins WHERE student_token=?")
+        .bind(&student_token)
+        .fetch_optional(&state.pool)
+        .await?
+        .ok_or_else(not_found)?;
     let id = Uuid::new_v4().to_string();
     let receipt_token = token();
     let created_at = now();
@@ -281,14 +276,30 @@ async fn create_submission(
         voice_delete_at =
             Some((Utc::now() + Duration::days(days)).to_rfc3339_opts(SecondsFormat::Secs, true));
     }
-    let result = sqlx::query("INSERT INTO submissions (id, checkin_id, receipt_token, student_name, explanation_text, confidence, voice_file, voice_mime, voice_delete_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
-        .bind(&id).bind(checkin.get::<String,_>("id")).bind(&receipt_token).bind(name).bind(explanation).bind(input.confidence)
-        .bind(&voice_file).bind(&voice_mime).bind(&voice_delete_at).bind(&created_at).execute(&state.pool).await;
-    if let Err(error) = result {
+    // Keep the count predicate and insert in one SQLite statement. With the
+    // pool's single writer connection this is atomic even when many students
+    // submit at the same instant.
+    let result = sqlx::query("INSERT INTO submissions (id, checkin_id, receipt_token, student_name, explanation_text, confidence, voice_file, voice_mime, voice_delete_at, created_at) SELECT ?, c.id, ?, ?, ?, ?, ?, ?, ?, ? FROM checkins c WHERE c.student_token=? AND (SELECT COUNT(*) FROM submissions s WHERE s.checkin_id=c.id) < c.max_submissions")
+        .bind(&id).bind(&receipt_token).bind(name).bind(explanation).bind(input.confidence)
+        .bind(&voice_file).bind(&voice_mime).bind(&voice_delete_at).bind(&created_at).bind(&student_token).execute(&state.pool).await;
+    let result = match result {
+        Ok(result) => result,
+        Err(error) => {
+            if let Some(filename) = voice_file {
+                let _ = fs::remove_file(state.uploads_dir.join(filename)).await;
+            }
+            return Err(error.into());
+        }
+    };
+    if result.rows_affected() == 0 {
         if let Some(filename) = voice_file {
             let _ = fs::remove_file(state.uploads_dir.join(filename)).await;
         }
-        return Err(error.into());
+        return Err(ApiError(
+            StatusCode::CONFLICT,
+            "This check-in has reached its submission limit. Ask your teacher for a new link."
+                .into(),
+        ));
     }
     Ok((
         StatusCode::CREATED,
@@ -588,8 +599,7 @@ mod tests {
         serde_json::from_slice(&bytes).unwrap()
     }
 
-    #[tokio::test]
-    async fn complete_free_checkin_flow() {
+    async fn test_app() -> (Router, tempfile::TempDir) {
         let temp = tempfile::tempdir().unwrap();
         let database = format!("sqlite:{}?mode=rwc", temp.path().join("test.db").display());
         let state = Arc::new(AppState {
@@ -599,7 +609,12 @@ mod tests {
             http: reqwest::Client::new(),
             build_sha: "test".into(),
         });
-        let app = router(state);
+        (router(state), temp)
+    }
+
+    #[tokio::test]
+    async fn complete_free_checkin_flow() {
+        let (app, _temp) = test_app().await;
         let create = app.clone().oneshot(Request::post("/api/checkins").header("content-type", "application/json").body(Body::from(r#"{"title":"Water cycle","prompt":"What step changed your thinking?","voice_retention_days":3}"#)).unwrap()).await.unwrap();
         assert_eq!(create.status(), StatusCode::CREATED);
         let created = json_response(create).await;
@@ -698,5 +713,67 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(json_response(health).await["build_sha"], "test");
+    }
+
+    #[tokio::test]
+    async fn concurrent_submissions_stop_exactly_at_the_free_limit() {
+        let (app, _temp) = test_app().await;
+        let create = app
+            .clone()
+            .oneshot(
+                Request::post("/api/checkins")
+                    .header("content-type", "application/json")
+                    .body(Body::from(r#"{"title":"Limit test","prompt":"Describe the choice you made.","voice_retention_days":1}"#))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        let student = json_response(create).await["student_token"]
+            .as_str()
+            .unwrap()
+            .to_owned();
+
+        let mut submissions = Vec::new();
+        for number in 0..40 {
+            let app = app.clone();
+            let student = student.clone();
+            submissions.push(tokio::spawn(async move {
+                app.oneshot(
+                    Request::post(format!("/api/checkins/{student}/submissions"))
+                        .header("content-type", "application/json")
+                        .body(Body::from(format!(
+                            r#"{{"student_name":"Student {number}","explanation_text":"I can explain my choice.","confidence":3}}"#
+                        )))
+                        .unwrap(),
+                )
+                .await
+                .unwrap()
+                .status()
+            }));
+        }
+        let mut created = 0;
+        let mut limited = 0;
+        for submission in submissions {
+            match submission.await.unwrap() {
+                StatusCode::CREATED => created += 1,
+                StatusCode::CONFLICT => limited += 1,
+                status => panic!("unexpected submission status {status}"),
+            }
+        }
+        assert_eq!(created, 35);
+        assert_eq!(limited, 5);
+
+        let checkin = app
+            .oneshot(
+                Request::get(format!("/api/checkins/{student}"))
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        let checkin = json_response(checkin).await;
+        assert_eq!(checkin["submissions"], 35);
+        assert_eq!(checkin["max_submissions"], 35);
+        assert_eq!(checkin["open"], false);
     }
 }

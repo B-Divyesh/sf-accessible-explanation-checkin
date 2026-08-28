@@ -23,6 +23,29 @@ test('landing and legal screens are semantic and console-clean', async ({ page }
   expect(errors).toEqual([]);
 });
 
+test('mobile theme and legal controls meet the 44px touch-target contract', async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith('mobile'), 'This is a 390px mobile regression check.');
+  await page.goto('/privacy');
+  for (const control of [
+    page.getByRole('button', { name: 'Change color theme' }),
+    page.getByRole('link', { name: 'Privacy', exact: true }),
+    page.getByRole('link', { name: 'Terms', exact: true }),
+  ]) {
+    const box = await control.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.width).toBeGreaterThanOrEqual(44);
+    expect(box!.height).toBeGreaterThanOrEqual(44);
+  }
+});
+
+test('plans use the production billing endpoint', async ({ page }) => {
+  await page.goto('/pricing');
+  await expect(page.getByRole('link', { name: 'Buy Classroom Plus' })).toHaveAttribute(
+    'href',
+    'https://api.sociobot.in/api/v1/products/accessible-explanation-checkin/checkout',
+  );
+});
+
 test('teacher creates, student explains, and teacher reviews', async ({ page }) => {
   await page.goto('/create');
   await page.getByLabel('Assignment name').fill('Watershed reasoning');
