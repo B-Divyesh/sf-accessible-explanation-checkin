@@ -64,6 +64,11 @@ test('plans use the production billing endpoint', async ({ page }) => {
   );
 });
 
+test('sample demo has no serious or critical accessibility findings', async ({ page }) => {
+  await page.goto('/demo');
+  await expectAccessible(page);
+});
+
 test('teacher creates, student explains, and teacher reviews', async ({ page }) => {
   await page.goto('/create');
   await page.getByLabel('Assignment name').fill('Watershed reasoning');
