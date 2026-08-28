@@ -20,6 +20,8 @@
       "package_scripts_preview",
       "package_scripts_start",
       "package_scripts_test",
+      "package_scripts_test_container_identity",
+      "package_scripts_test_deploy_helper",
       "package_scripts_test_e2e",
       "package_type",
       "package_version",
@@ -192,26 +194,33 @@
       "src_db_rs_sqlitepool"
     ],
     "12": [
-      "frontend_tests_app_spec",
-      "frontend_tests_app_spec_expectaccessible",
-      "test"
-    ],
-    "13": [
       "frontend_public_sw",
       "frontend_public_sw_shell"
     ],
+    "13": [
+      "frontend_tests_app_spec",
+      "frontend_tests_app_spec_expectaccessible"
+    ],
     "14": [
-      "frontend_playwright_config"
+      "scripts_test_container_build_identity",
+      "scripts_test_container_build_identity_sh__entry"
     ],
     "15": [
-      "frontend_vite_config"
+      "scripts_test_deploy_container_name",
+      "scripts_test_deploy_container_name_sh__entry"
     ],
     "16": [
+      "frontend_playwright_config"
+    ],
+    "17": [
+      "frontend_vite_config"
+    ],
+    "18": [
       "pkg_accessible_explanation_checkin"
     ]
   },
   "cohesion": {
-    "0": 0.07407407407407407,
+    "0": 0.06896551724137931,
     "1": 0.08695652173913043,
     "2": 0.1976284584980237,
     "3": 0.2,
@@ -223,11 +232,13 @@
     "9": 0.4642857142857143,
     "10": 0.4,
     "11": 0.4,
-    "12": 0.6666666666666666,
+    "12": 1.0,
     "13": 1.0,
     "14": 1.0,
     "15": 1.0,
-    "16": 1.0
+    "16": 1.0,
+    "17": 1.0,
+    "18": 1.0
   },
   "gods": [
     {
@@ -294,7 +305,7 @@
       "why": "bridges separate communities"
     },
     {
-      "source": "renderStudent()",
+      "source": "showError()",
       "target": "escapeHtml()",
       "source_files": [
         "frontend/src/main.ts",
@@ -305,7 +316,7 @@
       "why": "bridges separate communities"
     },
     {
-      "source": "renderReview()",
+      "source": "loadError()",
       "target": "escapeHtml()",
       "source_files": [
         "frontend/src/main.ts",
@@ -327,7 +338,7 @@
       "why": "bridges separate communities"
     },
     {
-      "source": "loadError()",
+      "source": "renderReview()",
       "target": "escapeHtml()",
       "source_files": [
         "frontend/src/main.ts",
