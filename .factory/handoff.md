@@ -39,6 +39,15 @@ Repair verification before deployment:
 Deployment and custom-domain `/` plus `/health` evidence is appended after the
 container deployment completes.
 
+During the first post-deploy identity check, `/health` correctly returned 200
+but exposed the fallback `build_sha: "development"`. This reproduced a
+product-level packaging fault: the ACR helper supplied `BUILD_SHA`, but the
+runtime Docker stage did not declare or export it. The runtime stage now
+declares `ARG BUILD_SHA=development` and sets `BUILD_SHA=${BUILD_SHA}` in its
+environment. `npm run test:container-identity` guards those two required
+Dockerfile contracts. A fresh ACR build and second live deployment follows
+this correction; its exact health response is recorded below.
+
 ## What shipped
 
 - A production-shaped teacher/student workflow served by one Axum container:

@@ -14,6 +14,7 @@ COPY migrations ./migrations
 RUN cargo build --release --locked
 
 FROM debian:bookworm-slim AS runtime
+ARG BUILD_SHA=development
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/* \
     && groupadd --system checkin && useradd --system --gid checkin --home-dir /app checkin \
     && mkdir -p /app/data/uploads && chown -R checkin:checkin /app
@@ -21,7 +22,6 @@ WORKDIR /app
 COPY --from=backend /app/target/release/accessible-explanation-checkin /app/server
 COPY --from=frontend /app/dist /app/dist
 USER checkin
-ENV PORT=8080 DATABASE_URL=sqlite:data/checkins.db?mode=rwc UPLOADS_DIR=data/uploads DIST_DIR=dist
+ENV PORT=8080 DATABASE_URL=sqlite:data/checkins.db?mode=rwc UPLOADS_DIR=data/uploads DIST_DIR=dist BUILD_SHA=${BUILD_SHA}
 EXPOSE 8080
 CMD ["/app/server"]
-
