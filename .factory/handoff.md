@@ -66,6 +66,10 @@ this correction; its exact health response is recorded below.
 - Factory `verify-url.sh` against the live custom domain passed in 567 ms:
   no console errors, title present, `lang=en`, one `<h1>`, one `<main>`, no
   images without `alt`, and no unlabelled buttons.
+- Live Chromium keyboard/offline/privacy smoke passed: the first Tab stop is
+  the `Skip to main content` link (`#main`); the activated service worker
+  controls a subsequent load and renders the cached shell while offline; and
+  `/privacy` loads no third-party script or stylesheet resources.
 
 ## What shipped
 
