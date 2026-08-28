@@ -1,0 +1,9 @@
+{
+  "slug": "accessible-explanation-checkin",
+  "title": "Accessible Explanation Check-in",
+  "artifact_class": "web-with-backend",
+  "user": "Teachers assigning work in AI-pervasive classes who need an inclusive, low-stakes way for each student to explain their reasoning rather than a cheating detector.",
+  "smallest_useful_product": "A keyboard/screen-reader-first web form for one prompt, one optional voice/text explanation, one confidence rating, and teacher review tags; export a minimal CSV/PDF receipt.",
+  "monetization": "freemium",
+  "constraints": "FERPA/GDPR-aware data minimization; delete voice files on a configurable schedule; WCAG 2.2 AA; no biometric or automated misconduct inference."
+}
