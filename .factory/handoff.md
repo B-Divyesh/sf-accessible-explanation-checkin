@@ -1,4 +1,13 @@
 # Handoff — Accessible Explanation Check-in
++
+## Adversarial first-read review 1 — FAIL (2026-08-28)
+
+Review artifact: .factory/review-1.md. No product code was modified.
+
+Fresh live checks at 390 px and desktop found no first-screen sample-data entry: /demo renders the in-app 404 and ?demo=1 is the ordinary landing page. .factory/claims.json, claim-tagged tests, and .factory/demo.md are absent, so visitor-reliant privacy, offline, export, retention, pricing, and accessibility claims cannot be verified in the required sandbox. The current Dockerfile still ends with USER root, repeating the prior verification-2 blocker. Route navigation leaves focus on body; canonical/OG/Twitter metadata is absent; and a missing path responds HTTP 200 while rendering a 404-style page.
+
+Verification performed: npm ci, npm test (4 TypeScript/Vitest and 7 Rust tests), npm run build, and npm run test:e2e (7 passed, 1 expected desktop-only skip). The deployed /health build is de2386a7a15f0b34fb67c58d751d17be87f1a821. See the review for the complete copy audit, evidence, and concrete repairs.
+
 
 ## Independent verification 2 — FAIL (2026-08-28)
 
