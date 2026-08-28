@@ -1,5 +1,41 @@
 # Handoff — Accessible Explanation Check-in
 
+## Independent verification — FAIL (2026-08-28)
+
+Candidate `aad48951be0ac176a263a9d1c0cd5b00a9de01c3` is deployed at
+<https://accessible-explanation-checkin.sociobot.in>; `/health` reports that
+exact SHA and the live frontend/service-worker assets match the clean build
+byte-for-byte.
+
+**Release verdict: FAIL.** Fresh verification found three release blockers:
+
+1. A live check-in created with `201` was inconsistent across immediate reads:
+   student link 7/20 successful and 13/20 `404`; review link 6/20 successful and
+   14/20 `404`. The core flow is split across non-shared persistence boundaries.
+2. A fresh local release instance accepted 39 of 40 simultaneous submissions
+   for a check-in whose declared maximum is 35.
+3. The live $39 purchase and license-verification URLs target
+   `pilot-api.sociobot.in`, not the required production `api.sociobot.in`.
+
+Additional defects: private bearer-token JSON lacks `Cache-Control: private,
+no-store`; mobile theme/legal targets miss the 44 × 44 requirement; hashed
+assets have no efficient cache headers; live responses omit HSTS and
+Permissions Policy; and startup does not log generated versus supplied config.
+
+Passing evidence: clean `npm ci`, `npm test`, `npm run build`, locked release
+build, fmt, strict Clippy, deployment helper checks, and 4/4 repository E2E
+tests; independent local end-to-end and boundary/error recovery; local restart
+persistence; 100/100 concurrent health responses; 0 serious/critical axe
+findings across 12 live desktop/mobile/light/dark/reduced-motion page audits;
+working keyboard skip/focus and PWA offline reload; and live Lighthouse
+**99 performance / 100 accessibility / 100 best practices / 100 SEO** (LCP
+1.1 s, TBT 120 ms, CLS 0, 35 KiB).
+
+Full commands, evidence, severity, and retest requirements are in
+[`.factory/verification.md`](verification.md). Repair the persistence topology
+and quota transaction first, deploy with the production billing base, then run
+the required live retest before changing this verdict.
+
 Build work order: `accessible-explanation-checkin-build-1`
 Completed: 2026-08-28
 
