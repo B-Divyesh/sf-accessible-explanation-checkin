@@ -18,6 +18,10 @@ if [ ${#app_name} -gt 32 ]; then
   app_name=${app_name//--/-}
 fi
 storage_name="${slug}-data"
+if [ ${#storage_name} -gt 32 ]; then
+  storage_name="aec-${slug:0:20}-$(printf '%s' "$slug" | sha1sum | cut -c1-6)"
+  storage_name=${storage_name//--/-}
+fi
 share_name="sf-${slug}-data"
 
 /opt/fleet/lib/deploy-container.sh "$slug" "$repo" "$dockerfile" "$port"
@@ -34,8 +38,7 @@ az containerapp env storage set --resource-group "$resource_group" --name "$envi
 app=$(az containerapp show --resource-group "$resource_group" --name "$app_name" --output json)
 template=$(jq --arg storage "$storage_name" '
   .properties.template
-  | .scale.minReplicas = 1
-  | .scale.maxReplicas = 1
+  | .scale = {minReplicas: 1, maxReplicas: 1}
   | .volumes = [{name: "checkin-data", storageType: "AzureFile", storageName: $storage}]
   | .containers |= map(if .name == "app" then .volumeMounts = [{volumeName: "checkin-data", mountPath: "/app/data"}] else . end)
 ' <<<"$app")
