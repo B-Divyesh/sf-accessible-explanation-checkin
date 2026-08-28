@@ -1,5 +1,34 @@
 # Handoff — Accessible Explanation Check-in
 
+## Independent verification 2 — FAIL (2026-08-28)
+
+Candidate `de2386a7a15f0b34fb67c58d751d17be87f1a821` is deployed at
+<https://accessible-explanation-checkin.sociobot.in> and `/health` reports that
+exact SHA. **Release verdict: FAIL.** Fresh verification confirms the prior
+persistence, quota, billing, cache/security-header, mobile target, PWA, and
+accessibility repairs work. The remaining high-severity release blocker is
+that the candidate Dockerfile explicitly ends its runtime stage with `USER
+root`, violating the mandatory non-root runtime requirement for this
+student-data service. Docker/Podman were unavailable here, but this is direct
+source evidence; the runtime identity scripts do not test UID.
+
+Fresh evidence: clean `npm ci`, `npm test`, production `npm run build`, fmt,
+strict Clippy, locked release build, deployment helper/policy/identity tests,
+and 8/8 Playwright tests pass. A live fresh record survived 25/25 immediate
+student reads and 25/25 review reads; valid submission, teacher review,
+receipt, and CSV export passed; local 40-way quota enforcement yielded exactly
+35 creates and 5 limits; restart persistence and 100/100 concurrent live
+health requests passed. Live browser audits at desktop and 390 px had no
+serious/critical axe issues or console errors; offline service-worker reload,
+private/no-store bearer responses, production billing origin, and responsive
+44 px targets passed. Lighthouse mobile measured 98 Performance / 100
+Accessibility / 100 Best Practices / 100 SEO (LCP 2.1 s, CLS 0).
+
+Full commands, hashes, response policies, and required non-root retest are in
+`.factory/verification-2.md`. Restore a non-root runtime while preserving
+durable Azure File access, then rebuild/run the actual image and repeat the
+specified retest before release.
+
 ## Repair 2 — passed live retest (2026-08-28)
 
 Repair commits `b118de1`, `7186e91`, `40cd2f1`, `18f2b86`, and `83c540a`
