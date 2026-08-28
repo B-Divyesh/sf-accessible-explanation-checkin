@@ -220,13 +220,12 @@
       "frontend_src_config_test"
     ],
     "9": [
-      "frontend_tests_app_spec",
-      "frontend_tests_app_spec_expectaccessible",
-      "test"
-    ],
-    "10": [
       "frontend_public_sw",
       "frontend_public_sw_shell"
+    ],
+    "10": [
+      "frontend_tests_app_spec",
+      "frontend_tests_app_spec_expectaccessible"
     ],
     "11": [
       "scripts_deploy_durable_container",
@@ -282,7 +281,7 @@
     "6": 0.35714285714285715,
     "7": 0.38095238095238093,
     "8": 0.8333333333333334,
-    "9": 0.6666666666666666,
+    "9": 1.0,
     "10": 1.0,
     "11": 1.0,
     "12": 1.0,
@@ -330,8 +329,8 @@
       "degree": 14
     },
     {
-      "id": "frontend_tsconfig_compileroptions",
-      "label": "compilerOptions",
+      "id": "src_routes_export_csv",
+      "label": "export_csv()",
       "degree": 13
     },
     {
@@ -340,13 +339,13 @@
       "degree": 13
     },
     {
-      "id": "src_routes_export_csv",
-      "label": "export_csv()",
+      "id": "frontend_tsconfig_compileroptions",
+      "label": "compilerOptions",
       "degree": 13
     },
     {
-      "id": "src_routes_get_review",
-      "label": "get_review()",
+      "id": "src_routes_delete_voice",
+      "label": "delete_voice()",
       "degree": 11
     }
   ],

@@ -506,7 +506,7 @@
       "label": "expectAccessible()",
       "_callable": true,
       "_origin": "ast",
-      "community": 9,
+      "community": 10,
       "file_type": "code",
       "norm_label": "expectaccessible()",
       "source_file": "frontend/tests/app.spec.ts",
@@ -1083,24 +1083,14 @@
       "source_location": "L1"
     },
     {
-      "id": "frontend_public_sw",
-      "label": "sw.js",
+      "id": "frontend_tests_app_spec",
+      "label": "app.spec.ts",
       "_origin": "ast",
       "community": 10,
       "file_type": "code",
-      "norm_label": "sw.js",
-      "source_file": "frontend/public/sw.js",
+      "norm_label": "app.spec.ts",
+      "source_file": "frontend/tests/app.spec.ts",
       "source_location": "L1"
-    },
-    {
-      "id": "frontend_public_sw_shell",
-      "label": "SHELL",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "shell",
-      "source_file": "frontend/public/sw.js",
-      "source_location": "L2"
     },
     {
       "id": "scripts_deploy_durable_container",
@@ -2298,24 +2288,24 @@
       "source_location": "L1"
     },
     {
-      "id": "test",
-      "label": "@playwright/test",
+      "id": "frontend_public_sw",
+      "label": "sw.js",
       "_origin": "ast",
       "community": 9,
-      "confidence": "EXTRACTED",
       "file_type": "code",
-      "norm_label": "@playwright/test",
-      "source_file": "@playwright/test"
+      "norm_label": "sw.js",
+      "source_file": "frontend/public/sw.js",
+      "source_location": "L1"
     },
     {
-      "id": "frontend_tests_app_spec",
-      "label": "app.spec.ts",
+      "id": "frontend_public_sw_shell",
+      "label": "SHELL",
       "_origin": "ast",
       "community": 9,
       "file_type": "code",
-      "norm_label": "app.spec.ts",
-      "source_file": "frontend/tests/app.spec.ts",
-      "source_location": "L1"
+      "norm_label": "shell",
+      "source_file": "frontend/public/sw.js",
+      "source_location": "L2"
     }
   ],
   "links": [
@@ -7459,15 +7449,6 @@
       "weight": 1.0
     },
     {
-      "source": "frontend_tests_app_spec",
-      "target": "test",
-      "relation": "dynamic_import",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "frontend/tests/app.spec.ts"
-    },
-    {
       "source": "src_routes_apierror",
       "target": "intoresponse",
       "relation": "implements",
@@ -7549,5 +7530,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "de2386a7a15f0b34fb67c58d751d17be87f1a821"
+  "built_at_commit": "1892cca93b28528ba45707e593b5dd3c6a1740cb"
 }
