@@ -48,6 +48,25 @@ environment. `npm run test:container-identity` guards those two required
 Dockerfile contracts. A fresh ACR build and second live deployment follows
 this correction; its exact health response is recorded below.
 
+## Final deployment evidence
+
+- Deployment class remained **container**. The current helper was run as
+  `/opt/fleet/lib/deploy-container.sh accessible-explanation-checkin /work/repo Dockerfile 8080`.
+- It deterministically used Container App
+  `sf-accessible-explanation-9c1a54` (32 characters) for the unchanged custom
+  hostname `https://accessible-explanation-checkin.sociobot.in`.
+- The clean ACR build for repair commit `7578e049db810a64b434c2f207d602c9376581a7`
+  completed successfully as run `cha1` in 5 minutes 4 seconds. Azure
+  provisioned the revision and the helper's final custom-domain probe was 200.
+- Independent live checks on 2026-08-28: `GET /` → 200;
+  `GET /health` → 200 with
+  `{"build_sha":"7578e049db810a64b434c2f207d602c9376581a7","status":"ok"}`.
+  This matches the deployed source commit and proves the Docker build identity
+  is now carried into the runtime image.
+- Factory `verify-url.sh` against the live custom domain passed in 567 ms:
+  no console errors, title present, `lang=en`, one `<h1>`, one `<main>`, no
+  images without `alt`, and no unlabelled buttons.
+
 ## What shipped
 
 - A production-shaped teacher/student workflow served by one Axum container:
