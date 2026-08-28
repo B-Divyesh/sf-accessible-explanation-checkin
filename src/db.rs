@@ -22,4 +22,3 @@ pub async fn connect(database_url: &str) -> Result<SqlitePool, sqlx::Error> {
     }
     Ok(pool)
 }
-

@@ -1,5 +1,5 @@
 const CACHE = 'check-in-shell-v2';
-const SHELL = ['/', '/manifest.webmanifest', '/doorway.svg', '/assets/hero-classroom-768.webp', '/assets/hero-classroom-768.jpg'];
+const SHELL = ['/', '/manifest.webmanifest', '/doorway.svg', '/assets/hero-classroom-768.avif', '/assets/hero-classroom-1536.avif', '/assets/hero-classroom-768.webp', '/assets/hero-classroom-1536.webp', '/assets/hero-classroom-768.jpg'];
 self.addEventListener('install', event => event.waitUntil((async () => {
   const cache = await caches.open(CACHE);
   const root = await fetch('/');
