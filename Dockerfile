@@ -21,7 +21,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 WORKDIR /app
 COPY --from=backend /app/target/release/accessible-explanation-checkin /app/server
 COPY --from=frontend /app/dist /app/dist
-USER checkin
+# Azure Container Apps mounts Azure Files as root-owned CIFS. The service needs
+# write access to its durable snapshot and voice directory, so it runs as the
+# container's root user; the runtime image contains only the service binary and
+# CA certificates, with no shell or package manager added by this application.
+USER root
 ENV PORT=8080 DATABASE_URL=sqlite:/tmp/checkins.db?mode=rwc UPLOADS_DIR=/app/data/uploads PERSISTENCE_DIR=/app/data DIST_DIR=dist BUILD_SHA=${BUILD_SHA}
 EXPOSE 8080
 CMD ["/app/server"]
