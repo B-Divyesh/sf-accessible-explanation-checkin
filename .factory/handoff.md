@@ -46,8 +46,9 @@ Current local evidence:
   `/no-such-page` returned 404. Screenshots are in `.factory/evidence/`.
 
 Every claim test command in `.factory/claims.json` runs from a fresh browser
-context at `/demo`. A clean clone of commit `18cca9552680c68aa98b6620d6c99f440cf9b4c7`
-ran `npm ci`, `npm run build`, and `npm run test:claims`: **18 passed**.
+context at `/demo`. A clean clone of deployed code commit
+`08f98714586c017a5022acc48fe48eaa4afb2a9a` ran `npm ci`, `npm run build`, and
+`npm run test:claims`: **18 passed**.
 Demo operation is documented in `.factory/demo.md`.
 
 ## Deployment
