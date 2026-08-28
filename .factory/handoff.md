@@ -36,7 +36,7 @@ Current local evidence:
 - `npm test`: passed; 4 TypeScript and 7 Rust tests.
 - `npm run build`: passed; 38.70 KB JavaScript (12.52 KB gzip) and 19.08 KB
   CSS (5.13 KB gzip).
-- `npm run test:e2e`: passed; 29 browser checks across desktop and 390 px
+- `npm run test:e2e`: passed; 31 browser checks across desktop and 390 px
   mobile, with one intentional desktop-only skip. It includes axe serious and
   critical checks, metadata/focus/404 coverage, the teacher/student flow, and
   all claim tests.
@@ -45,9 +45,10 @@ Current local evidence:
 - Local release smoke on port 18080: `/health` returned 200 and
   `/no-such-page` returned 404. Screenshots are in `.factory/evidence/`.
 
-Every claim test command in `.factory/claims.json` is intended to run from a
-fresh browser context at `/demo`. Demo operation is documented in
-`.factory/demo.md`.
+Every claim test command in `.factory/claims.json` runs from a fresh browser
+context at `/demo`. A clean clone of commit `18cca9552680c68aa98b6620d6c99f440cf9b4c7`
+ran `npm ci`, `npm run build`, and `npm run test:claims`: **18 passed**.
+Demo operation is documented in `.factory/demo.md`.
 
 ## Deployment
 
@@ -60,10 +61,21 @@ scripts/deploy-durable-container.sh accessible-explanation-checkin /work/repo Do
 The helper mounts durable `/app/data` and pins SQLite to one replica. The
 runtime image starts on `PORT` with no required configuration and runs as the
 non-root `checkin` user. Docker is not installed in this worker, so image UID
-execution is verified through source policy and must also be observed in the
-factory container build/deploy log.
+execution is verified through source policy and the successful cloud build.
 
 ## Known gaps
 
-None in the review scope. The final live deployment check and its exact commit
-are appended after the work-order deployment completes.
+None in the review scope.
+
+## Final deployed evidence
+
+The final deployed code commit is `08f98714586c017a5022acc48fe48eaa4afb2a9a`.
+The Container App revision `sf-accessible-explanation-9c1a54--0000017` is
+healthy, has 100% traffic, uses its Azure File mount at `/app/data`, and is
+pinned to one replica. Cold `GET /health` at the public URL returned that exact
+SHA. `GET /no-such-page` returned HTTP 404. The factory `verify-url.sh` check
+on `/demo` passed in 540 ms with zero console errors, one h1, one main, `lang`
+set, and no missing image alt or unlabelled button. A live 390 px Axe audit of
+`/?demo=1` returned zero serious or critical violations. It observed only the
+product origin during the demo load. Final artifacts are in
+`.factory/evidence/live-verify-final/`.

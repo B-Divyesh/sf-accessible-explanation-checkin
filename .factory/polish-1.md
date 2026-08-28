@@ -25,3 +25,14 @@ single-replica deployment, billing origin, cache/security policies, responsive
 targets, PWA reload, and baseline accessibility continue to pass in the full
 suite. API rate limiting now applies to APIs rather than static navigation, so
 normal page use cannot exhaust the service allowance.
+
+## Final live re-check
+
+Deployment commit `08f98714586c017a5022acc48fe48eaa4afb2a9a` is live. Cold
+checks at `https://accessible-explanation-checkin.sociobot.in/?demo=1` found
+the demo banner, Watershed reasoning sample review, demo canonical URL, one
+h1, and one main. The request log contained only the product origin. The
+public 404 returned status 404 with the designed heading. `verify-url.sh` and a
+390 px Playwright Axe scan recorded zero console errors and zero serious or
+critical violations on `/demo`; final screenshots and JSON are under
+`.factory/evidence/live-verify-final/`.
