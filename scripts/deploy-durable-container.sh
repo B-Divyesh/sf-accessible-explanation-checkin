@@ -9,6 +9,7 @@ repo=${2:-/work/repo}
 dockerfile=${3:-Dockerfile}
 port=${4:-8080}
 fleet_deploy_helper=${FLEET_DEPLOY_CONTAINER_HELPER:-/opt/fleet/lib/deploy-container.sh}
+live_durability_checker=${LIVE_DURABILITY_CHECKER:-$repo/scripts/verify-live-durable-workflow.sh}
 resource_group=${AZURE_RESOURCE_GROUP:-sociobot}
 environment=${AZURE_CONTAINERAPP_ENV:-factory-env}
 storage_account=${AZURE_STORAGE_ACCOUNT:-sociobotblob}
@@ -111,4 +112,7 @@ if [[ "$replicas_verified" != true ]]; then
   exit 1
 fi
 
-echo "PASS: deployed and verified $app_name with durable /app/data and exactly one SQLite replica"
+expected_build_sha=$(git -C "$repo" rev-parse HEAD)
+"$live_durability_checker" "https://$slug.sociobot.in" "$app_name" "$resource_group" "$expected_build_sha"
+
+echo "PASS: deployed and verified $app_name with durable /app/data, exactly one SQLite replica, and restart persistence"

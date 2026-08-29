@@ -1,0 +1,14 @@
+{
+  "url": "http://127.0.0.1:8091/demo",
+  "loadMs": 562,
+  "errors": [],
+  "a11y": {
+    "title": "Demo — Accessible Explanation Check-in",
+    "lang": "en",
+    "h1": 1,
+    "main": true,
+    "imgsMissingAlt": 0,
+    "buttonsUnlabeled": 0,
+    "textLength": 1625
+  }
+}
