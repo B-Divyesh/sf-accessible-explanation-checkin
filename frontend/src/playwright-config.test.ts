@@ -36,6 +36,7 @@ describe('clean claim startup budget', () => {
     expect(packageJson.scripts['test:e2e:mobile']).toContain('claims-a');
     expect(packageJson.scripts['test:e2e:mobile']).toContain('claims-b');
     expect(COLD_SERVER_START_TIMEOUT_MS).toBe(600_000);
+    expect(playwrightConfig.retries).toBe(1);
     expect(playwrightConfig.webServer).toMatchObject({
       command: expect.stringContaining('cargo run --locked'),
       timeout: COLD_SERVER_START_TIMEOUT_MS,

@@ -9,7 +9,10 @@ export const COLD_SERVER_START_TIMEOUT_MS = 10 * 60_000;
 export default defineConfig({
   testDir: './tests',
   timeout: 30_000,
-  retries: 0,
+  // Chromium headless-shell can exit while a long CI matrix is rotating
+  // browser contexts. One fresh-worker retry recovers that process failure;
+  // deterministic product assertions still fail on the second attempt.
+  retries: 1,
   workers: 1,
   reporter: 'line',
   use: {
