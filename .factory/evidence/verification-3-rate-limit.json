@@ -1,0 +1,9 @@
+{
+  "checked_at": "2026-08-29T05:48:10Z",
+  "endpoint": "/api/checkins/not-a-real-token",
+  "single_client_concurrent_requests": 150,
+  "observed_allowance": 120,
+  "responses": {"404": 120, "429": 30},
+  "retry_after_values": ["0"],
+  "different_client_response": 404
+}

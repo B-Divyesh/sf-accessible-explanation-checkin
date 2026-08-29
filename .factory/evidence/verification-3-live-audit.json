@@ -1,0 +1,19 @@
+{
+  "checked_at": "2026-08-29T05:47:40.928Z",
+  "build_sha": "96472326c1088487c69f739d97e3a3639f3cb4ed",
+  "routes_checked": ["/", "/demo", "/create", "/pricing", "/privacy", "/terms", "/no-such-page"],
+  "axe_serious_or_critical_light": 0,
+  "axe_serious_or_critical_dark": 0,
+  "undersized_touch_targets": 0,
+  "crawled_links": 14,
+  "console_errors": 0,
+  "demo_sample_responses": 3,
+  "demo_api_requests": 0,
+  "demo_storage_isolated": true,
+  "demo_reset": true,
+  "offline_reload": true,
+  "workflow_origin_only": "https://accessible-explanation-checkin.sociobot.in",
+  "checkout_status": 303,
+  "checkout_destination": "checkout.dodopayments.com",
+  "catalog_price_minor_usd": 3900
+}

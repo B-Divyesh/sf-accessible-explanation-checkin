@@ -1,0 +1,15 @@
+{
+  "checked_at": "2026-08-29T05:54:13Z",
+  "candidate": "96472326c1088487c69f739d97e3a3639f3cb4ed",
+  "url": "https://accessible-explanation-checkin.sociobot.in",
+  "fresh_checkin_create_status": 201,
+  "forty_concurrent_reads_after_1500ms": {"200": 13, "404": 27},
+  "forty_concurrent_valid_submissions": {"201": 13, "404": 27},
+  "representative_404_body": {"error": "That private link is not valid. Check that you copied the whole link."},
+  "independent_sequential_reproduction": {
+    "requests": 30,
+    "200": 10,
+    "404": 20,
+    "sequence": [404, 404, 200, 404, 404, 200, 404, 404, 200, 404, 404, 200, 404, 404, 200, 404, 404, 200, 404, 404, 200, 404, 404, 200, 404, 404, 200, 404, 404, 200]
+  }
+}

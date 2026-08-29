@@ -1,0 +1,9 @@
+{
+  "checked_at": "2026-08-29T05:50:00Z",
+  "url": "https://accessible-explanation-checkin.sociobot.in/",
+  "scores": {"performance": 90, "accessibility": 100, "best_practices": 100, "seo": 100},
+  "metrics_ms": {"first_contentful_paint": 981.192, "largest_contentful_paint": 1148.692, "total_blocking_time": 403, "speed_index": 981.192},
+  "cumulative_layout_shift": 0,
+  "network_request_count": 7,
+  "total_transfer_bytes": 38690
+}

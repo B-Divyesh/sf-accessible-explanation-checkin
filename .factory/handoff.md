@@ -1,48 +1,50 @@
-# Handoff — Polish 4 repair
+# Verification 3 handoff — FAIL
 
-## What changed
+Candidate `96472326c1088487c69f739d97e3a3639f3cb4ed` was independently tested on
+2026-08-29 against <https://accessible-explanation-checkin.sociobot.in>.
 
-- Added **Privacy** to the four-link primary navigation in the SPA shell and
-  the real static HTTP 404 page.
-- Added a browser regression that requires the primary Privacy link on `/`,
-  `/demo`, `/create`, `/pricing`, `/privacy`, `/terms`, and `/no-such-page`.
-- Strengthened the non-root runtime claim so a clean-clone test stages the
-  release app where UID 65534 can read it, then proves the live server wrote a
-  UID-65534 durable snapshot. This removes a `/proc` wrapper-process race.
-- Updated the live audit to assert visible Privacy navigation and save Polish 4
-  screenshots and machine-readable output.
-- Updated the verb-first catalog description and wrote the complete cumulative
-  finding map in `.factory/polish-4.md`.
+## Result
 
-## Repair source and local evidence
+**FAIL — do not release.** The live backend is running three replicas without
+the declared Azure File volume. A newly created private link returned 404 on
+two of every three requests (20/30 sequential reads; exact repeating
+`404, 404, 200` pattern). Forty concurrent reads and submissions independently
+returned 27 × 404 and 13 successes. Azure reports `replicas: 3`,
+`maxReplicas: 3`, `volumes: null`, and no app volume mounts.
 
-Product repair source: `0400d23952a7f91447d5b1a51f68f732c25ef242` on `main`.
-Deployed revision: `50c78df89f1a1ce7599067f61def6fcb5612af76`.
-The clean clone was `/tmp/accessible-explanation-checkin-polish4-final.L3vqGa`.
+The first declared claim command also failed from the installed clean checkout
+because Playwright's 120-second web-server timeout expired during the cold Rust
+compile. It passed after compilation, and a warm aggregate run completed all
+18 claims, but the acceptance contract makes the original claim failure
+release-blocking.
 
-From that fresh clone, after `npm ci` (86 packages, 0 vulnerabilities):
+## What passed
 
-- `npm test` passed: 4 frontend unit tests, 11 Rust tests, and deployment policy.
-- `npm run build` passed: `dist/`; 12.48 kB gzip JavaScript and 5.16 kB gzip CSS.
-- `npm run test:e2e` passed: 38 passed, 8 intentional single-fixture/mobile skips.
-- `npm run test:all-claims` passed every one of the 18 commands in
-  `.factory/claims.json`, including offline reload, request-boundary privacy,
-  workflow, retention cleanup, checkout, non-root runtime, and deployment.
-- `cargo fmt --check` and `cargo clippy --all-targets --locked -- -D warnings` passed.
+- First-read and one-click sample-demo gate.
+- `npm test`, `npm run build`, and the full Playwright suite (38 passed,
+  8 intentional skips).
+- All 18 claim commands after warm compilation.
+- Rust formatting, Clippy with warnings denied, locked release build, container
+  identity, non-root runtime, and source deployment-policy checks.
+- Local default startup with only `PORT`, restart persistence, invalid-input
+  recovery, exact local 35-response concurrency limit, and CSV safety.
+- Live build identity and byte-for-byte frontend assets.
+- Live 120-request per-client burst limit: 30/150 requests returned 429 and all
+  included `Retry-After`; another client remained available.
+- Seven-route light/dark Axe scan with zero serious/critical findings, 390 px
+  layout, keyboard focus, reduced motion, 200% text, offline reload, request
+  privacy, security/caching headers, and console checks.
+- Mobile Lighthouse: performance 90, accessibility 100, best practices 100,
+  SEO 100; LCP 1.149 s and CLS 0.
 
-## Deployment and live recheck
+## Required next steps
 
-Deployed through `scripts/deploy-durable-container.sh` to
-`https://accessible-explanation-checkin.sociobot.in` after the repair push.
-Cold audit at 2026-08-29T05:11:47.990Z observed the deployed health build SHA
-above. It passed all seven routes, the new visible primary Privacy link, 390 px
-targets, 200% text, light/dark axe scans, offline demo reload, demo isolation
-and reset, the create → submit → review → reload workflow, checkout redirect,
-security headers, and console checks. Evidence is recorded in
-`.factory/evidence/polish-4-live-check.json`,
-`.factory/evidence/polish-4-live-demo-cold-mobile.png`, and
-`.factory/evidence/polish-4-live-404-mobile.png`.
+1. Apply and verify the live one-replica plus `/app/data` Azure File settings.
+2. Confirm create/read/submit/review behavior across independent connections
+   and after a production restart.
+3. Make the claims runner tolerate or prebuild for a clean cold Rust compile.
+4. Re-run every `.factory/claims.json` command from a new clean checkout.
 
-## Known gaps and next steps
-
-None. All findings F-1-1 through F-4-1 are closed in `.factory/polish-4.md`.
+Full evidence and commands are in `.factory/verification-3.md`; compact machine
+evidence is under `.factory/evidence/verification-3-*.json`. No product code was
+changed during verification.
