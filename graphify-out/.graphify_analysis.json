@@ -433,13 +433,13 @@
       "degree": 23
     },
     {
-      "id": "src_routes_appstate",
-      "label": "AppState",
+      "id": "src_routes_apierror",
+      "label": "ApiError",
       "degree": 21
     },
     {
-      "id": "src_routes_apierror",
-      "label": "ApiError",
+      "id": "src_routes_appstate",
+      "label": "AppState",
       "degree": 21
     },
     {
@@ -458,8 +458,8 @@
       "degree": 15
     },
     {
-      "id": "frontend_tsconfig_compileroptions",
-      "label": "compilerOptions",
+      "id": "src_routes_export_csv",
+      "label": "export_csv()",
       "degree": 13
     },
     {
@@ -468,8 +468,8 @@
       "degree": 13
     },
     {
-      "id": "src_routes_export_csv",
-      "label": "export_csv()",
+      "id": "frontend_tsconfig_compileroptions",
+      "label": "compilerOptions",
       "degree": 13
     }
   ],
