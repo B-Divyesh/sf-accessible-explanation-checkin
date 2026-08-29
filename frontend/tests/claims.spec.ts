@@ -44,6 +44,18 @@ test('@claim:demo-reset restores the shipped sample', async ({ page }) => {
   await expect(page.getByLabel('Private teacher note').first()).toHaveValue('Ask Maya to connect the model to the class data.');
 });
 
+test('@claim:demo-exit-disposal discards edits before starting a real check-in', async ({ page }) => {
+  await page.goto('/?demo=1');
+  await page.getByLabel('Private teacher note').first().fill('Discard this sample edit');
+  await page.getByRole('button', { name: 'Save sample review' }).first().click();
+  await expect(page.getByText('Saved in demo')).toBeVisible();
+  await page.getByRole('link', { name: 'Start for real' }).click();
+  await expect(page).toHaveURL(/\/create$/);
+  expect(await page.evaluate(() => [...Array(localStorage.length)].map((_, index) => localStorage.key(index)).filter(key => key?.startsWith('demo:')))).toEqual([]);
+  await page.goto('/demo');
+  await expect(page.getByLabel('Private teacher note').first()).toHaveValue('Ask Maya to connect the model to the class data.');
+});
+
 test('@claim:sample-csv-export downloads each shipped sample response', async ({ page }) => {
   await page.goto('/demo');
   const download = page.waitForEvent('download');
@@ -121,6 +133,82 @@ test('@claim:voice-retention-control applies the selected free voice schedule', 
   const created = await response.json();
   await page.goto(`/c/${created.student_token}`);
   await expect(page.getByText('it will delete automatically 3 days after submission', { exact: false })).toBeVisible();
+});
+
+test('@claim:voice-recording-limits stops at 120 seconds and enforces the 4 MB boundary', async ({ page }, testInfo) => {
+  desktopOnly(testInfo);
+  await page.addInitScript(() => {
+    type RecordingWindow = Window & {
+      finishRecordingTimer?: () => void;
+      recordingTimerDelay?: number;
+    };
+    let scheduled: (() => void) | undefined;
+    const originalSetTimeout = window.setTimeout.bind(window);
+    window.setTimeout = ((handler: TimerHandler, timeout?: number, ...args: unknown[]) => {
+      if (timeout === 120_000 && typeof handler === 'function') {
+        scheduled = handler as () => void;
+        (window as RecordingWindow).recordingTimerDelay = timeout;
+        return 120_000;
+      }
+      return originalSetTimeout(handler, timeout, ...args);
+    }) as typeof window.setTimeout;
+    (window as RecordingWindow).finishRecordingTimer = () => scheduled?.();
+    Object.defineProperty(navigator, 'mediaDevices', {
+      configurable: true,
+      value: { getUserMedia: async () => ({ getTracks: () => [{ stop: () => undefined }] }) },
+    });
+    class RecordedMedia {
+      state: RecordingState = 'inactive';
+      mimeType = 'audio/webm';
+      ondataavailable: ((event: { data: Blob }) => void) | null = null;
+      onstop: (() => void) | null = null;
+      start() { this.state = 'recording'; }
+      stop() {
+        this.state = 'inactive';
+        this.ondataavailable?.({ data: new Blob(['recorded voice'], { type: this.mimeType }) });
+        this.onstop?.();
+      }
+    }
+    Object.defineProperty(window, 'MediaRecorder', { configurable: true, value: RecordedMedia });
+  });
+
+  await page.goto('/demo');
+  const create = await page.request.post('/api/checkins', { data: {
+    title: 'Voice boundary proof',
+    prompt: 'Explain the choice you made.',
+    voice_retention_days: 1,
+  }});
+  expect(create.status()).toBe(201);
+  const created = await create.json();
+  await page.goto(`/c/${created.student_token}`);
+  await page.getByRole('button', { name: 'Start recording' }).click();
+  await expect(page.getByText('Recording now… Select Stop recording when finished.')).toBeVisible();
+  expect(await page.evaluate(() => (window as Window & { recordingTimerDelay?: number }).recordingTimerDelay)).toBe(120_000);
+  await page.evaluate(() => (window as Window & { finishRecordingTimer?: () => void }).finishRecordingTimer?.());
+  await expect(page.getByText(/Recording ready \(1 KB\)/)).toBeVisible();
+
+  const exactVoice = Buffer.alloc(4 * 1024 * 1024).toString('base64');
+  const accepted = await page.request.post(`/api/checkins/${created.student_token}/submissions`, { data: {
+    student_name: 'Boundary student',
+    explanation_text: 'The exact-size recording is supported.',
+    confidence: 4,
+    voice_data: exactVoice,
+    voice_mime: 'audio/webm',
+  }});
+  expect(accepted.status()).toBe(201);
+
+  const oversizedVoice = Buffer.alloc(4 * 1024 * 1024 + 1).toString('base64');
+  const rejected = await page.request.post(`/api/checkins/${created.student_token}/submissions`, { data: {
+    student_name: 'Oversized student',
+    explanation_text: 'This upload must be rejected.',
+    confidence: 4,
+    voice_data: oversizedVoice,
+    voice_mime: 'audio/webm',
+  }});
+  expect(rejected.status()).toBe(413);
+  expect(await rejected.json()).toEqual({ error: 'The voice recording is over 4 MB. Record a shorter explanation or use text.' });
+  const review = await page.request.get(`/api/reviews/${created.review_token}`);
+  expect((await review.json()).submissions).toHaveLength(1);
 });
 
 test('@claim:free-response-limit enforces 35 responses under concurrent submissions', async ({ page }, testInfo) => {

@@ -7,6 +7,7 @@ const licenseKey = `sb_license:${PRODUCT}`;
 const licenseCacheKey = `${licenseKey}:verdict`;
 let currentRecording: Blob | null = null;
 let recorder: MediaRecorder | null = null;
+let recordingTimer: number | null = null;
 let focusOnRouteChange = false;
 const SITE_ORIGIN = 'https://accessible-explanation-checkin.sociobot.in';
 const demoStorageKey = 'demo:accessible-explanation-checkin:review';
@@ -48,7 +49,9 @@ function setMetadata(title:string, description:string, path=location.pathname) {
 function setMeta(selector:string, attribute:string, value:string) { document.querySelector(selector)?.setAttribute(attribute,value); }
 function focusAndAnnounceRoute() { if(!focusOnRouteChange)return; focusOnRouteChange=false; requestAnimationFrame(()=>{ const heading=document.querySelector<HTMLElement>('main h1'); if(heading){ heading.tabIndex=-1; heading.focus({preventScroll:true}); announce(`Opened ${heading.textContent?.trim()||document.title}.`); } }); }
 async function render() {
+  if (!isDemo()) clearDemoState();
   currentRecording=null; if (recorder?.state === 'recording') recorder.stop(); recorder=null;
+  if (recordingTimer !== null) window.clearTimeout(recordingTimer); recordingTimer=null;
   const [route, token] = routeParts();
   window.scrollTo({top:0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto':'smooth'});
   if (!route && isDemo()) return demoPage();
@@ -77,6 +80,7 @@ const demoSeed:DemoSubmission[] = [
 ];
 function demoSubmissions():DemoSubmission[] { try { return JSON.parse(localStorage.getItem(demoStorageKey)||'null') || structuredClone(demoSeed); } catch { return structuredClone(demoSeed); } }
 function saveDemo(submissions:DemoSubmission[]) { localStorage.setItem(demoStorageKey,JSON.stringify(submissions)); }
+function clearDemoState() { for (let index=localStorage.length-1; index>=0; index-=1) { const key=localStorage.key(index); if(key?.startsWith('demo:')) localStorage.removeItem(key); } }
 function demoPage() {
   setMetadata('Demo — Accessible Explanation Check-in','Try a populated teacher review with isolated sample student explanations.','/demo');
   const submissions=demoSubmissions();
@@ -132,7 +136,7 @@ function setupRecorder() {
   if(!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) { start.disabled=true; status.textContent='Voice recording is not supported in this browser. You can use the text box above.'; return; }
   start.addEventListener('click',async()=>{
     if(recorder?.state==='recording') { recorder.stop(); return; }
-    try { const stream=await navigator.mediaDevices.getUserMedia({audio:true}); const chunks:BlobPart[]=[]; recorder=new MediaRecorder(stream); recorder.ondataavailable=ev=>chunks.push(ev.data); recorder.onstop=()=>{ currentRecording=new Blob(chunks,{type:recorder?.mimeType||'audio/webm'}); stream.getTracks().forEach(t=>t.stop()); audio.src=URL.createObjectURL(currentRecording); audio.hidden=false; remove.hidden=false; start.innerHTML='<span aria-hidden="true">●</span> Record again'; status.textContent=`Recording ready (${Math.ceil(currentRecording.size/1024)} KB). Play it back before sending.`; announce('Recording ready to review.'); }; recorder.start(); start.innerHTML='<span aria-hidden="true">■</span> Stop recording'; status.textContent='Recording now… Select Stop recording when finished.'; announce('Recording started.'); setTimeout(()=>{if(recorder?.state==='recording')recorder.stop()},120000); }
+    try { const stream=await navigator.mediaDevices.getUserMedia({audio:true}); const chunks:BlobPart[]=[]; recorder=new MediaRecorder(stream); recorder.ondataavailable=ev=>chunks.push(ev.data); recorder.onstop=()=>{ if(recordingTimer!==null)window.clearTimeout(recordingTimer); recordingTimer=null; currentRecording=new Blob(chunks,{type:recorder?.mimeType||'audio/webm'}); stream.getTracks().forEach(t=>t.stop()); audio.src=URL.createObjectURL(currentRecording); audio.hidden=false; remove.hidden=false; start.innerHTML='<span aria-hidden="true">●</span> Record again'; status.textContent=`Recording ready (${Math.ceil(currentRecording.size/1024)} KB). Play it back before sending.`; announce('Recording ready to review.'); }; recorder.start(); start.innerHTML='<span aria-hidden="true">■</span> Stop recording'; status.textContent='Recording now… Select Stop recording when finished.'; announce('Recording started.'); recordingTimer=window.setTimeout(()=>{if(recorder?.state==='recording')recorder.stop()},120000); }
     catch { status.textContent='Microphone access was not available. Allow microphone access or use the text box.'; announce(status.textContent); }
   });
   remove.addEventListener('click',()=>{ currentRecording=null; audio.removeAttribute('src'); audio.hidden=true; remove.hidden=true; status.textContent='Nothing recorded. Maximum 2 minutes / 4 MB.'; announce('Recording removed.'); });
@@ -141,6 +145,7 @@ function setupRecorder() {
 async function submitStudent(event:SubmitEvent,token:string,draftKey:string) {
   event.preventDefault(); const form=event.currentTarget as HTMLFormElement; const button=form.querySelector('button[type=submit]') as HTMLButtonElement; const data=new FormData(form); showError('');
   if(!String(data.get('explanation_text')||'').trim() && !currentRecording) { showError('Add a text explanation, a voice explanation, or both.'); return; }
+  if(currentRecording && currentRecording.size > 4*1024*1024) { showError('The voice recording is over 4 MB. Record a shorter explanation or use text.'); return; }
   if(!navigator.onLine){ showError('You are offline. Your writing is saved on this device; reconnect and send again.'); return; }
   button.disabled=true; button.textContent='Sending securely…';
   try { const voice_data=currentRecording?await blobBase64(currentRecording):null; const result=await api<{receipt_token:string}>(`/api/checkins/${encodeURIComponent(token)}/submissions`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({student_name:data.get('student_name'),explanation_text:data.get('explanation_text'),confidence:Number(data.get('confidence')),voice_data,voice_mime:currentRecording?.type})}); localStorage.removeItem(draftKey); history.pushState({},'',`/receipt/${result.receipt_token}`); focusOnRouteChange=true; render(); }

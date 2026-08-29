@@ -924,6 +924,119 @@ mod tests {
     }
 
     #[tokio::test]
+    // @claim:teacher-voice-deletion
+    async fn claim_teacher_voice_deletion() {
+        let (state, _temp) = test_state("http://127.0.0.1:1".into()).await;
+        let app = router(state.clone());
+        let create = app.clone().oneshot(Request::post("/api/checkins").header("content-type", "application/json").body(Body::from(r#"{"title":"Teacher deletion","prompt":"Explain the choice you made.","voice_retention_days":7}"#)).unwrap()).await.unwrap();
+        assert_eq!(create.status(), StatusCode::CREATED);
+        let created = json_response(create).await;
+        let student = created["student_token"].as_str().unwrap();
+        let review = created["review_token"].as_str().unwrap();
+        let submit = app.clone().oneshot(Request::post(format!("/api/checkins/{student}/submissions")).header("content-type", "application/json").body(Body::from(r#"{"student_name":"Avery","explanation_text":"I compared both diagrams before choosing.","confidence":4,"voice_data":"dGVhY2hlciBkZWxldGlvbiBmaXh0dXJl","voice_mime":"audio/webm"}"#)).unwrap()).await.unwrap();
+        assert_eq!(submit.status(), StatusCode::CREATED);
+        let receipt = json_response(submit).await["receipt_token"]
+            .as_str()
+            .unwrap()
+            .to_owned();
+
+        let stored = sqlx::query("SELECT id, voice_file FROM submissions")
+            .fetch_one(&state.pool)
+            .await
+            .unwrap();
+        let submission_id: String = stored.get("id");
+        let voice_file = stored.get::<Option<String>, _>("voice_file").unwrap();
+        assert!(state.uploads_dir.join(&voice_file).exists());
+
+        let update = app.clone().oneshot(Request::patch(format!("/api/reviews/{review}/submissions/{submission_id}")).header("content-type", "application/json").body(Body::from(r#"{"teacher_tags":["Uses evidence"],"teacher_note":"Keep the written comparison.","follow_up":true}"#)).unwrap()).await.unwrap();
+        assert_eq!(update.status(), StatusCode::OK);
+        let delete = app
+            .clone()
+            .oneshot(
+                Request::delete(format!(
+                    "/api/reviews/{review}/submissions/{submission_id}/voice"
+                ))
+                .body(Body::empty())
+                .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(delete.status(), StatusCode::OK);
+        assert!(!state.uploads_dir.join(voice_file).exists());
+
+        let database = sqlx::query("SELECT explanation_text, voice_file, voice_mime, voice_delete_at FROM submissions WHERE id=?")
+            .bind(&submission_id)
+            .fetch_one(&state.pool)
+            .await
+            .unwrap();
+        assert_eq!(
+            database
+                .get::<Option<String>, _>("explanation_text")
+                .as_deref(),
+            Some("I compared both diagrams before choosing.")
+        );
+        assert!(database.get::<Option<String>, _>("voice_file").is_none());
+        assert!(database.get::<Option<String>, _>("voice_mime").is_none());
+        assert!(database
+            .get::<Option<String>, _>("voice_delete_at")
+            .is_none());
+
+        let audio = app
+            .clone()
+            .oneshot(
+                Request::get(format!(
+                    "/api/reviews/{review}/submissions/{submission_id}/voice"
+                ))
+                .body(Body::empty())
+                .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(audio.status(), StatusCode::GONE);
+        let teacher = app
+            .clone()
+            .oneshot(
+                Request::get(format!("/api/reviews/{review}"))
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        let teacher = json_response(teacher).await;
+        assert_eq!(teacher["submissions"][0]["has_voice"], false);
+        assert_eq!(teacher["submissions"][0]["voice_delete_at"], Value::Null);
+        assert_eq!(
+            teacher["submissions"][0]["explanation_text"],
+            "I compared both diagrams before choosing."
+        );
+        assert_eq!(
+            teacher["submissions"][0]["teacher_tags"],
+            json!(["Uses evidence"])
+        );
+        assert_eq!(
+            teacher["submissions"][0]["teacher_note"],
+            "Keep the written comparison."
+        );
+        assert_eq!(teacher["submissions"][0]["follow_up"], true);
+
+        let receipt_response = app
+            .oneshot(
+                Request::get(format!("/api/receipts/{receipt}"))
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(receipt_response.status(), StatusCode::OK);
+        let receipt_json = json_response(receipt_response).await;
+        assert_eq!(receipt_json["has_voice"], false);
+        assert_eq!(
+            receipt_json["explanation_text"],
+            "I compared both diagrams before choosing."
+        );
+    }
+
+    #[tokio::test]
     // @claim:classroom-plus-limits
     async fn claim_classroom_plus_limits() {
         let billing = Router::new().route(

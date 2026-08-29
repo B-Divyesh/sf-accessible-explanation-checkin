@@ -1,11 +1,10 @@
 {
   "name": "Accessible Explanation Check-in",
   "short_name": "Check-in",
-  "description": "A humane evidence-of-reasoning check-in for classes.",
+  "description": "Collect student reasoning with a private text or voice check-in.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#F3EEDF",
   "theme_color": "#102522",
   "icons": [{ "src": "/doorway.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
 }
-

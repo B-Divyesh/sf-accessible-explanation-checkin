@@ -18,7 +18,7 @@ describe('clean claim startup budget', () => {
     const browserClaims = claims.filter(({ test: command }) =>
       command.startsWith('npm run test:claims'),
     );
-    expect(browserClaims.map(({ id }) => id)).toHaveLength(16);
+    expect(browserClaims.map(({ id }) => id)).toHaveLength(18);
     expect(packageJson.scripts['test:claims']).toContain(
       '--config frontend/playwright.config.ts',
     );
