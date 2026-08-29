@@ -1,0 +1,17 @@
+{
+  "checked_at": "2026-08-29T13:07:52.812Z",
+  "result": "PASS",
+  "url": "https://accessible-explanation-checkin.sociobot.in/",
+  "lighthouse_version": "12.8.2",
+  "categories": {
+    "performance": 100,
+    "accessibility": 100,
+    "best_practices": 100,
+    "seo": 100
+  },
+  "metrics": {
+    "largest_contentful_paint_ms": 1165,
+    "cumulative_layout_shift": 0,
+    "total_blocking_time_ms": 63
+  }
+}

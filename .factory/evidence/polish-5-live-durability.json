@@ -1,0 +1,31 @@
+{
+  "result": "PASS",
+  "checked_at": "2026-08-29T13:05:07Z",
+  "base_url": "https://accessible-explanation-checkin.sociobot.in",
+  "container_app": "sf-accessible-explanation-9c1a54",
+  "previous_revision": "sf-accessible-explanation-9c1a54--0000056",
+  "revision": "sf-accessible-explanation-9c1a54--0000057",
+  "build_sha": "9f132e69f344ad82cacc4350c32d143bc849d7d3",
+  "marker": "durability-20260829T130507Z-42244",
+  "topology": {
+    "min_replicas": 1,
+    "max_replicas": 1,
+    "azure_files_mount": "/app/data",
+    "storage_name": "aec-accessible-explanati-9c1a54",
+    "share_name": "sf-accessible-explanation-checkin-data",
+    "active_revisions": 1,
+    "running_replicas": 1
+  },
+  "before_new_revision": {
+    "student_reads_200": 24,
+    "review_reads_200": 24,
+    "submission_status": 201,
+    "review_saved": true
+  },
+  "after_new_revision": {
+    "student_reads_200": 24,
+    "review_reads_200": 24,
+    "receipt_status": 200,
+    "submission_and_review_persisted": true
+  }
+}

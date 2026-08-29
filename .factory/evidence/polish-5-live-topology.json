@@ -1,0 +1,16 @@
+{
+  "checked_at": "2026-08-29T13:07:20Z",
+  "result": "PASS",
+  "image": "sociobotregistry.azurecr.io/sf-accessible-explanation-9c1a54:9f132e69f344",
+  "latest_revision": "sf-accessible-explanation-9c1a54--0000057",
+  "latest_ready_revision": "sf-accessible-explanation-9c1a54--0000057",
+  "min_replicas": 1,
+  "max_replicas": 1,
+  "active_revisions": 1,
+  "running_replicas": 1,
+  "volume": {
+    "type": "AzureFile",
+    "storage_name": "aec-accessible-explanati-9c1a54",
+    "mount_path": "/app/data"
+  }
+}

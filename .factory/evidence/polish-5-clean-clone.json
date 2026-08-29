@@ -1,0 +1,23 @@
+{
+  "checked_at": "2026-08-29T12:58:00Z",
+  "result": "PASS",
+  "commit": "9f132e69f344ad82cacc4350c32d143bc849d7d3",
+  "clone": "/tmp/aec-polish5-clean-final.R10Ppj/repo",
+  "commands": {
+    "npm_ci": "PASS; 86 packages, 0 vulnerabilities",
+    "npm_test": "PASS; TypeScript, 5 Vitest tests, 12 Rust tests, deployment fixtures",
+    "npm_run_build": "PASS; dist produced",
+    "npm_run_test_e2e": "PASS; 43 passed, 9 intentional device skips",
+    "npm_run_test_all_claims": "PASS; all 21 claim commands",
+    "cargo_fmt": "PASS",
+    "cargo_clippy": "PASS with -D warnings",
+    "npm_run_test_container_identity": "PASS",
+    "npm_run_test_deploy_helper": "PASS"
+  },
+  "bundle_bytes": {
+    "javascript_raw": 38568,
+    "javascript_gzip": 12310,
+    "css_raw": 19296,
+    "css_gzip": 5160
+  }
+}

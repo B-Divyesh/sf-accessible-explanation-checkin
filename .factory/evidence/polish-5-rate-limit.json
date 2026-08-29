@@ -1,0 +1,12 @@
+{
+  "checked_at": "2026-08-29T13:07:35Z",
+  "result": "PASS",
+  "url": "https://accessible-explanation-checkin.sociobot.in/api/checkins/00000000000000000000000000000000",
+  "requests": 150,
+  "statuses": {
+    "404": 120,
+    "429": 30
+  },
+  "all_429_responses_had_retry_after": true,
+  "retry_after_values": ["0"]
+}
