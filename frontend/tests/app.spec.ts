@@ -28,10 +28,12 @@ test('navigation moves focus to the new heading and updates route metadata', asy
   await page.getByRole('link', { name: 'Create' }).click();
   await expect(page).toHaveURL(/\/create$/);
   await expect(page.getByRole('heading', { level: 1 })).toBeFocused();
+  await expect(page.locator('#announcer')).toHaveText('Opened Create a student explanation check-in.');
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://accessible-explanation-checkin.sociobot.in/create');
   await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', 'Create a check-in — Accessible Explanation Check-in');
   await page.goBack();
   await expect(page.getByRole('heading', { level: 1 })).toBeFocused();
+  await expect(page.locator('#announcer')).toHaveText('Opened Collect student reasoning.');
 });
 
 test('unknown paths return the designed 404 with an HTTP 404 status', async ({ request, page }) => {

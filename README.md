@@ -17,16 +17,14 @@ npm test
 npm run build
 npm run test:e2e
 npm run test:claims
+npm run test:all-claims
 npm run test:runtime-policy
 cargo build --release --locked
 PORT=8080 cargo run
 ```
 
-Run every public claim check from a clean checkout:
-
-```sh
-for test in $(jq -r '.[].test' .factory/claims.json); do eval "$test"; done
-```
+`npm run test:all-claims` reads `.factory/claims.json` and runs every listed
+command separately. It stops at the first failure.
 
 The app listens on `PORT` and defaults to `8080`. Its frontend build is in `dist/`. Local records use `data/` unless configuration supplies another path.
 

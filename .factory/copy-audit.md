@@ -26,7 +26,7 @@
 | Privacy limits | 2 | informational heading |
 | Voice deletes on the selected schedule. | 6 | tested retention fact |
 | Keep private review links secure. | 5 | plain instruction |
-| Original generated classroom art · Param Factory, 2026 | 7 | provenance |
+| Original generated classroom art · Param Factory, 2026 | 8 | provenance |
 | Built by Param Factory · version 1.0.0 | 7 | builder and release identity |
 
 No landing sentence exceeds 22 words or contains a banned word. Every factual promise maps to `.factory/claims.json`.
