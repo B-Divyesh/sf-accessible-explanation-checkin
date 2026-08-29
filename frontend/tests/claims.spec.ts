@@ -242,6 +242,9 @@ test('@claim:billing-license-fixture handles an active and then revoked license 
   valid = false;
   await page.getByRole('button', { name: 'Verify license' }).click();
   await expect(page.getByText('This license is not active. Check the token or buy Classroom Plus.')).toBeVisible();
+  await page.goto('/create');
+  await expect(page.locator('select[name="voice_retention_days"] option')).toHaveText(['1 day', '3 days', '7 days']);
+  await expect(page.getByRole('button', { name: 'Create private links' })).toBeVisible();
 });
 
 test('@claim:external-checkout identifies Sociobot before leaving the product', async ({ page }) => {
