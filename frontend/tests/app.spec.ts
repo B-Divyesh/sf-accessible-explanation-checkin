@@ -100,6 +100,21 @@ test('plans use the production billing endpoint', async ({ page }) => {
   );
 });
 
+test('storage and legal copy stays precise and claim-backed', async ({ page }) => {
+  await page.goto('/create');
+  await expect(page.getByText('Creating a check-in stores these form fields, private-link tokens, limits, and timestamps.')).toBeVisible();
+  await expect(page.getByText('We store only the fields shown on this form.')).toHaveCount(0);
+
+  await page.goto('/privacy');
+  await expect(page.getByText('The service stores check-in and response fields, private-link tokens, response and retention limits, and timestamps.')).toBeVisible();
+  await expect(page.getByText(/SQLite database run on Sociobot infrastructure/)).toHaveCount(0);
+  await expect(page.getByText(/may request access, correction, or erasure/)).toHaveCount(0);
+
+  await page.goto('/terms');
+  await expect(page.getByText(/remove unlawful records/)).toHaveCount(0);
+  await expect(page.getByText(/Material changes will update/)).toHaveCount(0);
+});
+
 test('sample demo has no serious or critical accessibility findings', async ({ page }) => {
   await page.goto('/demo');
   await expectAccessible(page);

@@ -818,6 +818,68 @@ mod tests {
     }
 
     #[tokio::test]
+    // @claim:stored-record-shape
+    async fn claim_stored_record_shape() {
+        let (state, _temp) = test_state("http://127.0.0.1:1".into()).await;
+        let app = router(state.clone());
+        let create = app.clone().oneshot(Request::post("/api/checkins").header("content-type", "application/json").body(Body::from(r#"{"title":"Stored fields","prompt":"Which example changed your conclusion?","voice_retention_days":3}"#)).unwrap()).await.unwrap();
+        assert_eq!(create.status(), StatusCode::CREATED);
+        let created = json_response(create).await;
+        let student = created["student_token"].as_str().unwrap();
+        let review = created["review_token"].as_str().unwrap();
+
+        let checkin = sqlx::query("SELECT title, prompt, student_token, review_token, voice_retention_days, max_submissions, created_at FROM checkins")
+            .fetch_one(&state.pool)
+            .await
+            .unwrap();
+        assert_eq!(checkin.get::<String, _>("title"), "Stored fields");
+        assert_eq!(
+            checkin.get::<String, _>("prompt"),
+            "Which example changed your conclusion?"
+        );
+        assert_eq!(checkin.get::<String, _>("student_token"), student);
+        assert_eq!(checkin.get::<String, _>("review_token"), review);
+        assert_eq!(student.len(), 32);
+        assert_eq!(review.len(), 32);
+        assert_eq!(checkin.get::<i64, _>("voice_retention_days"), 3);
+        assert_eq!(checkin.get::<i64, _>("max_submissions"), 35);
+        assert!(!checkin.get::<String, _>("created_at").is_empty());
+
+        let submit = app.oneshot(Request::post(format!("/api/checkins/{student}/submissions")).header("content-type", "application/json").body(Body::from(r#"{"student_name":"Robin","explanation_text":"I compared both diagrams.","confidence":4,"voice_data":"dGVzdA==","voice_mime":"audio/webm"}"#)).unwrap()).await.unwrap();
+        assert_eq!(submit.status(), StatusCode::CREATED);
+        let receipt = json_response(submit).await["receipt_token"]
+            .as_str()
+            .unwrap()
+            .to_owned();
+        let response = sqlx::query("SELECT receipt_token, student_name, explanation_text, confidence, voice_file, voice_mime, voice_delete_at, teacher_tags, teacher_note, follow_up, created_at FROM submissions")
+            .fetch_one(&state.pool)
+            .await
+            .unwrap();
+        assert_eq!(response.get::<String, _>("receipt_token"), receipt);
+        assert_eq!(receipt.len(), 32);
+        assert_eq!(response.get::<String, _>("student_name"), "Robin");
+        assert_eq!(
+            response
+                .get::<Option<String>, _>("explanation_text")
+                .as_deref(),
+            Some("I compared both diagrams.")
+        );
+        assert_eq!(response.get::<i64, _>("confidence"), 4);
+        assert!(response.get::<Option<String>, _>("voice_file").is_some());
+        assert_eq!(
+            response.get::<Option<String>, _>("voice_mime").as_deref(),
+            Some("audio/webm")
+        );
+        assert!(response
+            .get::<Option<String>, _>("voice_delete_at")
+            .is_some());
+        assert_eq!(response.get::<String, _>("teacher_tags"), "[]");
+        assert_eq!(response.get::<String, _>("teacher_note"), "");
+        assert_eq!(response.get::<i64, _>("follow_up"), 0);
+        assert!(!response.get::<String, _>("created_at").is_empty());
+    }
+
+    #[tokio::test]
     // @claim:voice-retention-deletion
     async fn claim_voice_retention_deletion() {
         let (state, _temp) = test_state("http://127.0.0.1:1".into()).await;

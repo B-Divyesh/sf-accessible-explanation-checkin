@@ -31,6 +31,22 @@
 
 No landing sentence exceeds 22 words or contains a banned word. Every factual promise maps to `.factory/claims.json`.
 
+## Round 5 revised copy
+
+| Text | Words | Result |
+| --- | ---: | --- |
+| Creating a check-in stores these form fields, private-link tokens, limits, and timestamps. | 12 | precise stored-data claim |
+| Recent review links are saved only in this browser. | 9 | tested browser-local claim |
+| The service stores check-in and response fields, private-link tokens, response and retention limits, and timestamps. | 15 | precise stored-data claim |
+| Optional voice adds an audio file, file type, and deletion time. | 11 | precise stored-data claim |
+| Text does not follow the voice deletion schedule. | 8 | tested retention boundary |
+| Ask your teacher to coordinate access, correction, or deletion. | 9 | contact instruction, not an outcome promise |
+| Refunds are requested there; a refunded license becomes inactive here. | 9 | recorded refund-state contract |
+| The deployment gate checks private links, submission, and teacher review. | 10 | concise operator instruction |
+| It repeats those checks after replacing the production revision. | 9 | concise operator instruction |
+
+The inaccurate storage-only sentence and unproved infrastructure, completed-deletion, moderation, and legal-change promises were removed. No revised sentence exceeds 22 words or contains a banned word.
+
 ## Terminology
 
 | Concept | Term used |

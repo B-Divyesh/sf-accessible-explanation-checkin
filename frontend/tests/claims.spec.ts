@@ -81,6 +81,32 @@ test('@claim:no-account-needed creates a check-in without a sign-in step', async
   expect(new URL(review).pathname).toMatch(/^\/review\/[a-f0-9]{32}$/);
 });
 
+test('@claim:recent-links-local keeps recent review links in one browser only', async ({ browser, page }, testInfo) => {
+  desktopOnly(testInfo);
+  const requests: string[] = [];
+  page.on('request', request => requests.push(request.url()));
+  await page.goto('/demo');
+  await page.goto('/create');
+  await page.getByLabel('Assignment name').fill('Browser-only recent link');
+  await page.getByLabel('Explanation prompt').fill('Which example changed your conclusion?');
+  await page.getByRole('button', { name: 'Create private links' }).click();
+  const reviewUrl = await page.locator('#review-link').inputValue();
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('recent-checkins') || '[]'));
+  expect(saved).toHaveLength(1);
+  expect(saved[0]).toMatchObject({ title: 'Browser-only recent link', review: reviewUrl });
+  expect([...new Set(requests.map(url => new URL(url).origin))]).toEqual(['http://127.0.0.1:8080']);
+
+  const freshContext = await browser.newContext({ baseURL: 'http://127.0.0.1:8080' });
+  try {
+    const freshPage = await freshContext.newPage();
+    await freshPage.goto('/create');
+    await expect(freshPage.getByText('Your private review links will appear here after you create a check-in.')).toBeVisible();
+    expect(await freshPage.evaluate(() => localStorage.getItem('recent-checkins'))).toBeNull();
+  } finally {
+    await freshContext.close();
+  }
+});
+
 test('@claim:voice-retention-control applies the selected free voice schedule', async ({ page }, testInfo) => {
   desktopOnly(testInfo);
   await page.goto('/demo');
@@ -240,6 +266,24 @@ test('@claim:billing-license-fixture handles an active and then revoked license 
   await page.getByRole('button', { name: 'Verify license' }).click();
   await expect(page.getByText('Classroom Plus is active on this device.')).toBeVisible();
   valid = false;
+  await page.getByRole('button', { name: 'Verify license' }).click();
+  await expect(page.getByText('This license is not active. Check the token or buy Classroom Plus.')).toBeVisible();
+  await page.goto('/create');
+  await expect(page.locator('select[name="voice_retention_days"] option')).toHaveText(['1 day', '3 days', '7 days']);
+  await expect(page.getByRole('button', { name: 'Create private links' })).toBeVisible();
+});
+
+test('@claim:refund-license-contract treats a recorded refunded license as revoked', async ({ page }) => {
+  await page.route('https://api.sociobot.in/api/v1/products/accessible-explanation-checkin/verify**', route => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({ valid: false, reason: 'revoked', event: 'refund' }),
+  }));
+  await page.goto('/demo');
+  await page.goto('/pricing');
+  await expect(page.getByText('Sociobot/Dodo is the merchant of record.')).toBeVisible();
+  await expect(page.getByText('Refunds are requested there; a refunded license becomes inactive here.')).toBeVisible();
+  await page.getByLabel('License token').fill('recorded-refunded-license');
   await page.getByRole('button', { name: 'Verify license' }).click();
   await expect(page.getByText('This license is not active. Check the token or buy Classroom Plus.')).toBeVisible();
   await page.goto('/create');
