@@ -1,9 +1,9 @@
 {
-  "checked_at": "2026-08-29T13:07:20Z",
+  "checked_at": "2026-08-29T13:28:05Z",
   "result": "PASS",
-  "image": "sociobotregistry.azurecr.io/sf-accessible-explanation-9c1a54:9f132e69f344",
-  "latest_revision": "sf-accessible-explanation-9c1a54--0000057",
-  "latest_ready_revision": "sf-accessible-explanation-9c1a54--0000057",
+  "image": "sociobotregistry.azurecr.io/sf-accessible-explanation-9c1a54:5aa0519153e7",
+  "latest_revision": "sf-accessible-explanation-9c1a54--0000060",
+  "latest_ready_revision": "sf-accessible-explanation-9c1a54--0000060",
   "min_replicas": 1,
   "max_replicas": 1,
   "active_revisions": 1,

@@ -1,8 +1,8 @@
 {
-  "checked_at": "2026-08-29T12:58:00Z",
+  "checked_at": "2026-08-29T13:20:00Z",
   "result": "PASS",
-  "commit": "9f132e69f344ad82cacc4350c32d143bc849d7d3",
-  "clone": "/tmp/aec-polish5-clean-final.R10Ppj/repo",
+  "commit": "5aa0519153e7c34d129d37b9aba69d359b960a33",
+  "clone": "/tmp/aec-polish5-receipts.ATYgws/repo",
   "commands": {
     "npm_ci": "PASS; 86 packages, 0 vulnerabilities",
     "npm_test": "PASS; TypeScript, 5 Vitest tests, 12 Rust tests, deployment fixtures",

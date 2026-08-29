@@ -3,8 +3,8 @@
 - Work order: `accessible-explanation-checkin-polish-5`
 - Reviewed candidate: `976328637bdfe5cdec53afa4e4303882351ef760`
 - Review base: `84766c5177e24971b5596de3eaa3f75e7e9f37d1`
-- Deployed source: `9f132e69f344ad82cacc4350c32d143bc849d7d3`
-- Live revision: `sf-accessible-explanation-9c1a54--0000057`
+- Deployed source: `5aa0519153e7c34d129d37b9aba69d359b960a33`
+- Live revision: `sf-accessible-explanation-9c1a54--0000060`
 - Live URL: <https://accessible-explanation-checkin.sociobot.in>
 - Completed: 2026-08-29 UTC
 
@@ -27,8 +27,8 @@ The complete finding matrix is in `.factory/polish-5.md`.
 
 ## Clean-clone verification
 
-Verified at `/tmp/aec-polish5-clean-final.R10Ppj/repo`, cloned from source
-commit `9f132e6`:
+Verified at `/tmp/aec-polish5-receipts.ATYgws/repo`, cloned from source commit
+`5aa0519`:
 
 - `npm ci`: pass; 86 packages, zero vulnerabilities.
 - `npm test`: pass; TypeScript, 5 Vitest tests, 12 Rust tests, and both deployment fixtures.
@@ -60,19 +60,19 @@ scripts/deploy-durable-container.sh \
 
 The final Azure control plane returned:
 
-- latest and ready revision: `sf-accessible-explanation-9c1a54--0000057`;
+- latest and ready revision: `sf-accessible-explanation-9c1a54--0000060`;
 - one active revision and one running replica;
 - minimum and maximum replicas: 1;
 - Azure File storage: `aec-accessible-explanati-9c1a54`;
 - share: `sf-accessible-explanation-checkin-data`;
 - mount: `/app/data`;
-- image: `sociobotregistry.azurecr.io/sf-accessible-explanation-9c1a54:9f132e69f344`.
+- image: `sociobotregistry.azurecr.io/sf-accessible-explanation-9c1a54:5aa0519153e7`.
 
-The deployment gate created a real private check-in on revision `0000056`.
-It completed 24/24 independent student-link reads and 24/24 review-link reads.
-It submitted an explanation and saved a teacher review. The gate then forced
-revision `0000057`, confirmed a different running replica, repeated both sets
-of 24/24 reads, and recovered the saved review and receipt.
+The deployment gate created a real private check-in on revision `0000059`.
+It submitted an explanation and saved a teacher review. Student, review, and
+receipt links each returned 24/24 successful independent reads. The gate then
+forced revision `0000060` and confirmed a different running replica. All three
+resources returned another 24/24 successful reads, and the review remained.
 
 Evidence:
 
@@ -103,14 +103,14 @@ deployment. It verified:
 - required security headers are present and browser console errors are zero.
 
 The factory `verify-url.sh` also passed the cold home page. Its measured load
-was 546 ms with title, `lang`, one h1, main, alt text, and button labels present.
+was 552 ms with title, `lang`, one h1, main, alt text, and button labels present.
 
 A 150-request live burst returned 120 normal responses and 30 HTTP 429
 responses. Every 429 included `Retry-After`.
 
 Mobile Lighthouse 12.8.2 scores were 100 performance, 100 accessibility,
-100 best practices, and 100 SEO. LCP was 1.165 seconds, CLS was 0, and total
-blocking time was 63 ms.
+100 best practices, and 100 SEO. LCP was 1.052 seconds, CLS was 0, and total
+blocking time was 0 ms.
 
 Evidence:
 

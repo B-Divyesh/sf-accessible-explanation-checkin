@@ -2,8 +2,8 @@
 
 - Reviewed candidate: `976328637bdfe5cdec53afa4e4303882351ef760`
 - Review base: `84766c5177e24971b5596de3eaa3f75e7e9f37d1`
-- Repair source: `9f132e69f344ad82cacc4350c32d143bc849d7d3`
-- Live revision: `sf-accessible-explanation-9c1a54--0000057`
+- Repair source: `5aa0519153e7c34d129d37b9aba69d359b960a33`
+- Live revision: `sf-accessible-explanation-9c1a54--0000060`
 - Live URL: <https://accessible-explanation-checkin.sociobot.in>
 
 Every `.factory/review-*.md` and `.factory/polish-*.md` present at the review
@@ -34,13 +34,13 @@ F-2-1 is closed below with precise copy and three additional claim tests.
 | F-3-1 | Retained the public $39 one-time Sociobot/Dodo checkout and verified the live 303 destination. | `@claim:external-checkout`; checkout section in `.factory/evidence/polish-5-live-check.json`; live `/pricing`. |
 | F-3-2 | Retained the npm lockfile and verified installation from a clean clone. | `npm ci` passed with zero vulnerabilities in `.factory/evidence/polish-5-clean-clone.json`; `package-lock.json`. |
 | F-4-1 | Retained a visible Privacy link in the shared header on every SPA route and the static 404. | Browser test `every public route keeps Privacy in the primary navigation`; seven-route live audit; live `/`, `/demo`, `/create`, `/pricing`, `/privacy`, `/terms`, `/no-such-page`. |
-| F-5-1 | Deployed through the durable wrapper. Azure now has one active/running replica and one Azure File mount at `/app/data`. The gate created a check-in, read student and review links 24/24, submitted and reviewed it, replaced the revision, then repeated 24/24 reads and checked the receipt. | `scripts/verify-live-durable-workflow.sh`; `.factory/evidence/polish-5-live-durability.json`; `.factory/evidence/polish-5-live-topology.json`; live `/health`. |
+| F-5-1 | Deployed through the durable wrapper. Azure now has one active/running replica and one Azure File mount at `/app/data`. The gate read the student link, review link, and receipt 24/24 before replacement and 24/24 afterward. It also recovered the saved review. | `scripts/verify-live-durable-workflow.sh`; `.factory/evidence/polish-5-live-durability.json`; `.factory/evidence/polish-5-live-topology.json`; live `/health`. |
 | F-5-2 | Split the combined E2E command into fresh desktop/mobile application and claim shards. It remains fail-fast and avoids the accumulated Chromium lifecycle crash. | `npm run test:e2e` passed from the clean clone: 43 passed and 9 intentional device skips; `frontend/src/playwright-config.test.ts`; `.factory/evidence/polish-5-clean-clone.json`. |
 | F-5-3 | Split the 24-word README sentence into three short release-gate statements. | `.factory/copy-audit.md`; `README.md`; `@claim:durable-deployment-policy`. |
 
 ## Final verification
 
-- Fresh clone: `/tmp/aec-polish5-clean-final.R10Ppj/repo` at `9f132e6`.
+- Fresh clone: `/tmp/aec-polish5-receipts.ATYgws/repo` at `5aa0519`.
 - `npm ci`: pass, 86 packages and zero vulnerabilities.
 - `npm test`: pass, including TypeScript, 5 Vitest tests, 12 Rust tests, and deployment fixtures.
 - `npm run build`: pass; `dist/` produced. JavaScript is 38,568 bytes raw and 12,310 bytes gzip. CSS is 19,296 bytes raw and 5,160 bytes gzip.
@@ -51,6 +51,6 @@ F-2-1 is closed below with precise copy and three additional claim tests.
 - Live route, focus, link, demo, offline, workflow, checkout, security-header, mobile, dark-theme, and axe audit: pass.
 - Factory `verify-url.sh`: pass with no browser console errors.
 - Live 150-request rate burst: 120 normal responses, 30 HTTP 429 responses, and `Retry-After` on every 429.
-- Mobile Lighthouse: 100 performance, 100 accessibility, 100 best practices, and 100 SEO; LCP 1.165 s, CLS 0, TBT 63 ms.
+- Mobile Lighthouse: 100 performance, 100 accessibility, 100 best practices, and 100 SEO; LCP 1.052 s, CLS 0, TBT 0 ms.
 
 No finding from rounds 1–5 remains unresolved.
