@@ -7,7 +7,7 @@ use std::{
     str::FromStr,
     time::Duration,
 };
-use tokio::fs;
+use tokio::{fs, io::AsyncWriteExt};
 
 pub fn sqlite_path(database_url: &str) -> Option<PathBuf> {
     database_url
@@ -29,7 +29,7 @@ pub async fn restore_snapshot(
         if let Some(parent) = database_file.parent() {
             fs::create_dir_all(parent).await?;
         }
-        fs::copy(snapshot, database_file).await?;
+        copy_contents(&snapshot, database_file).await?;
     }
     Ok(())
 }
@@ -40,10 +40,24 @@ pub async fn save_snapshot(
 ) -> Result<(), std::io::Error> {
     fs::create_dir_all(persistence_dir).await?;
     let snapshot = persistence_dir.join("checkins.db");
-    // Azure Files does not permit the POSIX rename operation used for an
-    // atomic promotion. A single replica means no peer can read this snapshot
-    // while it is refreshed, and `copy` keeps the active SQLite file local.
-    fs::copy(database_file, snapshot).await.map(|_| ())
+    // Azure Files does not permit POSIX rename or chmod operations. Rust's
+    // fs::copy copies permission bits after the bytes and therefore fails with
+    // EPERM on the mounted SMB share. Stream only the file contents instead.
+    // One replica means no peer can read the snapshot while it is refreshed.
+    copy_contents(database_file, &snapshot).await
+}
+
+async fn copy_contents(source: &Path, destination: &Path) -> Result<(), std::io::Error> {
+    let mut source = fs::File::open(source).await?;
+    let mut destination = fs::OpenOptions::new()
+        .create(true)
+        .truncate(true)
+        .write(true)
+        .open(destination)
+        .await?;
+    tokio::io::copy(&mut source, &mut destination).await?;
+    destination.flush().await?;
+    destination.sync_all().await
 }
 
 pub async fn connect(database_url: &str) -> Result<SqlitePool, sqlx::Error> {
@@ -120,5 +134,35 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(fs::read(database_file).await.unwrap(), b"sqlite snapshot");
+    }
+
+    #[cfg(unix)]
+    #[tokio::test]
+    async fn durable_snapshot_replaces_bytes_without_copying_posix_permissions() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let temp = tempfile::tempdir().unwrap();
+        let database_file = temp.path().join("runtime.db");
+        let persistence_dir = temp.path().join("durable");
+        let snapshot = persistence_dir.join("checkins.db");
+        fs::create_dir_all(&persistence_dir).await.unwrap();
+        fs::write(&database_file, b"new snapshot").await.unwrap();
+        fs::write(&snapshot, b"old snapshot").await.unwrap();
+        fs::set_permissions(&database_file, std::fs::Permissions::from_mode(0o600))
+            .await
+            .unwrap();
+        fs::set_permissions(&snapshot, std::fs::Permissions::from_mode(0o644))
+            .await
+            .unwrap();
+
+        save_snapshot(&database_file, &persistence_dir)
+            .await
+            .unwrap();
+
+        assert_eq!(fs::read(&snapshot).await.unwrap(), b"new snapshot");
+        assert_eq!(
+            fs::metadata(&snapshot).await.unwrap().permissions().mode() & 0o777,
+            0o644
+        );
     }
 }
