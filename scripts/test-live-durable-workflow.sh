@@ -113,15 +113,18 @@ jq -e '
   and .topology.share_name == "durable-share"
   and .before_new_revision.student_reads_200 == 3
   and .before_new_revision.review_reads_200 == 3
+  and .before_new_revision.receipt_reads_200 == 3
   and .before_new_revision.submission_status == 201
   and .before_new_revision.review_saved == true
   and .after_new_revision.student_reads_200 == 3
   and .after_new_revision.review_reads_200 == 3
+  and .after_new_revision.receipt_reads_200 == 3
   and .after_new_revision.submission_and_review_persisted == true
 ' >/dev/null <<<"$output"
 grep -Fq 'containerapp update' "$test_dir/state/az.log"
 [[ $(grep -Fc 'GET https://example.test/api/checkins/student-token' "$test_dir/state/curl.log") == 6 ]]
 [[ $(grep -Fc 'GET https://example.test/api/reviews/review-token' "$test_dir/state/curl.log") == 8 ]]
+[[ $(grep -Fc 'GET https://example.test/api/receipts/receipt-token' "$test_dir/state/curl.log") == 6 ]]
 
 rm -rf "$test_dir/state"
 mkdir -p "$test_dir/state"
@@ -136,4 +139,4 @@ if MOCK_STATE_DIR="$test_dir/state" MOCK_FAIL_PRIVATE_READ=1 \
 fi
 grep -Fq 'student-link read 1/1 returned 404, expected 200' "$test_dir/failure.out"
 
-echo 'PASS: live durability checker covers cross-connection private reads, submit/review, and new-revision persistence'
+echo 'PASS: live durability checker covers student, review, and receipt reads across a new revision'

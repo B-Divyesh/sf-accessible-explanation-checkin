@@ -113,6 +113,15 @@ read_private_links() {
   done
 }
 
+read_receipt() {
+  local phase=$1
+  local status
+  for i in $(seq 1 "$read_attempts"); do
+    status=$(request GET "$base_url/api/receipts/$receipt_token")
+    expect_status 200 "$status" "$phase receipt read $i/$read_attempts"
+  done
+}
+
 read_private_links before-restart
 
 submission_payload=$(jq -nc --arg marker "$marker" '{
@@ -136,6 +145,7 @@ review_payload=$(jq -nc --arg marker "$marker" '{
 }')
 status=$(request PATCH "$base_url/api/reviews/$review_token/submissions/$submission_id" "$review_payload")
 expect_status 200 "$status" 'save teacher review'
+read_receipt before-restart
 
 $az_bin containerapp update --resource-group "$resource_group" \
   --name "$app_name" --set-env-vars "DURABILITY_REVISION_MARKER=$marker" --output none
@@ -213,8 +223,7 @@ jq -e --arg marker "$marker" '
     and .teacher_note == ("Revision persistence verified for " + $marker)
     and .follow_up == true)
 ' >/dev/null "$body_file" || fail "submitted explanation or saved teacher review did not persist across the new revision"
-status=$(request GET "$base_url/api/receipts/$receipt_token")
-expect_status 200 "$status" 'student receipt after new revision'
+read_receipt after-new-revision
 jq -e --arg marker "$marker" '
   .student_name == "Deployment verifier"
   and (.explanation_text | contains($marker))
@@ -240,6 +249,6 @@ jq -n \
     build_sha: $build_sha,
     marker: $marker,
     topology: {min_replicas: 1, max_replicas: 1, azure_files_mount: "/app/data", storage_name: $storage_name, share_name: $share_name, active_revisions: 1, running_replicas: 1},
-    before_new_revision: {student_reads_200: $reads, review_reads_200: $reads, submission_status: 201, review_saved: true},
-    after_new_revision: {student_reads_200: $reads, review_reads_200: $reads, receipt_status: 200, submission_and_review_persisted: true}
+    before_new_revision: {student_reads_200: $reads, review_reads_200: $reads, receipt_reads_200: $reads, submission_status: 201, review_saved: true},
+    after_new_revision: {student_reads_200: $reads, review_reads_200: $reads, receipt_reads_200: $reads, submission_and_review_persisted: true}
   }'
