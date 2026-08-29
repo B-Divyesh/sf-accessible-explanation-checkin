@@ -1,12 +1,17 @@
 {
   "communities": {
     "0": [
+      "frontend_src_config",
+      "frontend_src_config_billing_base_url",
+      "frontend_src_config_product_slug",
+      "frontend_src_config_test",
       "frontend_src_main",
       "frontend_src_main_announce",
       "frontend_src_main_api",
       "frontend_src_main_blobbase64",
       "frontend_src_main_capturelicense",
       "frontend_src_main_checkin",
+      "frontend_src_main_cleardemostate",
       "frontend_src_main_copytext",
       "frontend_src_main_createcheckin",
       "frontend_src_main_createpage",
@@ -82,6 +87,7 @@
       "src_routes_appstate",
       "src_routes_claim_classroom_plus_limits",
       "src_routes_claim_stored_record_shape",
+      "src_routes_claim_teacher_voice_deletion",
       "src_routes_claim_voice_retention_deletion",
       "src_routes_clean",
       "src_routes_cleanup_expired_voice",
@@ -218,6 +224,24 @@
       "src_main_shutdown"
     ],
     "6": [
+      "factory_live_audit",
+      "factory_live_audit_consoleerrors",
+      "factory_live_audit_crawledlinks",
+      "factory_live_audit_darkthemeresults",
+      "factory_live_audit_demorequests",
+      "factory_live_audit_evidencedir",
+      "factory_live_audit_exactvoice",
+      "factory_live_audit_expected",
+      "factory_live_audit_oversizedvoice",
+      "factory_live_audit_recordedmedia",
+      "factory_live_audit_recordedmedia_start",
+      "factory_live_audit_recordedmedia_stop",
+      "factory_live_audit_report",
+      "factory_live_audit_routeresults",
+      "factory_live_audit_unexpectedconsoleerrors",
+      "factory_live_audit_workflowrequests"
+    ],
+    "7": [
       "error",
       "pathbuf",
       "sqlitepool",
@@ -231,20 +255,17 @@
       "src_db_save_snapshot",
       "src_db_sqlite_path"
     ],
-    "7": [
-      "factory_live_audit",
-      "factory_live_audit_consoleerrors",
-      "factory_live_audit_crawledlinks",
-      "factory_live_audit_darkthemeresults",
-      "factory_live_audit_demorequests",
-      "factory_live_audit_evidencedir",
-      "factory_live_audit_expected",
-      "factory_live_audit_report",
-      "factory_live_audit_routeresults",
-      "factory_live_audit_unexpectedconsoleerrors",
-      "factory_live_audit_workflowrequests"
-    ],
     "8": [
+      "frontend_tests_claims_spec",
+      "frontend_tests_claims_spec_createcheckin",
+      "frontend_tests_claims_spec_desktoponly",
+      "frontend_tests_claims_spec_recordedmedia",
+      "frontend_tests_claims_spec_recordedmedia_start",
+      "frontend_tests_claims_spec_recordedmedia_stop",
+      "frontend_tests_claims_spec_recordingwindow",
+      "frontend_tests_claims_spec_tabto"
+    ],
+    "9": [
       "headermap",
       "intoresponse",
       "src_http_policy",
@@ -254,7 +275,7 @@
       "src_http_policy_rs_response",
       "src_http_policy_set_etag"
     ],
-    "9": [
+    "10": [
       "scripts_verify_live_durable_workflow",
       "scripts_verify_live_durable_workflow_expect_status",
       "scripts_verify_live_durable_workflow_fail",
@@ -263,131 +284,119 @@
       "scripts_verify_live_durable_workflow_request",
       "scripts_verify_live_durable_workflow_sh__entry"
     ],
-    "10": [
+    "11": [
       "frontend_playwright_config",
       "frontend_playwright_config_cold_server_start_timeout_ms",
       "frontend_src_playwright_config_test",
       "frontend_src_playwright_config_test_claim"
     ],
-    "11": [
-      "frontend_src_config",
-      "frontend_src_config_billing_base_url",
-      "frontend_src_config_product_slug",
-      "frontend_src_config_test"
-    ],
     "12": [
-      "frontend_tests_claims_spec",
-      "frontend_tests_claims_spec_createcheckin",
-      "frontend_tests_claims_spec_desktoponly",
-      "frontend_tests_claims_spec_tabto"
-    ],
-    "13": [
       "scripts_test_all_claims",
       "scripts_test_all_claims_claims",
       "scripts_test_all_claims_ids",
       "scripts_test_all_claims_root"
     ],
-    "14": [
+    "13": [
       "scripts_test_nonroot_runtime",
       "scripts_test_nonroot_runtime_cleanup",
       "scripts_test_nonroot_runtime_sh__entry"
     ],
-    "15": [
+    "14": [
       "frontend_public_sw",
       "frontend_public_sw_shell"
     ],
-    "16": [
+    "15": [
       "frontend_tests_app_spec",
       "frontend_tests_app_spec_expectaccessible"
     ],
-    "17": [
+    "16": [
       "scripts_deploy_durable_container",
       "scripts_deploy_durable_container_sh__entry"
     ],
-    "18": [
+    "17": [
       "scripts_test_container_build_identity",
       "scripts_test_container_build_identity_sh__entry"
     ],
-    "19": [
+    "18": [
       "scripts_test_deploy_container_name",
       "scripts_test_deploy_container_name_sh__entry"
     ],
-    "20": [
+    "19": [
       "scripts_test_durable_deploy",
       "scripts_test_durable_deploy_sh__entry"
     ],
-    "21": [
+    "20": [
       "scripts_test_live_durable_workflow",
       "scripts_test_live_durable_workflow_sh__entry"
     ],
-    "22": [
+    "21": [
       "frontend_vite_config"
     ],
-    "23": [
+    "22": [
       "pkg_accessible_explanation_checkin"
     ],
-    "24": [
+    "23": [
       "src_db_rs_error"
     ],
-    "25": [
+    "24": [
       "src_db_rs_option"
     ],
-    "26": [
+    "25": [
       "src_db_rs_path"
     ],
-    "27": [
+    "26": [
       "src_db_rs_pathbuf"
     ],
-    "28": [
+    "27": [
       "src_db_rs_result"
     ],
-    "29": [
+    "28": [
       "src_db_rs_sqlitepool"
     ],
-    "30": [
+    "29": [
       "src_routes_rs_error"
     ],
-    "31": [
+    "30": [
       "src_routes_rs_option"
     ],
-    "32": [
+    "31": [
       "src_routes_rs_path"
     ],
-    "33": [
+    "32": [
       "src_routes_rs_pathbuf"
     ],
-    "34": [
+    "33": [
       "src_routes_rs_response"
     ],
-    "35": [
+    "34": [
       "src_routes_rs_result"
     ],
-    "36": [
+    "35": [
       "src_routes_rs_sqlitepool"
     ],
-    "37": [
+    "36": [
       "src_routes_rs_state"
     ],
-    "38": [
+    "37": [
       "src_routes_rs_string"
     ]
   },
   "cohesion": {
-    "0": 0.08619777895293496,
-    "1": 0.11967213114754098,
+    "0": 0.07824513794663049,
+    "1": 0.11845584346906399,
     "2": 0.08695652173913043,
     "3": 0.08695652173913043,
     "4": 0.1,
     "5": 0.15833333333333333,
-    "6": 0.3333333333333333,
-    "7": 0.18181818181818182,
-    "8": 0.35714285714285715,
-    "9": 0.6190476190476191,
-    "10": 0.6666666666666666,
-    "11": 0.8333333333333334,
+    "6": 0.125,
+    "7": 0.3333333333333333,
+    "8": 0.25,
+    "9": 0.35714285714285715,
+    "10": 0.6190476190476191,
+    "11": 0.6666666666666666,
     "12": 0.5,
-    "13": 0.5,
-    "14": 0.6666666666666666,
+    "13": 0.6666666666666666,
+    "14": 1.0,
     "15": 1.0,
     "16": 1.0,
     "17": 1.0,
@@ -410,8 +419,7 @@
     "34": 1.0,
     "35": 1.0,
     "36": 1.0,
-    "37": 1.0,
-    "38": 1.0
+    "37": 1.0
   },
   "gods": [
     {
@@ -425,19 +433,19 @@
       "degree": 23
     },
     {
-      "id": "src_routes_apierror",
-      "label": "ApiError",
-      "degree": 21
-    },
-    {
       "id": "src_routes_appstate",
       "label": "AppState",
       "degree": 21
     },
     {
+      "id": "src_routes_apierror",
+      "label": "ApiError",
+      "degree": 21
+    },
+    {
       "id": "frontend_src_main_render",
       "label": "render()",
-      "degree": 17
+      "degree": 18
     },
     {
       "id": "src_routes_create_submission",
@@ -450,8 +458,8 @@
       "degree": 15
     },
     {
-      "id": "src_routes_export_csv",
-      "label": "export_csv()",
+      "id": "frontend_tsconfig_compileroptions",
+      "label": "compilerOptions",
       "degree": 13
     },
     {
@@ -460,8 +468,8 @@
       "degree": 13
     },
     {
-      "id": "frontend_tsconfig_compileroptions",
-      "label": "compilerOptions",
+      "id": "src_routes_export_csv",
+      "label": "export_csv()",
       "degree": 13
     }
   ],
