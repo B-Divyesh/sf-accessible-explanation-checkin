@@ -247,17 +247,36 @@ test('@claim:billing-license-fixture handles an active and then revoked license 
   await expect(page.getByRole('button', { name: 'Create private links' })).toBeVisible();
 });
 
-test('@claim:external-checkout identifies Sociobot before leaving the product', async ({ page }) => {
-  await page.route('https://api.sociobot.in/api/v1/products/accessible-explanation-checkin/checkout', route => route.fulfill({
+test('@claim:external-checkout verifies the live $39 checkout before leaving the product', async ({ page, request }, testInfo) => {
+  desktopOnly(testInfo);
+  const checkoutUrl = 'https://api.sociobot.in/api/v1/products/accessible-explanation-checkin/checkout';
+  const catalogResponse = await request.get('https://api.sociobot.in/api/v1/products');
+  expect(catalogResponse.status()).toBe(200);
+  const catalog = await catalogResponse.json();
+  expect(catalog.data).toContainEqual(expect.objectContaining({
+    slug: 'accessible-explanation-checkin',
+    name: 'Accessible Explanation Check-in Classroom Plus',
+    price_minor: 3900,
+    currency: 'USD',
+    checkout_url: checkoutUrl,
+  }));
+
+  // This GET creates only an unpaid checkout session. Do not follow it or submit payment details.
+  const liveCheckout = await request.get(checkoutUrl, { maxRedirects: 0 });
+  expect(liveCheckout.status()).toBe(303);
+  expect(liveCheckout.headers().location).toMatch(/^https:\/\/checkout\.dodopayments\.com\/session\/cks_[A-Za-z0-9]+$/);
+
+  await page.route(checkoutUrl, route => route.fulfill({
     status: 200,
     contentType: 'text/html',
     body: '<!doctype html><html lang="en"><title>Sociobot checkout fixture</title><body><h1>Sociobot checkout fixture</h1></body></html>',
   }));
   await page.goto('/demo');
   await page.goto('/pricing');
+  await expect(page.getByRole('heading', { name: '$39 one time' })).toBeVisible();
   const checkout = page.getByRole('link', { name: 'Buy Classroom Plus through Sociobot (opens external site)' });
-  await expect(checkout).toHaveAttribute('href', 'https://api.sociobot.in/api/v1/products/accessible-explanation-checkin/checkout');
+  await expect(checkout).toHaveAttribute('href', checkoutUrl);
   await checkout.click();
-  await expect(page).toHaveURL('https://api.sociobot.in/api/v1/products/accessible-explanation-checkin/checkout');
+  await expect(page).toHaveURL(checkoutUrl);
   await expect(page.getByRole('heading', { name: 'Sociobot checkout fixture' })).toBeVisible();
 });
