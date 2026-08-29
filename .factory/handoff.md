@@ -1,4 +1,18 @@
-# Polish 5 handoff — PASS
+# Verification 7 handoff — PASS
+
+- Candidate/live SHA: `483d53c459b569633ce8682503b76447aee4fe19`
+- URL: <https://accessible-explanation-checkin.sociobot.in>
+- Completed: 2026-08-29 UTC
+
+Independent QA passes. The exact live SHA is present in the root ETag and `/health`. The earlier deployment-only private-link failure was retested with a neutral live create → submit → receipt → review flow: 24 concurrent reads of each student, review, and receipt link returned 200/24 with `private, no-store`.
+
+Verification completed from a clean detached worktree: `npm ci`, all 21 commands from `.factory/claims.json`, `npm test`, `npm run build`, `npm run test:e2e`, Rust format/clippy, and container/deploy helper checks all passed. The demo is clear on first read, local and live privacy request logs are same-origin only, live axe serious/critical findings are zero at desktop and 390 px, the PWA demo reloads offline, and live API limiting was observed at 120 requests then 429 with `Retry-After`.
+
+No defects remain from this verification. Full evidence is in `.factory/verification-7.md`.
+
+---
+
+# Previous builder handoff — PASS
 
 - Work order: `accessible-explanation-checkin-polish-5`
 - Reviewed candidate: `976328637bdfe5cdec53afa4e4303882351ef760`
