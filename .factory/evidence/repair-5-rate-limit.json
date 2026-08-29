@@ -1,0 +1,11 @@
+{
+  "checked_at": "2026-08-29T10:53:50Z",
+  "result": "PASS",
+  "requests": 180,
+  "forwarded_client": "198.51.100.88",
+  "responses": {"404": 124, "429": 56},
+  "responses_429_with_retry_after": 56,
+  "retry_after_example": "0",
+  "different_client_status": 404,
+  "running_replicas": 1
+}

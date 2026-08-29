@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-08-29T10:53:21Z",
+  "result": "PASS",
+  "health_build_sha": "c949913b58d06915a1cf243576159622cdeb0eb0",
+  "root_etag": "c949913b58d06915a1cf243576159622cdeb0eb0",
+  "byte_matches": {
+    "index.html": "8ff3e0f37547a093e9a3876b3a46b46277728bc874d3eadc15e3785485b05996",
+    "assets/index-BCVrwGDy.js": "49650e93578cc609cadc6f2bcd4082c1ee166b012e73f9bbc348115b9ed9c314",
+    "assets/index-CkYimbxM.css": "afa9c4a8402f44e2bc2368210f5a32d9411e4bb099af786fcc188b4fc83c578c",
+    "manifest.webmanifest": "75b4f6e9d45bdc37543b05160032fcbd5f77b6b83969c06ba9562398476ec8b7",
+    "sw.js": "c3ecd512f954ab78c994d9ea351d8a23d3084dcc63dfa7ef3f9ae45129a652cb"
+  }
+}

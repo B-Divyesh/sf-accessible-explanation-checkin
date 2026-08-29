@@ -1,0 +1,25 @@
+{
+  "checked_on": "2026-08-29",
+  "candidate": "6c0209c9f783f69e9c6a90fb34aa1ef9765415cf",
+  "revision": "sf-accessible-explanation-9c1a54--0000047",
+  "topology": {
+    "min_replicas": 2,
+    "max_replicas": 3,
+    "running_replicas": 2,
+    "volumes": null,
+    "volume_mounts": null
+  },
+  "create_status": 201,
+  "student_link_reads": {
+    "requests": 20,
+    "responses": {"200": 13, "404": 7}
+  },
+  "review_link_reads": {
+    "requests": 20,
+    "responses": {"200": 12, "404": 8}
+  },
+  "unexpected_body": {
+    "error": "That private link is not valid. Check that you copied the whole link."
+  },
+  "result": "FAIL_REPRODUCED"
+}

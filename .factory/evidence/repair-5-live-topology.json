@@ -1,0 +1,24 @@
+{
+  "checked_at": "2026-08-29T10:53:21Z",
+  "result": "PASS",
+  "container_app": "sf-accessible-explanation-9c1a54",
+  "revision": "sf-accessible-explanation-9c1a54--0000050",
+  "ready_revision": "sf-accessible-explanation-9c1a54--0000050",
+  "image": "sociobotregistry.azurecr.io/sf-accessible-explanation-9c1a54:c949913b58d0",
+  "build_sha": "c949913b58d06915a1cf243576159622cdeb0eb0",
+  "min_replicas": 1,
+  "max_replicas": 1,
+  "active_revisions": 1,
+  "running_replicas": 1,
+  "volume": {
+    "name": "checkin-data",
+    "storage_type": "AzureFile",
+    "storage_name": "aec-accessible-explanati-9c1a54",
+    "mount_path": "/app/data"
+  },
+  "azure_file": {
+    "access_mode": "ReadWrite",
+    "account_name": "sociobotblob",
+    "share_name": "sf-accessible-explanation-checkin-data"
+  }
+}
