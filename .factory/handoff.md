@@ -60,9 +60,32 @@ apply the durable topology.
   errors, one H1, `lang=en`, a main landmark, no missing image alternatives,
   and no unlabeled buttons at desktop and 390 px. Evidence is in
   `.factory/evidence/repair-4-local-home/` and `repair-4-local-demo/`.
-- The final deployment is performed only after this handoff is committed. The
-  wrapper's mandatory live output is the authoritative create/read/submit/
-  review/restart evidence for that exact commit; `/health` must match `HEAD`.
+- First live repair deployment, commit
+  `f0cd4dbc8977aa361a42fadc75bbc851bbfd9f71`: revision
+  `sf-accessible-explanation-9c1a54--0000041`, one running replica,
+  `minReplicas=1`, `maxReplicas=1`, Azure File storage
+  `aec-accessible-explanati-9c1a54`, mounted at `/app/data`. Before and after
+  an actual revision restart, all 12 student reads and all 12 review reads
+  returned 200. The submission returned 201; its receipt and saved teacher
+  review persisted after restart.
+- Live route audit: seven light and seven dark routes had zero serious/critical
+  Axe findings, zero undersized controls, no 390 px or 200%-text overflow, no
+  console errors, and correct H1 focus/announcement on forward and back.
+  The 14-link crawl passed. The full create, submit, review, save, and reload
+  browser flow passed and contacted only the product origin.
+- Live demo: three sample responses, isolated demo storage, reset, service
+  worker update, and offline reload passed. No demo API requests were made.
+- Live response policy: shell revalidation, immutable hashed assets, private
+  API `no-store`, CSP, HSTS, `nosniff`, no-referrer, Permissions Policy, and
+  request IDs passed. A 150-request rate test returned 124 × 404 and 26 × 429;
+  all 26 limited responses had `Retry-After`.
+- Live mobile Lighthouse: performance 100, accessibility 100, best practices
+  100, SEO 100; FCP 901 ms, LCP 1,051 ms, TBT 8 ms, CLS 0.
+- Load smoke: 100 concurrent `/health` requests returned 100 × 200 in 356 ms
+  (281 requests/second observed).
+- The final deployment is performed after this evidence update is committed.
+  Its mandatory wrapper output repeats the topology, private-link, and restart
+  checks and requires `/health.build_sha` to equal repository `HEAD`.
 
 ## Run and deploy
 
