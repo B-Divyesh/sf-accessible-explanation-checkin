@@ -7,9 +7,7 @@
       "json",
       "option",
       "path",
-      "pathbuf",
       "self",
-      "sqlitepool",
       "sqliterow",
       "src_routes",
       "src_routes_apierror",
@@ -123,11 +121,7 @@
       "frontend_src_main_wiredemocontrols",
       "frontend_src_main_wirelinks",
       "frontend_src_main_wiretheme",
-      "frontend_src_utils",
-      "frontend_src_utils_escapehtml",
-      "frontend_src_utils_formatdate",
-      "frontend_src_utils_test",
-      "frontend_src_utils_validretention"
+      "frontend_src_utils_formatdate"
     ],
     "2": [
       "axe_core_playwright",
@@ -144,11 +138,13 @@
       "package_name",
       "package_private",
       "package_scripts",
+      "package_scripts_audit_live",
       "package_scripts_build",
       "package_scripts_dev",
       "package_scripts_preview",
       "package_scripts_start",
       "package_scripts_test",
+      "package_scripts_test_all_claims",
       "package_scripts_test_claims",
       "package_scripts_test_container_identity",
       "package_scripts_test_deploy_helper",
@@ -207,21 +203,34 @@
       "src_main_shutdown"
     ],
     "5": [
+      "error",
+      "pathbuf",
+      "result",
+      "sqlitepool",
       "src_db",
       "src_db_connect",
+      "src_db_copy_contents",
+      "src_db_durable_snapshot_replaces_bytes_without_copying_posix_permissions",
       "src_db_durable_snapshot_round_trips_a_local_database_file",
       "src_db_is_locked",
       "src_db_restore_snapshot",
-      "src_db_rs_error",
-      "src_db_rs_option",
-      "src_db_rs_path",
-      "src_db_rs_pathbuf",
-      "src_db_rs_result",
-      "src_db_rs_sqlitepool",
       "src_db_save_snapshot",
       "src_db_sqlite_path"
     ],
     "6": [
+      "factory_live_audit",
+      "factory_live_audit_consoleerrors",
+      "factory_live_audit_crawledlinks",
+      "factory_live_audit_darkthemeresults",
+      "factory_live_audit_demorequests",
+      "factory_live_audit_evidencedir",
+      "factory_live_audit_expected",
+      "factory_live_audit_report",
+      "factory_live_audit_routeresults",
+      "factory_live_audit_unexpectedconsoleerrors",
+      "factory_live_audit_workflowrequests"
+    ],
+    "7": [
       "headermap",
       "intoresponse",
       "src_http_policy",
@@ -231,99 +240,124 @@
       "src_http_policy_rs_response",
       "src_http_policy_set_etag"
     ],
-    "7": [
+    "8": [
       "frontend_src_config",
       "frontend_src_config_billing_base_url",
       "frontend_src_config_product_slug",
       "frontend_src_config_test"
     ],
-    "8": [
+    "9": [
+      "frontend_src_utils",
+      "frontend_src_utils_escapehtml",
+      "frontend_src_utils_test",
+      "frontend_src_utils_validretention"
+    ],
+    "10": [
       "frontend_tests_claims_spec",
       "frontend_tests_claims_spec_createcheckin",
       "frontend_tests_claims_spec_desktoponly",
       "frontend_tests_claims_spec_tabto"
     ],
-    "9": [
+    "11": [
+      "scripts_test_all_claims",
+      "scripts_test_all_claims_claims",
+      "scripts_test_all_claims_ids",
+      "scripts_test_all_claims_root"
+    ],
+    "12": [
+      "frontend_tests_app_spec",
+      "frontend_tests_app_spec_expectaccessible",
+      "test"
+    ],
+    "13": [
       "scripts_test_nonroot_runtime",
       "scripts_test_nonroot_runtime_cleanup",
       "scripts_test_nonroot_runtime_sh__entry"
     ],
-    "10": [
+    "14": [
       "frontend_public_sw",
       "frontend_public_sw_shell"
     ],
-    "11": [
-      "frontend_tests_app_spec",
-      "frontend_tests_app_spec_expectaccessible"
-    ],
-    "12": [
+    "15": [
       "scripts_deploy_durable_container",
       "scripts_deploy_durable_container_sh__entry"
     ],
-    "13": [
+    "16": [
       "scripts_test_container_build_identity",
       "scripts_test_container_build_identity_sh__entry"
     ],
-    "14": [
+    "17": [
       "scripts_test_deploy_container_name",
       "scripts_test_deploy_container_name_sh__entry"
     ],
-    "15": [
+    "18": [
       "scripts_test_durable_deploy",
       "scripts_test_durable_deploy_sh__entry"
     ],
-    "16": [
-      "error"
-    ],
-    "17": [
+    "19": [
       "frontend_playwright_config"
     ],
-    "18": [
+    "20": [
       "frontend_vite_config"
     ],
-    "19": [
+    "21": [
       "pkg_accessible_explanation_checkin"
     ],
-    "20": [
+    "22": [
       "response"
     ],
-    "21": [
-      "result"
-    ],
-    "22": [
-      "src_routes_rs_option"
-    ],
     "23": [
-      "src_routes_rs_path"
+      "src_db_rs_error"
     ],
     "24": [
-      "src_routes_rs_pathbuf"
+      "src_db_rs_option"
     ],
     "25": [
-      "src_routes_rs_sqlitepool"
+      "src_db_rs_path"
     ],
     "26": [
-      "state"
+      "src_db_rs_pathbuf"
     ],
     "27": [
+      "src_db_rs_result"
+    ],
+    "28": [
+      "src_db_rs_sqlitepool"
+    ],
+    "29": [
+      "src_routes_rs_option"
+    ],
+    "30": [
+      "src_routes_rs_path"
+    ],
+    "31": [
+      "src_routes_rs_pathbuf"
+    ],
+    "32": [
+      "src_routes_rs_sqlitepool"
+    ],
+    "33": [
+      "state"
+    ],
+    "34": [
       "string"
     ]
   },
   "cohesion": {
-    "0": 0.11264720942140297,
-    "1": 0.08619777895293496,
-    "2": 0.0625,
+    "0": 0.11912568306010929,
+    "1": 0.09316394434361766,
+    "2": 0.058823529411764705,
     "3": 0.08695652173913043,
     "4": 0.15833333333333333,
-    "5": 0.28205128205128205,
-    "6": 0.35714285714285715,
-    "7": 0.8333333333333334,
-    "8": 0.5,
-    "9": 0.6666666666666666,
-    "10": 1.0,
-    "11": 1.0,
-    "12": 1.0,
-    "13": 1.0,
+    "5": 0.3333333333333333,
+    "6": 0.18181818181818182,
+    "7": 0.35714285714285715,
+    "8": 0.8333333333333334,
+    "9": 0.8333333333333334,
+    "10": 0.5,
+    "11": 0.5,
+    "12": 0.6666666666666666,
+    "13": 0.6666666666666666,
     "14": 1.0,
     "15": 1.0,
     "16": 1.0,
@@ -337,7 +371,14 @@
     "24": 1.0,
     "25": 1.0,
     "26": 1.0,
-    "27": 1.0
+    "27": 1.0,
+    "28": 1.0,
+    "29": 1.0,
+    "30": 1.0,
+    "31": 1.0,
+    "32": 1.0,
+    "33": 1.0,
+    "34": 1.0
   },
   "gods": [
     {
@@ -371,6 +412,11 @@
       "degree": 15
     },
     {
+      "id": "package_scripts",
+      "label": "scripts",
+      "degree": 14
+    },
+    {
       "id": "src_routes_export_csv",
       "label": "export_csv()",
       "degree": 13
@@ -384,11 +430,6 @@
       "id": "frontend_tsconfig_compileroptions",
       "label": "compilerOptions",
       "degree": 13
-    },
-    {
-      "id": "package_scripts",
-      "label": "scripts",
-      "degree": 12
     }
   ],
   "surprises": [
