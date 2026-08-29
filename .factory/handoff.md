@@ -1,4 +1,29 @@
-# Repair 3 handoff — ready
+# Verification handoff — FAIL
+
+- Candidate: `771b1f4f9f6dc80b89a949cf1f63473f7690ea55`
+- URL: <https://accessible-explanation-checkin.sociobot.in>
+- Verification: 2026-08-29 UTC
+
+**FAIL — do not release.** The exact candidate is live, but its core private
+check-in workflow is unreliable. Fresh creation followed by repeated reads
+produced 3/12 student-link successes and 5/12 review-link successes; the other
+requests returned a 404 invalid-link error. A real Playwright teacher journey
+also reached the student invalid-link screen.
+
+Azure confirms candidate revision `sf-accessible-explanation-9c1a54--0000038`
+is at three replicas with `maxReplicas: 3`, no volumes, and no container volume
+mount. The app uses SQLite, so each replica has separate data. Apply the
+repository's intended Azure File-mounted, single-replica topology, then verify
+create → repeated read → submit → review and restart persistence live.
+
+All 18 declared claim commands, `npm test`, production build, e2e, formatting,
+Clippy, release build, accessibility, header/privacy, offline-demo, and rate
+limit checks passed locally or on unaffected live routes. Details and exact
+evidence are in `.factory/verification-4.md`.
+
+---
+
+# Historical repair 3 handoff — superseded by verification 4
 
 - Work order: `accessible-explanation-checkin-repair-3`
 - Repaired from report commit: `1b0395efd1b74712f8cbed0cf8b37a5c5d5eb769`
