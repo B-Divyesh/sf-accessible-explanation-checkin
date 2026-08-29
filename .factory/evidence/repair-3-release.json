@@ -1,0 +1,61 @@
+{
+  "checked_at": "2026-08-29T06:46:43Z",
+  "repaired_candidate": "4e2abe4bcd743908aadcc7bd864ae50438c61d73",
+  "url": "https://accessible-explanation-checkin.sociobot.in",
+  "cold_claim_regression": {
+    "command": "CARGO_BUILD_JOBS=1 npm run test:claims -- --grep @claim:demo-isolation",
+    "fresh_worktree": true,
+    "rust_compile_seconds": 135,
+    "old_timeout_seconds": 120,
+    "new_timeout_seconds": 600,
+    "result": "2 passed"
+  },
+  "topology": {
+    "revision": "sf-accessible-explanation-9c1a54--0000035",
+    "latest_equals_ready": true,
+    "active_revisions": 1,
+    "running_replicas": 1,
+    "min_replicas": 1,
+    "max_replicas": 1,
+    "volume_type": "AzureFile",
+    "storage_name": "aec-accessible-explanati-9c1a54",
+    "mount_path": "/app/data"
+  },
+  "cross_connection_persistence": {
+    "create_status": 201,
+    "reads": {"200": 40},
+    "submissions": {"201": 35, "409": 5},
+    "not_found_responses": 0,
+    "after_revision_restart": {"review_status": 200, "saved_submissions": 35}
+  },
+  "rate_limit": {
+    "requests": 150,
+    "responses": {"404": 120, "429": 30},
+    "retry_after_values": ["0"],
+    "independent_client_status": 404
+  },
+  "offline_update": {
+    "service_worker": "activated",
+    "cache": "check-in-shell-v2",
+    "offline_title": "Demo — Accessible Explanation Check-in",
+    "offline_heading": "Watershed reasoning",
+    "sample_responses": 3
+  },
+  "asset_budgets": {
+    "javascript_raw_bytes": 38782,
+    "javascript_gzip_bytes": 12465,
+    "css_raw_bytes": 19296,
+    "css_gzip_bytes": 5177,
+    "largest_hero_bytes": 56604
+  },
+  "lighthouse_mobile": {
+    "performance": 99,
+    "accessibility": 100,
+    "best_practices": 100,
+    "seo": 100,
+    "fcp_ms": 976,
+    "lcp_ms": 1126,
+    "cls": 0,
+    "tbt_ms": 148.5
+  }
+}

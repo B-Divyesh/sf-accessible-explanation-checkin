@@ -85,8 +85,10 @@ fi
 latest_revision=$(jq -r '.properties.latestRevisionName' <<<"$effective")
 while IFS= read -r stale_revision; do
   [[ -z "$stale_revision" || "$stale_revision" == "$latest_revision" ]] && continue
+  # Single-revision mode may deactivate it between the list and this call.
+  # The final active-revision check below remains authoritative.
   az containerapp revision deactivate --resource-group "$resource_group" \
-    --name "$app_name" --revision "$stale_revision" --output none
+    --name "$app_name" --revision "$stale_revision" --output none || true
 done < <(az containerapp revision list --resource-group "$resource_group" \
   --name "$app_name" --query '[?properties.active].name' --output tsv)
 

@@ -1,50 +1,85 @@
-# Verification 3 handoff — FAIL
+# Repair 3 handoff — ready
 
-Candidate `96472326c1088487c69f739d97e3a3639f3cb4ed` was independently tested on
-2026-08-29 against <https://accessible-explanation-checkin.sociobot.in>.
+- Work order: `accessible-explanation-checkin-repair-3`
+- Repaired from report commit: `1b0395efd1b74712f8cbed0cf8b37a5c5d5eb769`
+- Failed candidate: `96472326c1088487c69f739d97e3a3639f3cb4ed`
+- Verified: 2026-08-29 UTC
+- Live URL: <https://accessible-explanation-checkin.sociobot.in>
 
-## Result
+## Release blockers repaired
 
-**FAIL — do not release.** The live backend is running three replicas without
-the declared Azure File volume. A newly created private link returned 404 on
-two of every three requests (20/30 sequential reads; exact repeating
-`404, 404, 200` pattern). Forty concurrent reads and submissions independently
-returned 27 × 404 and 13 successes. Azure reports `replicas: 3`,
-`maxReplicas: 3`, `volumes: null`, and no app volume mounts.
+### Cold claim startup
 
-The first declared claim command also failed from the installed clean checkout
-because Playwright's 120-second web-server timeout expired during the cold Rust
-compile. It passed after compilation, and a warm aggregate run completed all
-18 claims, but the acceptance contract makes the original claim failure
-release-blocking.
+The verifier's 120-second failure was reproduced with a clean target and one
+Rust build job. Compilation was still running when Playwright returned
+`Timed out waiting 120000ms from config.webServer`.
 
-## What passed
+`frontend/playwright.config.ts` now gives the server 600 seconds and runs
+`cargo run --locked`. A clean detached worktree then completed the same
+single-job compile in 2 minutes 15 seconds and passed both desktop and 390 px
+`demo-isolation` tests. `frontend/src/playwright-config.test.ts` enumerates all
+14 browser-backed claim commands and prevents a shorter timeout or unlocked
+backend command from returning.
 
-- First-read and one-click sample-demo gate.
-- `npm test`, `npm run build`, and the full Playwright suite (38 passed,
-  8 intentional skips).
-- All 18 claim commands after warm compilation.
-- Rust formatting, Clippy with warnings denied, locked release build, container
-  identity, non-root runtime, and source deployment-policy checks.
-- Local default startup with only `PORT`, restart persistence, invalid-input
-  recovery, exact local 35-response concurrency limit, and CSV safety.
-- Live build identity and byte-for-byte frontend assets.
-- Live 120-request per-client burst limit: 30/150 requests returned 429 and all
-  included `Retry-After`; another client remained available.
-- Seven-route light/dark Axe scan with zero serious/critical findings, 390 px
-  layout, keyboard focus, reduced motion, 200% text, offline reload, request
-  privacy, security/caching headers, and console checks.
-- Mobile Lighthouse: performance 90, accessibility 100, best practices 100,
-  SEO 100; LCP 1.149 s and CLS 0.
+### Durable production topology
 
-## Required next steps
+The live failure was confirmed before deployment: Container Apps reported
+`minReplicas: 1`, `maxReplicas: 3`, no volumes, and no mounts.
 
-1. Apply and verify the live one-replica plus `/app/data` Azure File settings.
-2. Confirm create/read/submit/review behavior across independent connections
-   and after a production restart.
-3. Make the claims runner tolerate or prebuild for a clean cold Rust compile.
-4. Re-run every `.factory/claims.json` command from a new clean checkout.
+The durable deploy wrapper now executes through a configurable factory helper,
+applies the one-replica Azure File template, waits until the latest revision is
+also ready, deactivates stale revisions, and verifies exactly one active and
+running replica before succeeding. Its regression test executes the real
+wrapper against mocked fleet and Azure control planes. The test validates the
+patch body and proves that an unapplied topology makes deployment fail.
 
-Full evidence and commands are in `.factory/verification-3.md`; compact machine
-evidence is under `.factory/evidence/verification-3-*.json`. No product code was
-changed during verification.
+The repaired deployment produced revision
+`sf-accessible-explanation-9c1a54--0000035` with one healthy replica,
+`minReplicas: 1`, `maxReplicas: 1`, storage
+`aec-accessible-explanati-9c1a54`, and an Azure File mount at `/app/data`.
+Forty independent reads all returned 200. Forty concurrent submissions returned
+the intended 35 × 201 and 5 × 409, with no 404s. After restarting the revision,
+the review still returned 200 with all 35 submissions.
+
+## Verification
+
+- `npm ci`: 86 packages, 0 reported vulnerabilities.
+- `npm test`: TypeScript passed; 5 Vitest and 11 Rust tests passed; executable
+  deployment-policy regression passed.
+- `npm run build`: emitted `dist/`; JS 38,782 bytes raw / 12,465 gzip and CSS
+  19,296 bytes raw / 5,177 gzip.
+- `npm run test:e2e`: 38 passed, 8 intentional mobile skips, 0 failed across
+  desktop Chromium and a 390 × 844 mobile viewport.
+- `npm run test:all-claims`: all 18 declared commands passed independently.
+- `cargo fmt --all -- --check`, locked Clippy with warnings denied, and locked
+  release build passed.
+- Container-name, build-identity, non-root runtime, and deployment-policy checks
+  passed. Docker CLI was unavailable; the production image was instead built
+  by Azure Container Registry and deployed successfully.
+- Live route crawl: 14 links; seven light and seven dark routes had zero
+  serious/critical Axe findings, zero undersized controls, no horizontal
+  overflow at 390 px or 200% text, and no console errors.
+- Keyboard skip-link, route focus/announcement, and complete classroom keyboard
+  workflows passed.
+- Demo storage isolation, reset, service-worker update, and offline reload with
+  all three samples passed. Browser workflows contacted only the product origin.
+- Response policy passed: private routes use `private, no-store`; hashed assets
+  use one-year immutable caching; shell and worker revalidate; security headers
+  and request IDs are present.
+- Live rate limit returned 120 allowed responses and 30 × 429 with
+  `Retry-After`; an independent forwarded client remained available.
+- Mobile Lighthouse: performance 99, accessibility 100, best practices 100,
+  SEO 100; FCP 976 ms, LCP 1,126 ms, CLS 0, TBT 149 ms.
+
+Evidence is in `.factory/evidence/repair-3-release.json`,
+`.factory/evidence/repair-3-live-check.json`,
+`.factory/evidence/repair-3-lighthouse-mobile.json`, and
+`.factory/evidence/repair-3-verify/`.
+
+## Known gaps and operations
+
+There are no known product release blockers. This is still intentionally a
+single-writer SQLite service. Every future deployment must use
+`scripts/deploy-durable-container.sh`; the generic factory helper alone resets
+the app to a stateless 1–3 replica template. The controller may reapply and
+verify the same Azure Files mount after deployment.
