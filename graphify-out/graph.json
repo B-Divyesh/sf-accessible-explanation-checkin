@@ -57,7 +57,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 11,
+      "community": 10,
       "file_type": "code",
       "norm_label": "claim",
       "source_file": "frontend/src/playwright-config.test.ts",
@@ -651,7 +651,7 @@
       "label": "createCheckin()",
       "_callable": true,
       "_origin": "ast",
-      "community": 13,
+      "community": 12,
       "file_type": "code",
       "norm_label": "createcheckin()",
       "source_file": "frontend/tests/claims.spec.ts",
@@ -662,7 +662,7 @@
       "label": "desktopOnly()",
       "_callable": true,
       "_origin": "ast",
-      "community": 13,
+      "community": 12,
       "file_type": "code",
       "norm_label": "desktoponly()",
       "source_file": "frontend/tests/claims.spec.ts",
@@ -673,7 +673,7 @@
       "label": "tabTo()",
       "_callable": true,
       "_origin": "ast",
-      "community": 13,
+      "community": 12,
       "file_type": "code",
       "norm_label": "tabto()",
       "source_file": "frontend/tests/claims.spec.ts",
@@ -684,7 +684,7 @@
       "label": "expectAccessible()",
       "_callable": true,
       "_origin": "ast",
-      "community": 15,
+      "community": 16,
       "file_type": "code",
       "norm_label": "expectaccessible()",
       "source_file": "frontend/tests/app.spec.ts",
@@ -821,6 +821,16 @@
       "source_location": ""
     },
     {
+      "id": "self",
+      "label": "Self",
+      "_origin": "ast",
+      "community": 1,
+      "file_type": "code",
+      "norm_label": "self",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
       "id": "sqliterow",
       "label": "SqliteRow",
       "_origin": "ast",
@@ -851,6 +861,16 @@
       "source_location": "L31"
     },
     {
+      "id": "src_routes_apierror_from",
+      "label": ".from()",
+      "_origin": "ast",
+      "community": 1,
+      "file_type": "code",
+      "norm_label": ".from()",
+      "source_file": "src/routes.rs",
+      "source_location": "L40"
+    },
+    {
       "id": "src_routes_apierror_into_response",
       "label": ".into_response()",
       "_origin": "ast",
@@ -871,6 +891,36 @@
       "source_location": "L20"
     },
     {
+      "id": "src_routes_claim_classroom_plus_limits",
+      "label": "claim_classroom_plus_limits()",
+      "_origin": "ast",
+      "community": 1,
+      "file_type": "code",
+      "norm_label": "claim_classroom_plus_limits()",
+      "source_file": "src/routes.rs",
+      "source_location": "L928"
+    },
+    {
+      "id": "src_routes_claim_stored_record_shape",
+      "label": "claim_stored_record_shape()",
+      "_origin": "ast",
+      "community": 1,
+      "file_type": "code",
+      "norm_label": "claim_stored_record_shape()",
+      "source_file": "src/routes.rs",
+      "source_location": "L822"
+    },
+    {
+      "id": "src_routes_claim_voice_retention_deletion",
+      "label": "claim_voice_retention_deletion()",
+      "_origin": "ast",
+      "community": 1,
+      "file_type": "code",
+      "norm_label": "claim_voice_retention_deletion()",
+      "source_file": "src/routes.rs",
+      "source_location": "L884"
+    },
+    {
       "id": "src_routes_clean",
       "label": "clean()",
       "_origin": "ast",
@@ -889,6 +939,26 @@
       "norm_label": "cleanup_expired_voice()",
       "source_file": "src/routes.rs",
       "source_location": "L532"
+    },
+    {
+      "id": "src_routes_complete_free_checkin_flow",
+      "label": "complete_free_checkin_flow()",
+      "_origin": "ast",
+      "community": 1,
+      "file_type": "code",
+      "norm_label": "complete_free_checkin_flow()",
+      "source_file": "src/routes.rs",
+      "source_location": "L656"
+    },
+    {
+      "id": "src_routes_concurrent_submissions_stop_exactly_at_the_free_limit",
+      "label": "concurrent_submissions_stop_exactly_at_the_free_limit()",
+      "_origin": "ast",
+      "community": 1,
+      "file_type": "code",
+      "norm_label": "concurrent_submissions_stop_exactly_at_the_free_limit()",
+      "source_file": "src/routes.rs",
+      "source_location": "L759"
     },
     {
       "id": "src_routes_create_checkin",
@@ -1041,6 +1111,16 @@
       "source_location": "L585"
     },
     {
+      "id": "src_routes_json_response",
+      "label": "json_response()",
+      "_origin": "ast",
+      "community": 1,
+      "file_type": "code",
+      "norm_label": "json_response()",
+      "source_file": "src/routes.rs",
+      "source_location": "L620"
+    },
+    {
       "id": "src_routes_license_valid",
       "label": "license_valid()",
       "_origin": "ast",
@@ -1121,6 +1201,16 @@
       "source_location": "L380"
     },
     {
+      "id": "src_routes_router",
+      "label": "router()",
+      "_origin": "ast",
+      "community": 1,
+      "file_type": "code",
+      "norm_label": "router()",
+      "source_file": "src/routes.rs",
+      "source_location": "L49"
+    },
+    {
       "id": "src_routes_row_to_submission",
       "label": "row_to_submission()",
       "_origin": "ast",
@@ -1139,6 +1229,26 @@
       "norm_label": "submission",
       "source_file": "src/routes.rs",
       "source_location": "L326"
+    },
+    {
+      "id": "src_routes_test_app",
+      "label": "test_app()",
+      "_origin": "ast",
+      "community": 1,
+      "file_type": "code",
+      "norm_label": "test_app()",
+      "source_file": "src/routes.rs",
+      "source_location": "L625"
+    },
+    {
+      "id": "src_routes_test_state",
+      "label": "test_state()",
+      "_origin": "ast",
+      "community": 1,
+      "file_type": "code",
+      "norm_label": "test_state()",
+      "source_file": "src/routes.rs",
+      "source_location": "L640"
     },
     {
       "id": "src_routes_token",
@@ -1211,6 +1321,16 @@
       "source_location": ""
     },
     {
+      "id": "tempdir",
+      "label": "TempDir",
+      "_origin": "ast",
+      "community": 1,
+      "file_type": "code",
+      "norm_label": "tempdir",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
       "id": "value",
       "label": "Value",
       "_origin": "ast",
@@ -1231,108 +1351,10 @@
       "source_location": ""
     },
     {
-      "id": "scripts_verify_live_durable_workflow",
-      "label": "verify-live-durable-workflow.sh",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "metadata": {
-        "language": "bash",
-        "kind": "file"
-      },
-      "norm_label": "verify-live-durable-workflow.sh",
-      "source_file": "scripts/verify-live-durable-workflow.sh",
-      "source_location": "L1"
-    },
-    {
-      "id": "scripts_verify_live_durable_workflow_expect_status",
-      "label": "expect_status()",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "norm_label": "expect_status()",
-      "source_file": "scripts/verify-live-durable-workflow.sh",
-      "source_location": "L43"
-    },
-    {
-      "id": "scripts_verify_live_durable_workflow_fail",
-      "label": "fail()",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "norm_label": "fail()",
-      "source_file": "scripts/verify-live-durable-workflow.sh",
-      "source_location": "L25"
-    },
-    {
-      "id": "scripts_verify_live_durable_workflow_read_private_links",
-      "label": "read_private_links()",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "norm_label": "read_private_links()",
-      "source_file": "scripts/verify-live-durable-workflow.sh",
-      "source_location": "L105"
-    },
-    {
-      "id": "scripts_verify_live_durable_workflow_read_receipt",
-      "label": "read_receipt()",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "norm_label": "read_receipt()",
-      "source_file": "scripts/verify-live-durable-workflow.sh",
-      "source_location": "L116"
-    },
-    {
-      "id": "scripts_verify_live_durable_workflow_request",
-      "label": "request()",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_function"
-      },
-      "norm_label": "request()",
-      "source_file": "scripts/verify-live-durable-workflow.sh",
-      "source_location": "L30"
-    },
-    {
-      "id": "scripts_verify_live_durable_workflow_sh__entry",
-      "label": "verify-live-durable-workflow.sh script",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_entrypoint"
-      },
-      "norm_label": "verify-live-durable-workflow.sh script",
-      "source_file": "scripts/verify-live-durable-workflow.sh",
-      "source_location": "L1"
-    },
-    {
       "id": "frontend_playwright_config",
       "label": "playwright.config.ts",
       "_origin": "ast",
-      "community": 11,
+      "community": 10,
       "file_type": "code",
       "norm_label": "playwright.config.ts",
       "source_file": "frontend/playwright.config.ts",
@@ -1342,7 +1364,7 @@
       "id": "frontend_playwright_config_cold_server_start_timeout_ms",
       "label": "COLD_SERVER_START_TIMEOUT_MS",
       "_origin": "ast",
-      "community": 11,
+      "community": 10,
       "file_type": "code",
       "norm_label": "cold_server_start_timeout_ms",
       "source_file": "frontend/playwright.config.ts",
@@ -1352,7 +1374,7 @@
       "id": "frontend_src_playwright_config_test",
       "label": "playwright-config.test.ts",
       "_origin": "ast",
-      "community": 11,
+      "community": 10,
       "file_type": "code",
       "norm_label": "playwright-config.test.ts",
       "source_file": "frontend/src/playwright-config.test.ts",
@@ -1362,7 +1384,7 @@
       "id": "frontend_src_config",
       "label": "config.ts",
       "_origin": "ast",
-      "community": 12,
+      "community": 11,
       "file_type": "code",
       "norm_label": "config.ts",
       "source_file": "frontend/src/config.ts",
@@ -1372,7 +1394,7 @@
       "id": "frontend_src_config_billing_base_url",
       "label": "BILLING_BASE_URL",
       "_origin": "ast",
-      "community": 12,
+      "community": 11,
       "file_type": "code",
       "norm_label": "billing_base_url",
       "source_file": "frontend/src/config.ts",
@@ -1382,7 +1404,7 @@
       "id": "frontend_src_config_product_slug",
       "label": "PRODUCT_SLUG",
       "_origin": "ast",
-      "community": 12,
+      "community": 11,
       "file_type": "code",
       "norm_label": "product_slug",
       "source_file": "frontend/src/config.ts",
@@ -1392,7 +1414,7 @@
       "id": "frontend_src_config_test",
       "label": "config.test.ts",
       "_origin": "ast",
-      "community": 12,
+      "community": 11,
       "file_type": "code",
       "norm_label": "config.test.ts",
       "source_file": "frontend/src/config.test.ts",
@@ -1402,7 +1424,7 @@
       "id": "frontend_tests_claims_spec",
       "label": "claims.spec.ts",
       "_origin": "ast",
-      "community": 13,
+      "community": 12,
       "file_type": "code",
       "norm_label": "claims.spec.ts",
       "source_file": "frontend/tests/claims.spec.ts",
@@ -1412,7 +1434,7 @@
       "id": "scripts_test_all_claims",
       "label": "test-all-claims.mjs",
       "_origin": "ast",
-      "community": 14,
+      "community": 13,
       "file_type": "code",
       "norm_label": "test-all-claims.mjs",
       "source_file": "scripts/test-all-claims.mjs",
@@ -1422,7 +1444,7 @@
       "id": "scripts_test_all_claims_claims",
       "label": "claims",
       "_origin": "ast",
-      "community": 14,
+      "community": 13,
       "file_type": "code",
       "norm_label": "claims",
       "source_file": "scripts/test-all-claims.mjs",
@@ -1432,7 +1454,7 @@
       "id": "scripts_test_all_claims_ids",
       "label": "ids",
       "_origin": "ast",
-      "community": 14,
+      "community": 13,
       "file_type": "code",
       "norm_label": "ids",
       "source_file": "scripts/test-all-claims.mjs",
@@ -1442,37 +1464,17 @@
       "id": "scripts_test_all_claims_root",
       "label": "root",
       "_origin": "ast",
-      "community": 14,
+      "community": 13,
       "file_type": "code",
       "norm_label": "root",
       "source_file": "scripts/test-all-claims.mjs",
       "source_location": "L6"
     },
     {
-      "id": "test",
-      "label": "@playwright/test",
-      "_origin": "ast",
-      "community": 15,
-      "confidence": "EXTRACTED",
-      "file_type": "code",
-      "norm_label": "@playwright/test",
-      "source_file": "@playwright/test"
-    },
-    {
-      "id": "frontend_tests_app_spec",
-      "label": "app.spec.ts",
-      "_origin": "ast",
-      "community": 15,
-      "file_type": "code",
-      "norm_label": "app.spec.ts",
-      "source_file": "frontend/tests/app.spec.ts",
-      "source_location": "L1"
-    },
-    {
       "id": "scripts_test_nonroot_runtime",
       "label": "test-nonroot-runtime.sh",
       "_origin": "ast",
-      "community": 16,
+      "community": 14,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1486,7 +1488,7 @@
       "id": "scripts_test_nonroot_runtime_cleanup",
       "label": "cleanup()",
       "_origin": "ast",
-      "community": 16,
+      "community": 14,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1500,7 +1502,7 @@
       "id": "scripts_test_nonroot_runtime_sh__entry",
       "label": "test-nonroot-runtime.sh script",
       "_origin": "ast",
-      "community": 16,
+      "community": 14,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1514,7 +1516,7 @@
       "id": "frontend_public_sw",
       "label": "sw.js",
       "_origin": "ast",
-      "community": 17,
+      "community": 15,
       "file_type": "code",
       "norm_label": "sw.js",
       "source_file": "frontend/public/sw.js",
@@ -1524,17 +1526,27 @@
       "id": "frontend_public_sw_shell",
       "label": "SHELL",
       "_origin": "ast",
-      "community": 17,
+      "community": 15,
       "file_type": "code",
       "norm_label": "shell",
       "source_file": "frontend/public/sw.js",
       "source_location": "L2"
     },
     {
+      "id": "frontend_tests_app_spec",
+      "label": "app.spec.ts",
+      "_origin": "ast",
+      "community": 16,
+      "file_type": "code",
+      "norm_label": "app.spec.ts",
+      "source_file": "frontend/tests/app.spec.ts",
+      "source_location": "L1"
+    },
+    {
       "id": "scripts_deploy_durable_container",
       "label": "deploy-durable-container.sh",
       "_origin": "ast",
-      "community": 18,
+      "community": 17,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1548,7 +1560,7 @@
       "id": "scripts_deploy_durable_container_sh__entry",
       "label": "deploy-durable-container.sh script",
       "_origin": "ast",
-      "community": 18,
+      "community": 17,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1562,7 +1574,7 @@
       "id": "scripts_test_container_build_identity",
       "label": "test-container-build-identity.sh",
       "_origin": "ast",
-      "community": 19,
+      "community": 18,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1576,7 +1588,7 @@
       "id": "scripts_test_container_build_identity_sh__entry",
       "label": "test-container-build-identity.sh script",
       "_origin": "ast",
-      "community": 19,
+      "community": 18,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1584,6 +1596,34 @@
       },
       "norm_label": "test-container-build-identity.sh script",
       "source_file": "scripts/test-container-build-identity.sh",
+      "source_location": "L1"
+    },
+    {
+      "id": "scripts_test_deploy_container_name",
+      "label": "test-deploy-container-name.sh",
+      "_origin": "ast",
+      "community": 19,
+      "file_type": "code",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "norm_label": "test-deploy-container-name.sh",
+      "source_file": "scripts/test-deploy-container-name.sh",
+      "source_location": "L1"
+    },
+    {
+      "id": "scripts_test_deploy_container_name_sh__entry",
+      "label": "test-deploy-container-name.sh script",
+      "_origin": "ast",
+      "community": 19,
+      "file_type": "code",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "norm_label": "test-deploy-container-name.sh script",
+      "source_file": "scripts/test-deploy-container-name.sh",
       "source_location": "L1"
     },
     {
@@ -1817,38 +1857,10 @@
       "source_location": "L14"
     },
     {
-      "id": "scripts_test_deploy_container_name",
-      "label": "test-deploy-container-name.sh",
-      "_origin": "ast",
-      "community": 20,
-      "file_type": "code",
-      "metadata": {
-        "language": "bash",
-        "kind": "file"
-      },
-      "norm_label": "test-deploy-container-name.sh",
-      "source_file": "scripts/test-deploy-container-name.sh",
-      "source_location": "L1"
-    },
-    {
-      "id": "scripts_test_deploy_container_name_sh__entry",
-      "label": "test-deploy-container-name.sh script",
-      "_origin": "ast",
-      "community": 20,
-      "file_type": "code",
-      "metadata": {
-        "language": "bash",
-        "kind": "bash_entrypoint"
-      },
-      "norm_label": "test-deploy-container-name.sh script",
-      "source_file": "scripts/test-deploy-container-name.sh",
-      "source_location": "L1"
-    },
-    {
       "id": "scripts_test_durable_deploy",
       "label": "test-durable-deploy.sh",
       "_origin": "ast",
-      "community": 21,
+      "community": 20,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1862,7 +1874,7 @@
       "id": "scripts_test_durable_deploy_sh__entry",
       "label": "test-durable-deploy.sh script",
       "_origin": "ast",
-      "community": 21,
+      "community": 20,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1876,7 +1888,7 @@
       "id": "scripts_test_live_durable_workflow",
       "label": "test-live-durable-workflow.sh",
       "_origin": "ast",
-      "community": 22,
+      "community": 21,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1890,7 +1902,7 @@
       "id": "scripts_test_live_durable_workflow_sh__entry",
       "label": "test-live-durable-workflow.sh script",
       "_origin": "ast",
-      "community": 22,
+      "community": 21,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1904,7 +1916,7 @@
       "id": "frontend_vite_config",
       "label": "vite.config.ts",
       "_origin": "ast",
-      "community": 23,
+      "community": 22,
       "file_type": "code",
       "norm_label": "vite.config.ts",
       "source_file": "frontend/vite.config.ts",
@@ -1914,7 +1926,7 @@
       "id": "pkg_accessible_explanation_checkin",
       "label": "accessible-explanation-checkin",
       "_origin": "ast",
-      "community": 24,
+      "community": 23,
       "ecosystem": "cargo",
       "file_type": "code",
       "norm_label": "accessible-explanation-checkin",
@@ -1927,7 +1939,7 @@
       "id": "src_db_rs_error",
       "label": "Error",
       "_origin": "ast",
-      "community": 25,
+      "community": 24,
       "file_type": "code",
       "norm_label": "error",
       "source_file": "",
@@ -1937,7 +1949,7 @@
       "id": "src_db_rs_option",
       "label": "Option",
       "_origin": "ast",
-      "community": 26,
+      "community": 25,
       "file_type": "code",
       "norm_label": "option",
       "source_file": "",
@@ -1947,7 +1959,7 @@
       "id": "src_db_rs_path",
       "label": "Path",
       "_origin": "ast",
-      "community": 27,
+      "community": 26,
       "file_type": "code",
       "norm_label": "path",
       "source_file": "",
@@ -1957,7 +1969,7 @@
       "id": "src_db_rs_pathbuf",
       "label": "PathBuf",
       "_origin": "ast",
-      "community": 28,
+      "community": 27,
       "file_type": "code",
       "norm_label": "pathbuf",
       "source_file": "",
@@ -1967,9 +1979,19 @@
       "id": "src_db_rs_result",
       "label": "Result",
       "_origin": "ast",
-      "community": 29,
+      "community": 28,
       "file_type": "code",
       "norm_label": "result",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "src_db_rs_sqlitepool",
+      "label": "SqlitePool",
+      "_origin": "ast",
+      "community": 29,
+      "file_type": "code",
+      "norm_label": "sqlitepool",
       "source_file": "",
       "source_location": ""
     },
@@ -2204,20 +2226,10 @@
       "source_location": "L12"
     },
     {
-      "id": "src_db_rs_sqlitepool",
-      "label": "SqlitePool",
-      "_origin": "ast",
-      "community": 30,
-      "file_type": "code",
-      "norm_label": "sqlitepool",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
       "id": "src_routes_rs_error",
       "label": "Error",
       "_origin": "ast",
-      "community": 31,
+      "community": 30,
       "file_type": "code",
       "norm_label": "error",
       "source_file": "",
@@ -2227,7 +2239,7 @@
       "id": "src_routes_rs_option",
       "label": "Option",
       "_origin": "ast",
-      "community": 32,
+      "community": 31,
       "file_type": "code",
       "norm_label": "option",
       "source_file": "",
@@ -2237,7 +2249,7 @@
       "id": "src_routes_rs_path",
       "label": "Path",
       "_origin": "ast",
-      "community": 33,
+      "community": 32,
       "file_type": "code",
       "norm_label": "path",
       "source_file": "",
@@ -2247,7 +2259,7 @@
       "id": "src_routes_rs_pathbuf",
       "label": "PathBuf",
       "_origin": "ast",
-      "community": 34,
+      "community": 33,
       "file_type": "code",
       "norm_label": "pathbuf",
       "source_file": "",
@@ -2257,7 +2269,7 @@
       "id": "src_routes_rs_response",
       "label": "Response",
       "_origin": "ast",
-      "community": 35,
+      "community": 34,
       "file_type": "code",
       "norm_label": "response",
       "source_file": "",
@@ -2267,7 +2279,7 @@
       "id": "src_routes_rs_result",
       "label": "Result",
       "_origin": "ast",
-      "community": 36,
+      "community": 35,
       "file_type": "code",
       "norm_label": "result",
       "source_file": "",
@@ -2277,7 +2289,7 @@
       "id": "src_routes_rs_sqlitepool",
       "label": "SqlitePool",
       "_origin": "ast",
-      "community": 37,
+      "community": 36,
       "file_type": "code",
       "norm_label": "sqlitepool",
       "source_file": "",
@@ -2287,7 +2299,7 @@
       "id": "src_routes_rs_state",
       "label": "State",
       "_origin": "ast",
-      "community": 38,
+      "community": 37,
       "file_type": "code",
       "norm_label": "state",
       "source_file": "",
@@ -2297,7 +2309,7 @@
       "id": "src_routes_rs_string",
       "label": "String",
       "_origin": "ast",
-      "community": 39,
+      "community": 38,
       "file_type": "code",
       "norm_label": "string",
       "source_file": "",
@@ -2784,130 +2796,10 @@
       "source_location": "L12"
     },
     {
-      "id": "self",
-      "label": "Self",
-      "_origin": "ast",
-      "community": 7,
-      "file_type": "code",
-      "norm_label": "self",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "src_routes_apierror_from",
-      "label": ".from()",
-      "_origin": "ast",
-      "community": 7,
-      "file_type": "code",
-      "norm_label": ".from()",
-      "source_file": "src/routes.rs",
-      "source_location": "L40"
-    },
-    {
-      "id": "src_routes_claim_classroom_plus_limits",
-      "label": "claim_classroom_plus_limits()",
-      "_origin": "ast",
-      "community": 7,
-      "file_type": "code",
-      "norm_label": "claim_classroom_plus_limits()",
-      "source_file": "src/routes.rs",
-      "source_location": "L928"
-    },
-    {
-      "id": "src_routes_claim_stored_record_shape",
-      "label": "claim_stored_record_shape()",
-      "_origin": "ast",
-      "community": 7,
-      "file_type": "code",
-      "norm_label": "claim_stored_record_shape()",
-      "source_file": "src/routes.rs",
-      "source_location": "L822"
-    },
-    {
-      "id": "src_routes_claim_voice_retention_deletion",
-      "label": "claim_voice_retention_deletion()",
-      "_origin": "ast",
-      "community": 7,
-      "file_type": "code",
-      "norm_label": "claim_voice_retention_deletion()",
-      "source_file": "src/routes.rs",
-      "source_location": "L884"
-    },
-    {
-      "id": "src_routes_complete_free_checkin_flow",
-      "label": "complete_free_checkin_flow()",
-      "_origin": "ast",
-      "community": 7,
-      "file_type": "code",
-      "norm_label": "complete_free_checkin_flow()",
-      "source_file": "src/routes.rs",
-      "source_location": "L656"
-    },
-    {
-      "id": "src_routes_concurrent_submissions_stop_exactly_at_the_free_limit",
-      "label": "concurrent_submissions_stop_exactly_at_the_free_limit()",
-      "_origin": "ast",
-      "community": 7,
-      "file_type": "code",
-      "norm_label": "concurrent_submissions_stop_exactly_at_the_free_limit()",
-      "source_file": "src/routes.rs",
-      "source_location": "L759"
-    },
-    {
-      "id": "src_routes_json_response",
-      "label": "json_response()",
-      "_origin": "ast",
-      "community": 7,
-      "file_type": "code",
-      "norm_label": "json_response()",
-      "source_file": "src/routes.rs",
-      "source_location": "L620"
-    },
-    {
-      "id": "src_routes_router",
-      "label": "router()",
-      "_origin": "ast",
-      "community": 7,
-      "file_type": "code",
-      "norm_label": "router()",
-      "source_file": "src/routes.rs",
-      "source_location": "L49"
-    },
-    {
-      "id": "src_routes_test_app",
-      "label": "test_app()",
-      "_origin": "ast",
-      "community": 7,
-      "file_type": "code",
-      "norm_label": "test_app()",
-      "source_file": "src/routes.rs",
-      "source_location": "L625"
-    },
-    {
-      "id": "src_routes_test_state",
-      "label": "test_state()",
-      "_origin": "ast",
-      "community": 7,
-      "file_type": "code",
-      "norm_label": "test_state()",
-      "source_file": "src/routes.rs",
-      "source_location": "L640"
-    },
-    {
-      "id": "tempdir",
-      "label": "TempDir",
-      "_origin": "ast",
-      "community": 7,
-      "file_type": "code",
-      "norm_label": "tempdir",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
       "id": "factory_live_audit",
       "label": "live-audit.mjs",
       "_origin": "ast",
-      "community": 8,
+      "community": 7,
       "file_type": "code",
       "norm_label": "live-audit.mjs",
       "source_file": ".factory/live-audit.mjs",
@@ -2917,7 +2809,7 @@
       "id": "factory_live_audit_consoleerrors",
       "label": "consoleErrors",
       "_origin": "ast",
-      "community": 8,
+      "community": 7,
       "file_type": "code",
       "norm_label": "consoleerrors",
       "source_file": ".factory/live-audit.mjs",
@@ -2927,7 +2819,7 @@
       "id": "factory_live_audit_crawledlinks",
       "label": "crawledLinks",
       "_origin": "ast",
-      "community": 8,
+      "community": 7,
       "file_type": "code",
       "norm_label": "crawledlinks",
       "source_file": ".factory/live-audit.mjs",
@@ -2937,7 +2829,7 @@
       "id": "factory_live_audit_darkthemeresults",
       "label": "darkThemeResults",
       "_origin": "ast",
-      "community": 8,
+      "community": 7,
       "file_type": "code",
       "norm_label": "darkthemeresults",
       "source_file": ".factory/live-audit.mjs",
@@ -2947,7 +2839,7 @@
       "id": "factory_live_audit_demorequests",
       "label": "demoRequests",
       "_origin": "ast",
-      "community": 8,
+      "community": 7,
       "file_type": "code",
       "norm_label": "demorequests",
       "source_file": ".factory/live-audit.mjs",
@@ -2957,7 +2849,7 @@
       "id": "factory_live_audit_evidencedir",
       "label": "evidenceDir",
       "_origin": "ast",
-      "community": 8,
+      "community": 7,
       "file_type": "code",
       "norm_label": "evidencedir",
       "source_file": ".factory/live-audit.mjs",
@@ -2967,7 +2859,7 @@
       "id": "factory_live_audit_expected",
       "label": "expected",
       "_origin": "ast",
-      "community": 8,
+      "community": 7,
       "file_type": "code",
       "norm_label": "expected",
       "source_file": ".factory/live-audit.mjs",
@@ -2977,7 +2869,7 @@
       "id": "factory_live_audit_report",
       "label": "report",
       "_origin": "ast",
-      "community": 8,
+      "community": 7,
       "file_type": "code",
       "norm_label": "report",
       "source_file": ".factory/live-audit.mjs",
@@ -2987,7 +2879,7 @@
       "id": "factory_live_audit_routeresults",
       "label": "routeResults",
       "_origin": "ast",
-      "community": 8,
+      "community": 7,
       "file_type": "code",
       "norm_label": "routeresults",
       "source_file": ".factory/live-audit.mjs",
@@ -2997,7 +2889,7 @@
       "id": "factory_live_audit_unexpectedconsoleerrors",
       "label": "unexpectedConsoleErrors",
       "_origin": "ast",
-      "community": 8,
+      "community": 7,
       "file_type": "code",
       "norm_label": "unexpectedconsoleerrors",
       "source_file": ".factory/live-audit.mjs",
@@ -3007,7 +2899,7 @@
       "id": "factory_live_audit_workflowrequests",
       "label": "workflowRequests",
       "_origin": "ast",
-      "community": 8,
+      "community": 7,
       "file_type": "code",
       "norm_label": "workflowrequests",
       "source_file": ".factory/live-audit.mjs",
@@ -3017,7 +2909,7 @@
       "id": "headermap",
       "label": "HeaderMap",
       "_origin": "ast",
-      "community": 9,
+      "community": 8,
       "file_type": "code",
       "norm_label": "headermap",
       "source_file": "",
@@ -3027,7 +2919,7 @@
       "id": "intoresponse",
       "label": "IntoResponse",
       "_origin": "ast",
-      "community": 9,
+      "community": 8,
       "file_type": "code",
       "norm_label": "intoresponse",
       "source_file": "",
@@ -3037,7 +2929,7 @@
       "id": "src_http_policy",
       "label": "http_policy.rs",
       "_origin": "ast",
-      "community": 9,
+      "community": 8,
       "file_type": "code",
       "norm_label": "http_policy.rs",
       "source_file": "src/http_policy.rs",
@@ -3047,7 +2939,7 @@
       "id": "src_http_policy_apply_response_policy",
       "label": "apply_response_policy()",
       "_origin": "ast",
-      "community": 9,
+      "community": 8,
       "file_type": "code",
       "norm_label": "apply_response_policy()",
       "source_file": "src/http_policy.rs",
@@ -3057,7 +2949,7 @@
       "id": "src_http_policy_assets_are_immutable_and_shell_is_revalidated",
       "label": "assets_are_immutable_and_shell_is_revalidated()",
       "_origin": "ast",
-      "community": 9,
+      "community": 8,
       "file_type": "code",
       "norm_label": "assets_are_immutable_and_shell_is_revalidated()",
       "source_file": "src/http_policy.rs",
@@ -3067,7 +2959,7 @@
       "id": "src_http_policy_bearer_navigation_and_api_are_never_stored",
       "label": "bearer_navigation_and_api_are_never_stored()",
       "_origin": "ast",
-      "community": 9,
+      "community": 8,
       "file_type": "code",
       "norm_label": "bearer_navigation_and_api_are_never_stored()",
       "source_file": "src/http_policy.rs",
@@ -3077,7 +2969,7 @@
       "id": "src_http_policy_rs_response",
       "label": "Response",
       "_origin": "ast",
-      "community": 9,
+      "community": 8,
       "file_type": "code",
       "norm_label": "response",
       "source_file": "",
@@ -3087,11 +2979,109 @@
       "id": "src_http_policy_set_etag",
       "label": "set_etag()",
       "_origin": "ast",
-      "community": 9,
+      "community": 8,
       "file_type": "code",
       "norm_label": "set_etag()",
       "source_file": "src/http_policy.rs",
       "source_location": "L39"
+    },
+    {
+      "id": "scripts_verify_live_durable_workflow",
+      "label": "verify-live-durable-workflow.sh",
+      "_origin": "ast",
+      "community": 9,
+      "file_type": "code",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "norm_label": "verify-live-durable-workflow.sh",
+      "source_file": "scripts/verify-live-durable-workflow.sh",
+      "source_location": "L1"
+    },
+    {
+      "id": "scripts_verify_live_durable_workflow_expect_status",
+      "label": "expect_status()",
+      "_origin": "ast",
+      "community": 9,
+      "file_type": "code",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "norm_label": "expect_status()",
+      "source_file": "scripts/verify-live-durable-workflow.sh",
+      "source_location": "L43"
+    },
+    {
+      "id": "scripts_verify_live_durable_workflow_fail",
+      "label": "fail()",
+      "_origin": "ast",
+      "community": 9,
+      "file_type": "code",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "norm_label": "fail()",
+      "source_file": "scripts/verify-live-durable-workflow.sh",
+      "source_location": "L25"
+    },
+    {
+      "id": "scripts_verify_live_durable_workflow_read_private_links",
+      "label": "read_private_links()",
+      "_origin": "ast",
+      "community": 9,
+      "file_type": "code",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "norm_label": "read_private_links()",
+      "source_file": "scripts/verify-live-durable-workflow.sh",
+      "source_location": "L105"
+    },
+    {
+      "id": "scripts_verify_live_durable_workflow_read_receipt",
+      "label": "read_receipt()",
+      "_origin": "ast",
+      "community": 9,
+      "file_type": "code",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "norm_label": "read_receipt()",
+      "source_file": "scripts/verify-live-durable-workflow.sh",
+      "source_location": "L116"
+    },
+    {
+      "id": "scripts_verify_live_durable_workflow_request",
+      "label": "request()",
+      "_origin": "ast",
+      "community": 9,
+      "file_type": "code",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "norm_label": "request()",
+      "source_file": "scripts/verify-live-durable-workflow.sh",
+      "source_location": "L30"
+    },
+    {
+      "id": "scripts_verify_live_durable_workflow_sh__entry",
+      "label": "verify-live-durable-workflow.sh script",
+      "_origin": "ast",
+      "community": 9,
+      "file_type": "code",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "norm_label": "verify-live-durable-workflow.sh script",
+      "source_file": "scripts/verify-live-durable-workflow.sh",
+      "source_location": "L1"
     }
   ],
   "links": [
@@ -9541,15 +9531,6 @@
       "weight": 1.0
     },
     {
-      "source": "frontend_tests_app_spec",
-      "target": "test",
-      "relation": "dynamic_import",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "frontend/tests/app.spec.ts"
-    },
-    {
       "source": "src_routes_apierror",
       "target": "intoresponse",
       "relation": "implements",
@@ -9643,5 +9624,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "483d53c459b569633ce8682503b76447aee4fe19"
+  "built_at_commit": "9595291790ab0a928072be63029962e5e0690946"
 }
