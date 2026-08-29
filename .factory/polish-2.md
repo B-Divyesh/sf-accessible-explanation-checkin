@@ -33,3 +33,9 @@ Candidate reviewed: `6430b28613d0a32700fde782519188a5b57cced3`.
 - Production bundle: 12.45 kB gzip JavaScript and 5.13 kB gzip CSS.
 - Local Lighthouse mobile: 100 performance, 100 accessibility, 100 best practices, 100 SEO; LCP 1.3 s, TBT 70 ms, CLS 0.
 - Local `verify-url.sh` reported one h1, one main, `lang=en`, complete image alt text, and zero console errors on home and demo.
+
+## Final live recheck
+
+Deployment source `396c6c5a861e15a62c449e31584307a2f380a0d3` is live at <https://accessible-explanation-checkin.sociobot.in>. A cold 390 × 844 browser check confirmed the first screen, isolated `?demo=1` storage, reset, offline reload, 44 px demo controls, task headings, focus transfer, route metadata, legal links, and external checkout label. The real unknown route returns HTTP 404 with the shared header/footer and complete metadata. All successful routes were console-clean and contacted only the product origin during the demo flow.
+
+Live Lighthouse mobile scored 100 performance, 100 accessibility, 100 best practices, and 100 SEO. LCP was 1.1 s, TBT 20 ms, and CLS 0. See `.factory/evidence/polish-2-live-check.json`, `.factory/evidence/polish-2-live-lighthouse-mobile.json`, `.factory/evidence/polish-2-live-404-mobile.png`, and the two `polish-2-live-*` verification directories.

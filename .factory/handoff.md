@@ -31,7 +31,11 @@ Evidence is under `.factory/evidence/polish-2-local-home/`, `.factory/evidence/p
 
 ## Deployment and live recheck
 
-Deployment evidence and the final live build SHA are recorded after the work-order deployment in this file’s next commit.
+The work-order helper deployed source `396c6c5a861e15a62c449e31584307a2f380a0d3`. `/health` returns that exact SHA. Azure reports image tag `396c6c5a861e`, one minimum and maximum replica, and an Azure File volume mounted at `/app/data`.
+
+A cold 390 × 844 production browser rechecked every reviewed surface. Home, demo, create, plans, privacy, and terms returned 200 with distinct titles, one h1/main, complete metadata, no horizontal overflow, and no console errors. The isolated demo wrote only its `demo:` key, made no API request, reset its seed, reloaded offline, and had no serious or critical Axe finding. The real 404 returned 404 with the shared header/footer, legal links, canonical, Open Graph, Twitter, and favicon metadata.
+
+Live Lighthouse mobile scored 100 performance, 100 accessibility, 100 best practices, and 100 SEO. LCP was 1.1 s, TBT was 20 ms, and CLS was 0. Evidence is in `.factory/evidence/polish-2-live-check.json` and `.factory/evidence/polish-2-live-lighthouse-mobile.json`.
 
 ## Known gaps and next steps
 

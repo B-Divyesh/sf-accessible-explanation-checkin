@@ -1,0 +1,54 @@
+{
+  "build_sha": "396c6c5a861e15a62c449e31584307a2f380a0d3",
+  "home": {
+    "status": 200,
+    "title": "Accessible Explanation Check-in — Collect student reasoning",
+    "h1": "Collect student reasoning",
+    "main_count": 1,
+    "horizontal_overflow_px": 0,
+    "sample_action_visible": true
+  },
+  "create": {
+    "h1": "Create a student explanation check-in",
+    "route_heading_focused": true,
+    "canonical": "https://accessible-explanation-checkin.sociobot.in/create"
+  },
+  "pricing": {
+    "h1": "Plans and prices",
+    "checkout_label": "Buy Classroom Plus through Sociobot (opens external site)",
+    "checkout_url": "https://api.sociobot.in/api/v1/products/accessible-explanation-checkin/checkout"
+  },
+  "demo": {
+    "h1": "Watershed reasoning",
+    "banner_visible": true,
+    "storage_keys_after_edit": ["demo:accessible-explanation-checkin:review"],
+    "api_requests": [],
+    "reset_restored_seed": true,
+    "offline_reload_passed": true,
+    "horizontal_overflow_px": 0,
+    "reset_target_height_px": 44,
+    "start_real_target_height_px": 44,
+    "axe_serious_or_critical": []
+  },
+  "not_found": {
+    "status": 404,
+    "h1": "That page is not available",
+    "header_count": 1,
+    "footer_count": 1,
+    "privacy_link": "/privacy",
+    "terms_link": "/terms",
+    "canonical": "https://accessible-explanation-checkin.sociobot.in/404",
+    "open_graph_image": "https://accessible-explanation-checkin.sociobot.in/assets/social-classroom.jpg",
+    "twitter_card": "summary_large_image"
+  },
+  "routes_200": ["/", "/demo", "/create", "/pricing", "/privacy", "/terms"],
+  "successful_route_console_errors": [],
+  "request_origins_during_demo": ["https://accessible-explanation-checkin.sociobot.in"],
+  "deployment": {
+    "image": "sociobotregistry.azurecr.io/sf-accessible-explanation-9c1a54:396c6c5a861e",
+    "min_replicas": 1,
+    "max_replicas": 1,
+    "volume_type": "AzureFile",
+    "mount_path": "/app/data"
+  }
+}
