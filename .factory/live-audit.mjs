@@ -37,7 +37,9 @@ for (const [route, wanted] of expected) {
   assert.equal(await page.locator('link[rel="canonical"]').getAttribute('href'), `${base}${wanted.canonical}`, `${route} canonical`);
   assert.ok(await page.locator('meta[name="description"]').getAttribute('content'), `${route} description`);
   assert.ok(await page.locator('meta[property="og:image"]').getAttribute('content'), `${route} social image`);
-  assert.ok(await page.getByRole('link', { name: 'Privacy' }).count() >= 1, `${route} privacy link`);
+  const primaryNavigation = page.getByRole('navigation', { name: 'Primary' });
+  assert.equal(await primaryNavigation.getByRole('link', { name: 'Privacy' }).count(), 1, `${route} primary privacy link`);
+  assert.equal(await primaryNavigation.getByRole('link', { name: 'Privacy' }).isVisible(), true, `${route} visible primary privacy link`);
   assert.ok(await page.getByRole('link', { name: 'Terms' }).count() >= 1, `${route} terms link`);
   assert.ok((await page.getByRole('contentinfo').innerText()).includes('Built by Param Factory · version 1.0.0'), `${route} footer identity`);
 
@@ -59,7 +61,7 @@ for (const [route, wanted] of expected) {
   const severe = axe.violations.filter(violation => ['serious', 'critical'].includes(violation.impact || ''));
   assert.deepEqual(severe, [], `${route} serious/critical axe findings`);
   if (route === '/no-such-page') {
-    await page.screenshot({ path: new URL('./evidence/polish-3-live-404-mobile.png', import.meta.url).pathname, fullPage: true });
+    await page.screenshot({ path: new URL('./evidence/polish-4-live-404-mobile.png', import.meta.url).pathname, fullPage: true });
   }
   await page.evaluate(() => { document.documentElement.style.fontSize = '32px'; });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth), false, `${route} 200% text overflow`);
@@ -138,7 +140,7 @@ await demoContext.setOffline(true);
 await demo.reload({ waitUntil: 'domcontentloaded' });
 await demo.getByRole('heading', { name: 'Watershed reasoning' }).waitFor();
 await demoContext.setOffline(false);
-await demo.screenshot({ path: new URL('./evidence/polish-3-live-demo-cold-mobile.png', import.meta.url).pathname, fullPage: true });
+await demo.screenshot({ path: new URL('./evidence/polish-4-live-demo-cold-mobile.png', import.meta.url).pathname, fullPage: true });
 await demoContext.close();
 
 const flowContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
@@ -206,7 +208,7 @@ const report = {
   securityHeaders: ['content-security-policy', 'strict-transport-security', 'permissions-policy', 'x-content-type-options', 'referrer-policy'],
   consoleErrors: unexpectedConsoleErrors,
 };
-await writeFile(new URL('./evidence/polish-3-live-check.json', import.meta.url), `${JSON.stringify(report, null, 2)}\n`);
+await writeFile(new URL('./evidence/polish-4-live-check.json', import.meta.url), `${JSON.stringify(report, null, 2)}\n`);
 console.log(JSON.stringify(report, null, 2));
 await context.close();
 await browser.close();

@@ -36,6 +36,14 @@ test('navigation moves focus to the new heading and updates route metadata', asy
   await expect(page.locator('#announcer')).toHaveText('Opened Collect student reasoning.');
 });
 
+test('every public route keeps Privacy in the primary navigation', async ({ page }) => {
+  for (const route of ['/', '/demo', '/create', '/pricing', '/privacy', '/terms', '/no-such-page']) {
+    await page.goto(route);
+    const primaryNavigation = page.getByRole('navigation', { name: 'Primary' });
+    await expect(primaryNavigation.getByRole('link', { name: 'Privacy' }), route).toHaveAttribute('href', '/privacy');
+  }
+});
+
 test('unknown paths return the designed 404 with an HTTP 404 status', async ({ request, page }) => {
   const response = await request.get('/no-such-page');
   expect(response.status()).toBe(404);
@@ -44,8 +52,9 @@ test('unknown paths return the designed 404 with an HTTP 404 status', async ({ r
   await expect(page.getByRole('link', { name: 'Skip to main content' })).toHaveAttribute('href', '#main');
   await expect(page.getByRole('banner')).toBeVisible();
   await expect(page.getByRole('contentinfo')).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy');
-  await expect(page.getByRole('link', { name: 'Terms' })).toHaveAttribute('href', '/terms');
+  const legalNavigation = page.getByRole('navigation', { name: 'Legal' });
+  await expect(legalNavigation.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy');
+  await expect(legalNavigation.getByRole('link', { name: 'Terms' })).toHaveAttribute('href', '/terms');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /unavailable/);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://accessible-explanation-checkin.sociobot.in/404');
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /social-classroom\.jpg$/);
