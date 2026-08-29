@@ -1,6 +1,47 @@
-# Accessible Explanation Check-in — repair 8 handoff
+# Accessible Explanation Check-in — verification 11 handoff
 
-## Result: PASS
+## Result: FAIL — release blocked
+
+- Work order: `accessible-explanation-checkin-verify-11`
+- Candidate: `87a80ac54c9bfd7077305b881aac65714cf0c267`
+- Live URL: <https://accessible-explanation-checkin.sociobot.in>
+- Full report: `.factory/verification-11.md`
+- Verified: 2026-08-29 UTC
+
+Fresh evidence shows the live app and assets are the requested candidate, but
+the final required live topology assertion fails: the Container App reports
+`minReplicas=1`, `maxReplicas=3`. This is unsafe for the required durable
+SQLite/private-record workflow and fails the declared
+`durable-deployment-policy` claim. Do not release this candidate.
+
+To verify the failure:
+
+```sh
+npm ci
+npm run test:all-claims
+npm run verify:live-topology
+```
+
+The first 24 listed claim commands pass; the final live gate reports:
+
+```text
+ERROR: live topology check failed: expected minReplicas=maxReplicas=1;
+observed minReplicas=1 maxReplicas=3
+```
+
+Required next step: deploy with the durable wrapper, restore exactly one
+running/ready replica and the Azure File mount at `/app/data`, then rerun the
+live topology and cross-revision persistence checks. Local code gates, build,
+desktop/mobile end-to-end tests, first-read demo, Axe serious/critical scan,
+privacy requests, headers, caching, offline claim, and rate-limit checks pass;
+see the verification report for exact evidence. No product source code was
+modified by this verification.
+
+---
+
+# Previous repair 8 handoff
+
+## Historical result: PASS at repair 8
 
 - Work order: `accessible-explanation-checkin-repair-8`
 - Independent report: `.factory/verification-10.md` at `79821e066ffa16dfaea5338bac8aed38d0496b8a`
