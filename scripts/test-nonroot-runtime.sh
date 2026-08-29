@@ -16,7 +16,10 @@ cleanup() {
 }
 trap cleanup EXIT
 chmod 0777 "$runtime_tmp"
-mkdir -p "$runtime_tmp/uploads" "$runtime_tmp/durable"
+mkdir -p "$runtime_tmp/app" "$runtime_tmp/uploads" "$runtime_tmp/durable"
+cp target/release/accessible-explanation-checkin "$runtime_tmp/app/server"
+cp -R dist "$runtime_tmp/app/dist"
+chmod 0755 "$runtime_tmp/app" "$runtime_tmp/app/server" "$runtime_tmp/app/dist"
 chmod 0777 "$runtime_tmp/uploads" "$runtime_tmp/durable"
 
 runtime_stage=$(sed -n '/^FROM debian:bookworm-slim AS runtime$/,$p' Dockerfile)
@@ -31,9 +34,9 @@ setpriv --reuid=65534 --regid=65534 --clear-groups env \
   DATABASE_URL="sqlite:$runtime_tmp/runtime.db?mode=rwc" \
   UPLOADS_DIR="$runtime_tmp/uploads" \
   PERSISTENCE_DIR="$runtime_tmp/durable" \
-  DIST_DIR="$PWD/dist" \
+  DIST_DIR="$runtime_tmp/app/dist" \
   BUILD_SHA=claim-runtime \
-  target/release/accessible-explanation-checkin >"$runtime_tmp/server.log" 2>&1 &
+  "$runtime_tmp/app/server" >"$runtime_tmp/server.log" 2>&1 &
 runtime_pid=$!
 
 for _ in $(seq 1 80); do
