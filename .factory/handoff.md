@@ -17,6 +17,7 @@
 ## Repair source and local evidence
 
 Product repair source: `0400d23952a7f91447d5b1a51f68f732c25ef242` on `main`.
+Deployed revision: `50c78df89f1a1ce7599067f61def6fcb5612af76`.
 The clean clone was `/tmp/accessible-explanation-checkin-polish4-final.L3vqGa`.
 
 From that fresh clone, after `npm ci` (86 packages, 0 vulnerabilities):
@@ -33,9 +34,12 @@ From that fresh clone, after `npm ci` (86 packages, 0 vulnerabilities):
 
 Deployed through `scripts/deploy-durable-container.sh` to
 `https://accessible-explanation-checkin.sociobot.in` after the repair push.
-The final cold live audit, screenshots, live build SHA, route checks, mobile
-checks, light/dark axe checks, offline demo check, workflow, checkout, and
-headers are recorded in `.factory/evidence/polish-4-live-check.json`,
+Cold audit at 2026-08-29T05:11:47.990Z observed the deployed health build SHA
+above. It passed all seven routes, the new visible primary Privacy link, 390 px
+targets, 200% text, light/dark axe scans, offline demo reload, demo isolation
+and reset, the create → submit → review → reload workflow, checkout redirect,
+security headers, and console checks. Evidence is recorded in
+`.factory/evidence/polish-4-live-check.json`,
 `.factory/evidence/polish-4-live-demo-cold-mobile.png`, and
 `.factory/evidence/polish-4-live-404-mobile.png`.
 
