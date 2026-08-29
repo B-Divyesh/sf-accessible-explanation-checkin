@@ -25,12 +25,16 @@ describe('clean claim startup budget', () => {
     expect(packageJson.scripts['test:e2e']).toBe(
       'npm run test:e2e:desktop && npm run test:e2e:mobile',
     );
-    expect(packageJson.scripts['test:e2e:desktop']).toContain(
+    expect(packageJson.scripts['test:e2e:desktop:app']).toContain(
       '--project=desktop-chromium',
     );
-    expect(packageJson.scripts['test:e2e:mobile']).toContain(
+    expect(packageJson.scripts['test:e2e:mobile:app']).toContain(
       '--project=mobile-chromium',
     );
+    expect(packageJson.scripts['test:e2e:desktop']).toContain('claims-a');
+    expect(packageJson.scripts['test:e2e:desktop']).toContain('claims-b');
+    expect(packageJson.scripts['test:e2e:mobile']).toContain('claims-a');
+    expect(packageJson.scripts['test:e2e:mobile']).toContain('claims-b');
     expect(COLD_SERVER_START_TIMEOUT_MS).toBe(600_000);
     expect(playwrightConfig.webServer).toMatchObject({
       command: expect.stringContaining('cargo run --locked'),
