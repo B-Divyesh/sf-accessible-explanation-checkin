@@ -48,22 +48,37 @@ test('unknown paths return the designed 404 with an HTTP 404 status', async ({ r
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://accessible-explanation-checkin.sociobot.in/404');
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /social-classroom\.jpg$/);
   await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute('content', 'summary_large_image');
+  await expect(page.getByRole('contentinfo')).toContainText('Built by Param Factory · version 1.0.0');
   await expectAccessible(page);
 });
 
 test('mobile theme and legal controls meet the 44px touch-target contract', async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith('mobile'), 'This is a 390px mobile regression check.');
-  await page.goto('/privacy');
-  for (const control of [
-    page.getByRole('button', { name: 'Change color theme' }),
-    page.getByRole('link', { name: 'Privacy', exact: true }),
-    page.getByRole('link', { name: 'Terms', exact: true }),
-  ]) {
-    const box = await control.boundingBox();
-    expect(box).not.toBeNull();
-    expect(box!.width).toBeGreaterThanOrEqual(44);
-    expect(box!.height).toBeGreaterThanOrEqual(44);
+  for (const route of ['/', '/demo', '/create', '/pricing', '/privacy', '/terms', '/no-such-page']) {
+    await page.goto(route);
+    const undersized = await page.locator('a, button, input, select, textarea').evaluateAll(elements => elements.flatMap(element => {
+      const control = element as HTMLElement;
+      if (getComputedStyle(control).visibility === 'hidden') return [];
+      const input = control instanceof HTMLInputElement ? control : null;
+      const target = input && ['checkbox', 'radio'].includes(input.type)
+        ? input.closest('label') as HTMLElement | null
+        : control;
+      if (!target) return [];
+      const box = target.getBoundingClientRect();
+      if (box.width === 0 || box.height === 0 || (box.width >= 44 && box.height >= 44)) return [];
+      return [{
+        name: control.getAttribute('aria-label') || control.textContent?.trim() || input?.name,
+        width: box.width,
+        height: box.height,
+      }];
+    }));
+    expect(undersized, route + ' has undersized controls').toEqual([]);
   }
+});
+
+test('shared footer identifies the builder and release version', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('contentinfo')).toContainText('Built by Param Factory · version 1.0.0');
 });
 
 test('plans use the production billing endpoint', async ({ page }) => {
