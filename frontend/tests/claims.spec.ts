@@ -1,4 +1,27 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page, type TestInfo } from '@playwright/test';
+
+function desktopOnly(testInfo: TestInfo) {
+  test.skip(testInfo.project.name.startsWith('mobile'), 'One state-changing backend fixture is sufficient for this claim.');
+}
+
+async function createCheckin(page: Page, title: string) {
+  await page.goto('/create');
+  await page.getByLabel('Assignment name').fill(title);
+  await page.getByLabel('Explanation prompt').fill('Which choice changed your conclusion and why?');
+  await page.getByRole('button', { name: 'Create private links' }).click();
+  return {
+    studentUrl: await page.locator('#student-link').inputValue(),
+    reviewUrl: await page.locator('#review-link').inputValue(),
+  };
+}
+
+async function tabTo(page: Page, selector: string) {
+  for (let step = 0; step < 30; step += 1) {
+    if (await page.evaluate(target => document.activeElement?.matches(target), selector)) return;
+    await page.keyboard.press('Tab');
+  }
+  throw new Error(`Keyboard focus did not reach ${selector}`);
+}
 
 test('@claim:demo-isolation starts with a populated review and keeps mutations in the demo namespace', async ({ page }) => {
   const apiRequests:string[]=[];
@@ -33,7 +56,7 @@ test('@claim:sample-csv-export downloads each shipped sample response', async ({
   expect(content).toContain('Maya Chen');
 });
 
-test('@claim:keyboard-demo is usable with a keyboard', async ({ page }) => {
+test('@claim:keyboard-demo lets a teacher use the sample review with a keyboard', async ({ page }) => {
   await page.goto('/demo');
   await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: 'Skip to main content' })).toBeFocused();
@@ -51,24 +74,67 @@ test('@claim:no-account-needed creates a check-in without a sign-in step', async
   await page.getByLabel('Explanation prompt').fill('Which choice changed your conclusion and why?');
   await page.getByRole('button', { name: 'Create private links' }).click();
   await expect(page.getByRole('heading', { name: 'Keep one link. Share the other.' })).toBeVisible();
+  const student = await page.locator('#student-link').inputValue();
+  const review = await page.locator('#review-link').inputValue();
+  expect(student).not.toBe(review);
+  expect(new URL(student).pathname).toMatch(/^\/c\/[a-f0-9]{32}$/);
+  expect(new URL(review).pathname).toMatch(/^\/review\/[a-f0-9]{32}$/);
 });
 
-test('@claim:voice-retention-control offers the free one-to-seven-day schedule', async ({ page }) => {
+test('@claim:voice-retention-control applies the selected free voice schedule', async ({ page }, testInfo) => {
+  desktopOnly(testInfo);
   await page.goto('/demo');
   await page.goto('/create');
   await expect(page.locator('select[name="voice_retention_days"] option')).toHaveText(['1 day', '3 days', '7 days']);
+  const response = await page.request.post('/api/checkins', { data: {
+    title: 'Retention proof',
+    prompt: 'Explain the choice you made.',
+    voice_retention_days: 3,
+  }});
+  expect(response.status()).toBe(201);
+  const created = await response.json();
+  await page.goto(`/c/${created.student_token}`);
+  await expect(page.getByText('it will delete automatically 3 days after submission', { exact: false })).toBeVisible();
 });
 
-test('@claim:free-response-limit shows the free limit in the creation flow', async ({ page }) => {
+test('@claim:free-response-limit enforces 35 responses under concurrent submissions', async ({ page }, testInfo) => {
+  desktopOnly(testInfo);
   await page.goto('/demo');
-  await page.goto('/create');
-  await expect(page.getByText('Free check-ins accept 35 responses and voice is kept for up to 7 days.')).toBeVisible();
+  const create = await page.request.post('/api/checkins', { data: {
+    title: 'Concurrent limit proof',
+    prompt: 'Explain one choice.',
+    voice_retention_days: 1,
+  }});
+  const { student_token: student } = await create.json();
+  const responses = await Promise.all(Array.from({ length: 40 }, (_, number) => page.request.post(`/api/checkins/${student}/submissions`, { data: {
+    student_name: `Student ${number}`,
+    explanation_text: 'I compared both choices.',
+    confidence: 3,
+  }})));
+  expect(responses.filter(response => response.status() === 201)).toHaveLength(35);
+  expect(responses.filter(response => response.status() === 409)).toHaveLength(5);
+  const checkin = await page.request.get(`/api/checkins/${student}`);
+  expect(await checkin.json()).toMatchObject({ submissions: 35, max_submissions: 35, open: false });
 });
 
-test('@claim:no-automated-judgment states the product limit in the landing content', async ({ page }) => {
+test('@claim:no-automated-judgment returns only student input and teacher-authored review fields', async ({ page }, testInfo) => {
+  desktopOnly(testInfo);
   await page.goto('/demo');
-  await page.goto('/');
-  await expect(page.getByText('It does not grade, detect AI use, proctor, or verify identity.')).toBeVisible();
+  const create = await page.request.post('/api/checkins', { data: { title: 'No scoring proof', prompt: 'Explain one choice.', voice_retention_days: 1 }});
+  const created = await create.json();
+  await page.request.post(`/api/checkins/${created.student_token}/submissions`, { data: {
+    student_name: 'Alex', explanation_text: 'I used the second example.', confidence: 2,
+  }});
+  const review = await page.request.get(`/api/reviews/${created.review_token}`);
+  const payload = await review.json();
+  const keys = JSON.stringify(payload).toLowerCase();
+  for (const automatedField of ['grade', 'ai_score', 'identity_score', 'proctor_score', 'misconduct_score']) {
+    expect(keys).not.toContain(`"${automatedField}"`);
+  }
+  expect(payload.submissions[0]).toMatchObject({
+    student_name: 'Alex', explanation_text: 'I used the second example.', confidence: 2,
+    teacher_tags: [], teacher_note: '', follow_up: false,
+  });
 });
 
 test('@claim:offline-demo reloads after its first visit', async ({ context, page }) => {
@@ -79,4 +145,116 @@ test('@claim:offline-demo reloads after its first visit', async ({ context, page
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Watershed reasoning' })).toBeVisible();
   await context.setOffline(false);
+});
+
+test('@claim:student-keyboard-flow submits every required student field using only the keyboard', async ({ page }, testInfo) => {
+  desktopOnly(testInfo);
+  await page.goto('/demo');
+  await page.goto('/create');
+  await tabTo(page, 'input[name="title"]');
+  await page.keyboard.type('Keyboard path proof');
+  await tabTo(page, 'textarea[name="prompt"]');
+  await page.keyboard.type('Which step changed your conclusion?');
+  await tabTo(page, 'button[type="submit"]');
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#student-link')).toBeVisible();
+  const studentUrl = await page.locator('#student-link').inputValue();
+
+  await page.goto(studentUrl);
+  await tabTo(page, 'input[name="student_name"]');
+  await page.keyboard.type('Taylor');
+  await tabTo(page, 'textarea[name="explanation_text"]');
+  await page.keyboard.type('I compared the examples and changed my answer.');
+  await tabTo(page, 'input[name="confidence"]');
+  await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('ArrowRight');
+  await tabTo(page, 'button[type="submit"]');
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('heading', { name: 'Your check-in receipt' })).toBeVisible();
+  await expect(page.getByText('I compared the examples and changed my answer.')).toBeVisible();
+});
+
+test('@claim:student-review-workflow carries the explanation into a saved teacher review and free outputs', async ({ page }, testInfo) => {
+  desktopOnly(testInfo);
+  await page.goto('/demo');
+  const { studentUrl, reviewUrl } = await createCheckin(page, 'Review workflow proof');
+  await page.goto(studentUrl);
+  await page.getByLabel('Your name').fill('Morgan Lee');
+  await page.getByLabel('Write your explanation').fill('The comparison table changed my conclusion.');
+  await page.getByLabel('Mostly').check();
+  await page.getByRole('button', { name: 'Send my explanation' }).click();
+  await expect(page.getByRole('heading', { name: 'Your check-in receipt' })).toBeVisible();
+  await expect(page.getByText('The comparison table changed my conclusion.')).toBeVisible();
+  await page.evaluate(() => { (window as Window & { printCalled?: boolean }).printCalled = false; window.print = () => { (window as Window & { printCalled?: boolean }).printCalled = true; }; });
+  await page.getByRole('button', { name: 'Print or save PDF' }).click();
+  expect(await page.evaluate(() => (window as Window & { printCalled?: boolean }).printCalled)).toBe(true);
+
+  await page.goto(reviewUrl);
+  await expect(page.getByRole('heading', { name: 'Morgan Lee' })).toBeVisible();
+  await expect(page.getByText('Confidence 4/5')).toBeVisible();
+  await page.getByLabel('Uses evidence').check();
+  await page.getByLabel('Private teacher note').fill('Ask Morgan to show the table.');
+  await page.getByLabel('Mark for follow-up').check();
+  await page.getByRole('button', { name: 'Save review' }).click();
+  await expect(page.getByText('Saved', { exact: true })).toBeVisible();
+  await page.reload();
+  await expect(page.getByLabel('Uses evidence')).toBeChecked();
+  await expect(page.getByLabel('Private teacher note')).toHaveValue('Ask Morgan to show the table.');
+  await expect(page.getByLabel('Mark for follow-up')).toBeChecked();
+  const download = page.waitForEvent('download');
+  await page.getByRole('link', { name: 'Export CSV' }).click();
+  const csv = await download;
+  const content = await csv.createReadStream().then(async stream => { const chunks: Buffer[] = []; for await (const chunk of stream!) chunks.push(Buffer.from(chunk)); return Buffer.concat(chunks).toString('utf8'); });
+  expect(content).toContain('Morgan Lee');
+  expect(content).toContain('Uses evidence');
+  expect(content).toContain('Ask Morgan to show the table.');
+});
+
+test('@claim:privacy-request-boundary keeps the demo and classroom flow on the product origin', async ({ page }, testInfo) => {
+  desktopOnly(testInfo);
+  const requests: string[] = [];
+  page.on('request', request => requests.push(request.url()));
+  await page.goto('/demo');
+  const { studentUrl, reviewUrl } = await createCheckin(page, 'Privacy request proof');
+  await page.goto(studentUrl);
+  await page.getByLabel('Your name').fill('Casey');
+  await page.getByLabel('Write your explanation').fill('I checked the evidence twice.');
+  await page.getByLabel('In between').check();
+  await page.getByRole('button', { name: 'Send my explanation' }).click();
+  await page.goto(reviewUrl);
+  expect([...new Set(requests.map(url => new URL(url).origin))]).toEqual(['http://127.0.0.1:8080']);
+  expect(requests.some(url => /analytics|doubleclick|openai|google-analytics|segment/i.test(url))).toBe(false);
+});
+
+test('@claim:billing-license-fixture handles an active and then revoked license verdict', async ({ page }) => {
+  let valid = true;
+  await page.route('https://api.sociobot.in/api/v1/products/accessible-explanation-checkin/verify**', route => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({ valid, reason: valid ? 'ok' : 'revoked' }),
+  }));
+  await page.goto('/demo');
+  await page.goto('/pricing');
+  await page.getByLabel('License token').fill('recorded-fixture-license');
+  await page.getByRole('button', { name: 'Verify license' }).click();
+  await expect(page.getByText('Classroom Plus is active on this device.')).toBeVisible();
+  valid = false;
+  await page.getByRole('button', { name: 'Verify license' }).click();
+  await expect(page.getByText('This license is not active. Check the token or buy Classroom Plus.')).toBeVisible();
+});
+
+test('@claim:external-checkout identifies Sociobot before leaving the product', async ({ page }) => {
+  await page.route('https://api.sociobot.in/api/v1/products/accessible-explanation-checkin/checkout', route => route.fulfill({
+    status: 200,
+    contentType: 'text/html',
+    body: '<!doctype html><html lang="en"><title>Sociobot checkout fixture</title><body><h1>Sociobot checkout fixture</h1></body></html>',
+  }));
+  await page.goto('/demo');
+  await page.goto('/pricing');
+  const checkout = page.getByRole('link', { name: 'Buy Classroom Plus through Sociobot (opens external site)' });
+  await expect(checkout).toHaveAttribute('href', 'https://api.sociobot.in/api/v1/products/accessible-explanation-checkin/checkout');
+  await checkout.click();
+  await expect(page).toHaveURL('https://api.sociobot.in/api/v1/products/accessible-explanation-checkin/checkout');
+  await expect(page.getByRole('heading', { name: 'Sociobot checkout fixture' })).toBeVisible();
 });

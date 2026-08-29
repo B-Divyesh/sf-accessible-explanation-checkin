@@ -9,6 +9,7 @@
     "test": "tsc --noEmit -p frontend/tsconfig.json && vitest run --config frontend/vite.config.ts && cargo test && bash scripts/test-durable-deploy.sh",
     "test:deploy-helper": "bash scripts/test-deploy-container-name.sh",
     "test:container-identity": "bash scripts/test-container-build-identity.sh",
+    "test:runtime-policy": "bash scripts/test-nonroot-runtime.sh",
     "test:deployment-policy": "bash scripts/test-durable-deploy.sh",
     "test:e2e": "playwright test --config frontend/playwright.config.ts",
     "test:claims": "playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts",

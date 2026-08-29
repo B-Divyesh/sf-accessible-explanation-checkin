@@ -16,6 +16,8 @@ npm ci
 npm test
 npm run build
 npm run test:e2e
+npm run test:claims
+npm run test:runtime-policy
 cargo build --release --locked
 PORT=8080 cargo run
 ```
@@ -30,8 +32,12 @@ The app listens on `PORT` and defaults to `8080`. Its frontend build is in `dist
 
 ## Deploy
 
-This is a single-container Rust and Vite application. Build it with the root `Dockerfile`. The runtime serves the frontend and API on port 8080 as the non-root `checkin` user.
+This is a single-container Rust and Vite application. Build it with the root `Dockerfile`.
 
-Use `scripts/deploy-durable-container.sh` for Container Apps. It mounts a product-specific Azure File share at `/app/data` and uses one SQLite replica.
+The image declares port 8080 and the non-root `checkin` user. Its claim test executes the release server under an unprivileged UID.
+
+Use `scripts/deploy-durable-container.sh` for Container Apps. It mounts a product-specific Azure File share at `/app/data`.
+
+The deployment uses one SQLite replica. The deployment-policy claim test checks both settings.
 
 See [privacy](https://accessible-explanation-checkin.sociobot.in/privacy), [terms](https://accessible-explanation-checkin.sociobot.in/terms), [demo notes](.factory/demo.md), and the [MIT license](LICENSE).

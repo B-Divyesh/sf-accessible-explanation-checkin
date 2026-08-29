@@ -390,12 +390,13 @@ async fn update_submission(
 ) -> Result<Json<Value>, ApiError> {
     let allowed = [
         "Clear reasoning",
+        "Uses evidence",
         "Needs follow-up",
         "New strategy",
         "AI use discussed",
         "Misconception",
     ];
-    if input.teacher_tags.len() > 5
+    if input.teacher_tags.len() > 6
         || input
             .teacher_tags
             .iter()
@@ -636,6 +637,21 @@ mod tests {
         (router(state), temp)
     }
 
+    async fn test_state(billing_base: String) -> (Arc<AppState>, tempfile::TempDir) {
+        let temp = tempfile::tempdir().unwrap();
+        let database = format!("sqlite:{}?mode=rwc", temp.path().join("test.db").display());
+        let state = Arc::new(AppState {
+            pool: crate::db::connect(&database).await.unwrap(),
+            uploads_dir: temp.path().join("uploads"),
+            billing_base,
+            http: reqwest::Client::new(),
+            build_sha: "test".into(),
+            database_file: None,
+            persistence_dir: None,
+        });
+        (state, temp)
+    }
+
     #[tokio::test]
     async fn complete_free_checkin_flow() {
         let (app, _temp) = test_app().await;
@@ -799,5 +815,68 @@ mod tests {
         assert_eq!(checkin["submissions"], 35);
         assert_eq!(checkin["max_submissions"], 35);
         assert_eq!(checkin["open"], false);
+    }
+
+    #[tokio::test]
+    // @claim:voice-retention-deletion
+    async fn claim_voice_retention_deletion() {
+        let (state, _temp) = test_state("http://127.0.0.1:1".into()).await;
+        let app = router(state.clone());
+        let create = app.clone().oneshot(Request::post("/api/checkins").header("content-type", "application/json").body(Body::from(r#"{"title":"Voice cleanup","prompt":"Explain the choice you made.","voice_retention_days":1}"#)).unwrap()).await.unwrap();
+        let created = json_response(create).await;
+        let student = created["student_token"].as_str().unwrap();
+        let review = created["review_token"].as_str().unwrap();
+        let submit = app.clone().oneshot(Request::post(format!("/api/checkins/{student}/submissions")).header("content-type", "application/json").body(Body::from(r#"{"student_name":"Riley","explanation_text":"I compared both examples.","confidence":4,"voice_data":"dGVzdA==","voice_mime":"audio/webm"}"#)).unwrap()).await.unwrap();
+        assert_eq!(submit.status(), StatusCode::CREATED);
+
+        let row = sqlx::query("SELECT id, voice_file FROM submissions")
+            .fetch_one(&state.pool)
+            .await
+            .unwrap();
+        let id: String = row.get("id");
+        let voice_file: String = row.get::<Option<String>, _>("voice_file").unwrap();
+        assert!(state.uploads_dir.join(&voice_file).exists());
+        sqlx::query("UPDATE submissions SET voice_delete_at=? WHERE id=?")
+            .bind("2000-01-01T00:00:00Z")
+            .bind(&id)
+            .execute(&state.pool)
+            .await
+            .unwrap();
+
+        assert_eq!(cleanup_expired_voice(&state).await.unwrap(), 1);
+        assert!(!state.uploads_dir.join(voice_file).exists());
+        let review_response = app
+            .oneshot(
+                Request::get(format!("/api/reviews/{review}"))
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        let review_json = json_response(review_response).await;
+        assert_eq!(review_json["submissions"][0]["has_voice"], false);
+        assert_eq!(
+            review_json["submissions"][0]["voice_delete_at"],
+            Value::Null
+        );
+    }
+
+    #[tokio::test]
+    // @claim:classroom-plus-limits
+    async fn claim_classroom_plus_limits() {
+        let billing = Router::new().route(
+            "/api/v1/products/accessible-explanation-checkin/verify",
+            get(|| async { Json(json!({"valid": true, "reason": "ok"})) }),
+        );
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let address = listener.local_addr().unwrap();
+        tokio::spawn(async move { axum::serve(listener, billing).await.unwrap() });
+        let (state, _temp) = test_state(format!("http://{address}")).await;
+        let app = router(state);
+        let response = app.oneshot(Request::post("/api/checkins").header("content-type", "application/json").body(Body::from(r#"{"title":"Licensed class","prompt":"Explain the choice you made.","voice_retention_days":365,"license":"fixture-valid"}"#)).unwrap()).await.unwrap();
+        assert_eq!(response.status(), StatusCode::CREATED);
+        let created = json_response(response).await;
+        assert_eq!(created["max_submissions"], 500);
+        assert_eq!(created["voice_retention_days"], 365);
     }
 }

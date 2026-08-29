@@ -39,6 +39,16 @@ test('unknown paths return the designed 404 with an HTTP 404 status', async ({ r
   expect(response.status()).toBe(404);
   await page.goto('/no-such-page');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('That page is not available');
+  await expect(page.getByRole('link', { name: 'Skip to main content' })).toHaveAttribute('href', '#main');
+  await expect(page.getByRole('banner')).toBeVisible();
+  await expect(page.getByRole('contentinfo')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy');
+  await expect(page.getByRole('link', { name: 'Terms' })).toHaveAttribute('href', '/terms');
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /unavailable/);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://accessible-explanation-checkin.sociobot.in/404');
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /social-classroom\.jpg$/);
+  await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute('content', 'summary_large_image');
+  await expectAccessible(page);
 });
 
 test('mobile theme and legal controls meet the 44px touch-target contract', async ({ page }, testInfo) => {
@@ -58,7 +68,7 @@ test('mobile theme and legal controls meet the 44px touch-target contract', asyn
 
 test('plans use the production billing endpoint', async ({ page }) => {
   await page.goto('/pricing');
-  await expect(page.getByRole('link', { name: 'Buy Classroom Plus' })).toHaveAttribute(
+  await expect(page.getByRole('link', { name: 'Buy Classroom Plus through Sociobot (opens external site)' })).toHaveAttribute(
     'href',
     'https://api.sociobot.in/api/v1/products/accessible-explanation-checkin/checkout',
   );

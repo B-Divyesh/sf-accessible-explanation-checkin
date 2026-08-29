@@ -13,7 +13,9 @@ use axum::{
 use routes::AppState;
 use std::{net::SocketAddr, path::PathBuf, sync::Arc, time::Duration};
 use tokio::net::TcpListener;
-use tower_governor::{governor::GovernorConfigBuilder, GovernorLayer};
+use tower_governor::{
+    governor::GovernorConfigBuilder, key_extractor::SmartIpKeyExtractor, GovernorLayer,
+};
 use tower_http::{
     compression::CompressionLayer,
     request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer},
@@ -122,8 +124,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route_service("/c/:token", get_service(index_file.clone()))
         .route_service("/review/:token", get_service(index_file.clone()))
         .route_service("/receipt/:token", get_service(index_file));
+    let mut rate_limit_builder =
+        GovernorConfigBuilder::default().key_extractor(SmartIpKeyExtractor);
     let rate_limit = Arc::new(
-        GovernorConfigBuilder::default()
+        rate_limit_builder
             .per_second(1)
             .burst_size(120)
             .finish()
@@ -204,4 +208,54 @@ async fn shutdown() {
     let terminate = std::future::pending::<()>();
     tokio::select! { _=ctrl_c=>{}, _=terminate=>{} }
     tracing::info!("shutdown signal received");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use axum::{body::Body, http::Request};
+    use tower::ServiceExt;
+
+    #[tokio::test]
+    async fn rate_limit_uses_forwarded_client_ip_and_returns_retry_after() {
+        let mut builder = GovernorConfigBuilder::default().key_extractor(SmartIpKeyExtractor);
+        let config = Arc::new(
+            builder
+                .per_second(60)
+                .burst_size(2)
+                .finish()
+                .expect("valid test rate limit"),
+        );
+        let app = Router::new()
+            .route("/api/test", get(|| async { "ok" }))
+            .layer(GovernorLayer { config });
+
+        for expected in [200, 200, 429] {
+            let response = app
+                .clone()
+                .oneshot(
+                    Request::get("/api/test")
+                        .header("x-forwarded-for", "203.0.113.7, 10.0.0.1")
+                        .body(Body::empty())
+                        .unwrap(),
+                )
+                .await
+                .unwrap();
+            assert_eq!(response.status().as_u16(), expected);
+            if expected == 429 {
+                assert!(response.headers().contains_key(header::RETRY_AFTER));
+            }
+        }
+
+        let other_client = app
+            .oneshot(
+                Request::get("/api/test")
+                    .header("x-forwarded-for", "198.51.100.9")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(other_client.status(), axum::http::StatusCode::OK);
+    }
 }
