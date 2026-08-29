@@ -4,7 +4,7 @@ import { chromium } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 const base = process.env.AUDIT_BASE_URL || 'https://accessible-explanation-checkin.sociobot.in';
-const evidencePrefix = process.env.AUDIT_EVIDENCE_PREFIX || 'repair-3';
+const evidencePrefix = process.env.AUDIT_EVIDENCE_PREFIX || 'polish-6';
 const evidenceDir = new URL('./evidence/', import.meta.url);
 await mkdir(evidenceDir, { recursive: true });
 
@@ -135,6 +135,14 @@ assert.deepEqual(await demo.evaluate(() => ({
 assert.equal(demoRequests.some(url => new URL(url).pathname.startsWith('/api/')), false, 'demo API isolation');
 await demo.getByRole('button', { name: 'Reset demo' }).click();
 assert.equal(await demo.getByLabel('Private teacher note').first().inputValue(), 'Ask Maya to connect the model to the class data.');
+await demo.getByLabel('Private teacher note').first().fill('Discard this live demo edit');
+await demo.getByRole('button', { name: 'Save sample review' }).first().click();
+await demo.evaluate(() => localStorage.setItem('demo:live-audit-extra', 'discard me'));
+await demo.getByRole('link', { name: 'Start for real' }).click();
+await demo.waitForURL(`${base}/create`);
+assert.deepEqual(await demo.evaluate(() => Object.keys(localStorage).filter(key => key.startsWith('demo:'))), []);
+await demo.goto(`${base}/?demo=1`, { waitUntil: 'networkidle' });
+assert.equal(await demo.getByLabel('Private teacher note').first().inputValue(), 'Ask Maya to connect the model to the class data.');
 await demo.waitForFunction(() => navigator.serviceWorker.controller !== null);
 await demo.reload({ waitUntil: 'networkidle' });
 await demoContext.setOffline(true);
@@ -175,6 +183,112 @@ assert.equal(await flow.getByLabel('Private teacher note').inputValue(), 'Live r
 assert.deepEqual([...new Set(workflowRequests.map(url => new URL(url).origin))], [base]);
 await flowContext.close();
 
+const voiceContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+await voiceContext.addInitScript(() => {
+  let scheduled;
+  const originalSetTimeout = window.setTimeout.bind(window);
+  window.setTimeout = ((handler, timeout, ...args) => {
+    if (timeout === 120_000 && typeof handler === 'function') {
+      scheduled = handler;
+      window.recordingTimerDelay = timeout;
+      return 120_000;
+    }
+    return originalSetTimeout(handler, timeout, ...args);
+  });
+  window.finishRecordingTimer = () => scheduled?.();
+  Object.defineProperty(navigator, 'mediaDevices', {
+    configurable: true,
+    value: { getUserMedia: async () => ({ getTracks: () => [{ stop: () => undefined }] }) },
+  });
+  class RecordedMedia {
+    state = 'inactive';
+    mimeType = 'audio/webm';
+    ondataavailable = null;
+    onstop = null;
+    start() { this.state = 'recording'; }
+    stop() {
+      this.state = 'inactive';
+      this.ondataavailable?.({ data: new Blob(['recorded voice'], { type: this.mimeType }) });
+      this.onstop?.();
+    }
+  }
+  Object.defineProperty(window, 'MediaRecorder', { configurable: true, value: RecordedMedia });
+});
+const voicePage = await voiceContext.newPage();
+const voiceCreate = await voiceContext.request.post(`${base}/api/checkins`, { data: {
+  title: 'Live voice boundary verification',
+  prompt: 'Explain which example changed your conclusion.',
+  voice_retention_days: 1,
+} });
+assert.equal(voiceCreate.status(), 201);
+const voiceCheckin = await voiceCreate.json();
+await voicePage.goto(`${base}/c/${voiceCheckin.student_token}`);
+await voicePage.getByRole('button', { name: 'Start recording' }).click();
+assert.equal(await voicePage.evaluate(() => window.recordingTimerDelay), 120_000);
+await voicePage.evaluate(() => window.finishRecordingTimer?.());
+await voicePage.getByText(/Recording ready \(1 KB\)/).waitFor();
+
+const exactVoice = Buffer.alloc(4 * 1024 * 1024).toString('base64');
+const acceptedVoice = await voiceContext.request.post(`${base}/api/checkins/${voiceCheckin.student_token}/submissions`, { data: {
+  student_name: 'Live voice verifier',
+  explanation_text: 'The exact-size recording is supported.',
+  confidence: 4,
+  voice_data: exactVoice,
+  voice_mime: 'audio/webm',
+} });
+assert.equal(acceptedVoice.status(), 201);
+const acceptedSubmission = await acceptedVoice.json();
+const oversizedVoice = Buffer.alloc(4 * 1024 * 1024 + 1).toString('base64');
+const rejectedVoice = await voiceContext.request.post(`${base}/api/checkins/${voiceCheckin.student_token}/submissions`, { data: {
+  student_name: 'Oversized voice verifier',
+  explanation_text: 'This recording must be rejected.',
+  confidence: 4,
+  voice_data: oversizedVoice,
+  voice_mime: 'audio/webm',
+} });
+assert.equal(rejectedVoice.status(), 413);
+assert.deepEqual(await rejectedVoice.json(), { error: 'The voice recording is over 4 MB. Record a shorter explanation or use text.' });
+let voiceReviewResponse = await voiceContext.request.get(`${base}/api/reviews/${voiceCheckin.review_token}`);
+assert.equal(voiceReviewResponse.status(), 200);
+let voiceReview = await voiceReviewResponse.json();
+assert.equal(voiceReview.submissions.length, 1);
+const voiceSubmission = voiceReview.submissions[0];
+assert.equal(voiceSubmission.has_voice, true);
+const savedVoiceReview = await voiceContext.request.patch(`${base}/api/reviews/${voiceCheckin.review_token}/submissions/${voiceSubmission.id}`, { data: {
+  teacher_tags: ['Uses evidence'],
+  teacher_note: 'Keep the written explanation.',
+  follow_up: true,
+} });
+assert.equal(savedVoiceReview.status(), 200);
+const deletedVoice = await voiceContext.request.delete(`${base}/api/reviews/${voiceCheckin.review_token}/submissions/${voiceSubmission.id}/voice`);
+assert.equal(deletedVoice.status(), 200);
+assert.equal((await voiceContext.request.get(`${base}/api/reviews/${voiceCheckin.review_token}/submissions/${voiceSubmission.id}/voice`)).status(), 410);
+voiceReviewResponse = await voiceContext.request.get(`${base}/api/reviews/${voiceCheckin.review_token}`);
+voiceReview = await voiceReviewResponse.json();
+assert.deepEqual({
+  count: voiceReview.submissions.length,
+  hasVoice: voiceReview.submissions[0].has_voice,
+  voiceDeleteAt: voiceReview.submissions[0].voice_delete_at,
+  explanation: voiceReview.submissions[0].explanation_text,
+  tags: voiceReview.submissions[0].teacher_tags,
+  note: voiceReview.submissions[0].teacher_note,
+  followUp: voiceReview.submissions[0].follow_up,
+}, {
+  count: 1,
+  hasVoice: false,
+  voiceDeleteAt: null,
+  explanation: 'The exact-size recording is supported.',
+  tags: ['Uses evidence'],
+  note: 'Keep the written explanation.',
+  followUp: true,
+});
+const retainedReceiptResponse = await voiceContext.request.get(`${base}/api/receipts/${acceptedSubmission.receipt_token}`);
+assert.equal(retainedReceiptResponse.status(), 200);
+const retainedReceipt = await retainedReceiptResponse.json();
+assert.equal(retainedReceipt.has_voice, false);
+assert.equal(retainedReceipt.explanation_text, 'The exact-size recording is supported.');
+await voiceContext.close();
+
 const checkoutUrl = 'https://api.sociobot.in/api/v1/products/accessible-explanation-checkin/checkout';
 const catalogResponse = await fetch('https://api.sociobot.in/api/v1/products');
 assert.equal(catalogResponse.status, 200);
@@ -203,8 +317,9 @@ const report = {
   darkThemeRoutes: darkThemeResults,
   crawledLinks: crawledLinks.size,
   focus: { forward: 'h1', back: 'h1', forwardAnnouncement, backAnnouncement },
-  demo: { entry: '/?demo=1', sampleResponses: 3, isolatedStorage: true, reset: true, apiRequests: 0, offlineReload: true },
+  demo: { entry: '/?demo=1', sampleResponses: 3, isolatedStorage: true, reset: true, exitDiscardsAllDemoKeys: true, apiRequests: 0, offlineReload: true },
   workflow: { created: true, submitted: true, reviewed: true, reloadedSavedReview: true, origins: [base] },
+  voice: { autoStopMilliseconds: 120000, acceptedBytes: 4194304, rejectedBytes: 4194305, earlyDelete: true, textReceiptAndReviewRetained: true },
   checkout: { catalogPriceMinor: 3900, currency: 'USD', status: 303, destination: 'checkout.dodopayments.com' },
   securityHeaders: ['content-security-policy', 'strict-transport-security', 'permissions-policy', 'x-content-type-options', 'referrer-policy'],
   consoleErrors: unexpectedConsoleErrors,

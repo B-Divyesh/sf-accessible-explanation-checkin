@@ -1,0 +1,42 @@
+{
+  "checkedAt": "2026-08-29T15:56:45Z",
+  "clone": "/tmp/aec-polish6-final.PrzYNP/repo",
+  "commit": "0dc87fe3a578a96de0e3451b3aa9811bcf1e33e8",
+  "npmCi": {
+    "passed": true,
+    "packages": 86,
+    "vulnerabilities": 0
+  },
+  "claims": {
+    "command": "npm run test:all-claims",
+    "passed": true,
+    "commands": 24
+  },
+  "unitIntegration": {
+    "command": "npm test",
+    "passed": true,
+    "vitest": 5,
+    "rust": 13,
+    "deploymentFixtures": 2
+  },
+  "build": {
+    "command": "npm run build",
+    "passed": true,
+    "distProduced": true,
+    "javascriptBytes": 38930,
+    "javascriptGzipBytes": 12430,
+    "cssBytes": 19300,
+    "cssGzipBytes": 5160
+  },
+  "browser": {
+    "command": "npm run test:e2e",
+    "passed": true,
+    "passedTests": 46,
+    "intentionalDeviceSkips": 10
+  },
+  "rustQuality": {
+    "formatCommand": "cargo fmt --all -- --check",
+    "clippyCommand": "cargo clippy --all-targets --locked -- -D warnings",
+    "passed": true
+  }
+}
