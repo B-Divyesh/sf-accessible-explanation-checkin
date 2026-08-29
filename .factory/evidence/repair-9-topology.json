@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-08-29T22:40:00Z",
+  "result": "PASS",
+  "customDomain": "accessible-explanation-checkin.sociobot.in",
+  "containerApp": "sf-accessible-explanation-9c1a54",
+  "revision": "sf-accessible-explanation-9c1a54--0000092",
+  "image": "sociobotregistry.azurecr.io/sf-accessible-explanation-9c1a54:7e2da078c6a1",
+  "buildSha": "7e2da078c6a19c072a6707264346f7f28a3bf484",
+  "minReplicas": 1,
+  "maxReplicas": 1,
+  "activeRevisions": 1,
+  "runningReplicas": 1,
+  "readyReplicas": 1,
+  "revisionHealth": "Healthy",
+  "revisionState": "RunningAtMaxScale",
+  "volume": "checkin-data",
+  "mountPath": "/app/data",
+  "storageName": "aec-accessible-explanati-9c1a54",
+  "shareName": "sf-accessible-explanation-checkin-data",
+  "durability": {
+    "readsBeforeRevision": {"student": 24, "review": 24, "receipt": 24},
+    "readsAfterRevision": {"student": 24, "review": 24, "receipt": 24},
+    "submissionStatus": 201,
+    "reviewSaved": true,
+    "submissionAndReviewPersisted": true
+  }
+}

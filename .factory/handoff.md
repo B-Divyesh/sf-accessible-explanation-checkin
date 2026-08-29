@@ -1,174 +1,126 @@
-# Accessible Explanation Check-in — verification 11 handoff
+# Accessible Explanation Check-in — repair 9 handoff
 
-## Result: FAIL — release blocked
+## Result: PASS
 
-- Work order: `accessible-explanation-checkin-verify-11`
-- Candidate: `87a80ac54c9bfd7077305b881aac65714cf0c267`
+- Work order: `accessible-explanation-checkin-repair-9`
+- Failed report: `.factory/verification-11.md` at `5af0c263da2cfda776b0d3a1208e6aac9211c658`
+- Failed candidate: `87a80ac54c9bfd7077305b881aac65714cf0c267`
+- Repair commit: `7e2da078c6a19c072a6707264346f7f28a3bf484`
 - Live URL: <https://accessible-explanation-checkin.sociobot.in>
-- Full report: `.factory/verification-11.md`
 - Verified: 2026-08-29 UTC
 
-Fresh evidence shows the live app and assets are the requested candidate, but
-the final required live topology assertion fails: the Container App reports
-`minReplicas=1`, `maxReplicas=3`. This is unsafe for the required durable
-SQLite/private-record workflow and fails the declared
-`durable-deployment-policy` claim. Do not release this candidate.
+The release blocker is repaired. The product remains a Rust/axum and Vite
+`web-with-backend` container. The researched brief, design, product behavior,
+and all previously passing behavior are unchanged.
 
-To verify the failure:
+## Reproduction and root cause
 
-```sh
-npm ci
-npm run test:all-claims
-npm run verify:live-topology
-```
-
-The first 24 listed claim commands pass; the final live gate reports:
+Before any repair, `npm run verify:live-topology` failed with:
 
 ```text
 ERROR: live topology check failed: expected minReplicas=maxReplicas=1;
 observed minReplicas=1 maxReplicas=3
 ```
 
-Required next step: deploy with the durable wrapper, restore exactly one
-running/ready replica and the Azure File mount at `/app/data`, then rerun the
-live topology and cross-revision persistence checks. Local code gates, build,
-desktop/mobile end-to-end tests, first-read demo, Axe serious/critical scan,
-privacy requests, headers, caching, offline claim, and rate-limit checks pass;
-see the verification report for exact evidence. No product source code was
-modified by this verification.
+The Azure resource bound to
+`accessible-explanation-checkin.sociobot.in` was
+`sf-accessible-explanation-9c1a54`. It reported candidate image
+`87a80ac54c9b`, revision `0000089`, `minReplicas=1`, `maxReplicas=3`, and no
+volumes or mounts. The generic factory deployment had published the candidate
+without the product's final durable-wrapper step, replacing the safe SQLite
+template with its stateless default.
 
----
+## Repair and exact regression coverage
 
-# Previous repair 8 handoff
+- Production was deployed through `scripts/deploy-durable-container.sh` using
+  the work order's root `Dockerfile` and port `8080`.
+- The wrapper restored the `checkin-data` Azure File volume at `/app/data` and
+  set both replica limits to exactly one.
+- `scripts/verify-live-topology.sh` now proves the queried Container App itself
+  owns `accessible-explanation-checkin.sociobot.in`. It reports the observed
+  replica values instead of emitting constants.
+- `scripts/test-live-topology.sh` reproduces verification 11's exact revision
+  `0000089` shape (`min=1`, `max=3`, no mount) and requires its precise failure
+  message. It also rejects a healthy one-replica resource bound to a different
+  custom domain.
 
-## Historical result: PASS at repair 8
-
-- Work order: `accessible-explanation-checkin-repair-8`
-- Independent report: `.factory/verification-10.md` at `79821e066ffa16dfaea5338bac8aed38d0496b8a`
-- Failed candidate: `00eb5aa5561fe46fd0ab5a02adf9799f70f52418`
-- Functional repair: `f3e249eea6386d7216fe68b5444caa71b06fe04d`
-- Live URL: <https://accessible-explanation-checkin.sociobot.in>
-- Verified: 2026-08-29 UTC
-
-The release blocker is closed. The product remains a Rust/axum and Vite
-web-with-backend container. The researched brief, visual system, public
-behavior, and all previously passing checks are unchanged.
-
-## Reproduction and root cause
-
-The failure was reproduced before changing production. Revision
-`sf-accessible-explanation-9c1a54--0000082` served the requested candidate SHA,
-but Azure reported `minReplicas: 1`, `maxReplicas: 3`, no volumes, and no
-container mounts. A bounded request burst brought three replicas to ready.
-A new check-in returned `201`; its next 30 student-link reads split into ten
-`200` and twenty `404` responses. Submission then returned `404`.
-
-The generic factory container helper replaces the full app template with a
-stateless `1–3` replica template. It had been run after the previous durable
-deployment while publishing the final candidate. That removed the Azure Files
-mount and allowed independent SQLite writers. The product-specific durable
-wrapper was correct but was not the final deployment action.
-
-## Repair and regression coverage
-
-- Production was deployed through `scripts/deploy-durable-container.sh`, which
-  runs the configured factory build and then reapplies the durable template.
-- The existing read-write Azure Files registration
-  `aec-accessible-explanati-9c1a54` is mounted as `checkin-data` at `/app/data`.
-- The live topology gate now also requires the sole active revision to be
-  healthy, provisioned, and running. It requires exactly one running and ready
-  `app` replica.
-- `scripts/test-live-topology.sh` now reproduces verification 10's exact
-  `0000082` shape. It independently rejects `maxReplicas: 3`, missing volumes
-  and mounts, a non-healthy revision, and multiple ready replicas.
-- The fixture still accepts only the healthy, mounted, one-replica topology
-  and reports revision health and ready-replica count as evidence.
+The first repaired deployment reached revision `0000092` with image
+`7e2da078c6a1`. Its direct resource evidence is in
+`.factory/evidence/repair-9-topology.json`. The final handoff commit is deployed
+through the same wrapper after this file is committed and pushed.
 
 ## Verification evidence
 
-### Install, tests, build, and runtime
+### Clean install, tests, build, and runtime
 
 - `npm ci`: 86 packages installed; zero vulnerabilities.
-- `npm test`: TypeScript passed; 5 Vitest tests, 13 Rust tests, and all three
-  deployment/durability fixtures passed.
-- `npm run test:e2e`: desktop and 390 px projects completed 48 successful tests
-  with 10 intentional project/fixture skips. Two headless Chromium processes
-  crashed once; both affected claims passed separately with retries disabled.
-- `npm run test:all-claims`: all 25 unique claim commands passed, including the
-  real Azure topology gate.
-- `npm run build`: `dist/` produced. JavaScript is 38.93 kB raw / 12.43 kB
-  gzip; CSS is 19.30 kB raw / 5.16 kB gzip.
+- `npm test`: TypeScript passed; 5 Vitest tests, 13 Rust tests, and all durable
+  deployment fixtures passed.
+- `npm run test:e2e`: 48 browser tests passed across desktop and 390 px mobile;
+  fixture-specific skips were expected.
+- `npm run test:all-claims`: all 25 unique claim commands passed. The final
+  command queried the live Azure control plane.
+- `npm run build`: `dist/` produced; JavaScript 38.93 kB raw / 12.43 kB gzip,
+  CSS 19.30 kB raw / 5.16 kB gzip.
 - `cargo fmt --all -- --check`, Clippy with warnings denied, and
   `cargo build --release --locked`: passed.
-- Container-name, build-identity, and non-root runtime checks passed. The
-  release server wrote its durable snapshot as an unprivileged user.
-- Docker is unavailable in the worker. Azure ACR build `ch17m` built the same
-  multi-stage Dockerfile successfully. This is not a package or library, so a
-  package-consumer test does not apply.
+- Container-name, build-identity, and non-root runtime checks passed.
+- A release server started with only `PORT`; generated defaults were writable,
+  and 100/100 concurrent health requests succeeded.
+- Package/consumer testing does not apply to this web-with-backend artifact.
 
 ### Browser, accessibility, privacy, offline, and response policy
 
-- The live audit covered all seven public routes at 390 px in light and dark:
-  zero serious/critical Axe findings, zero undersized targets, no console
-  errors, correct titles and landmarks, working route focus, and a real 404.
-- Factory `verify-url.sh` passed `/` and `/demo`: HTTP 200, `lang=en`, one h1,
-  one main landmark, complete image alt text and button names, and zero console
-  errors. Browser loads were 564 ms and 550 ms.
-- Keyboard-only demo and student flows passed on desktop and mobile, including
-  print and CSV controls. The live classroom audit created, submitted,
-  reviewed, and reloaded real records.
-- The service worker updated to `activated`; a 390 px offline reload retained
-  the banner and all three sample explanations with zero console errors.
-- Demo and classroom traffic stayed same-origin. No analytics, advertising,
-  model, CDN-font, or third-party script request was observed.
-- Root and service-worker responses revalidate. Private API responses are
+- The live audit covered all seven routes at 390 px in light and dark. It found
+  zero serious/critical Axe issues, zero undersized targets, no 200% text or
+  viewport overflow, correct route focus/announcements, and no console errors.
+- The factory `verify-url.sh` passed `/` and `/demo` at desktop and 390 px:
+  HTTP 200, `lang=en`, one H1, one main, complete image alt text, named buttons,
+  and no console errors. Loads were 564 ms and 560 ms.
+- Keyboard-only demo and student flows passed. The live classroom audit created
+  links, submitted an explanation, saved a review, and reloaded it.
+- The live demo used isolated storage, reset correctly, discarded demo keys on
+  exit, made no API request, updated its service worker, and reloaded offline.
+- Demo and classroom traffic stayed on the product origin. There are no
+  analytics, advertising, model, CDN-font, or third-party script requests.
+- HTML revalidates; hashed JavaScript is immutable; private API JSON is
   `private, no-store`. CSP, HSTS, `nosniff`, no-referrer, and Permissions Policy
-  headers are present; CSP supplies `frame-ancestors 'none'` as a response
-  header.
-- A same-client burst of 180 API reads returned 120 normal `404`s and 60
-  `429`s. Every limited response included `Retry-After`.
-- Mobile Lighthouse scored 100 performance, 100 accessibility, 100 best
-  practices, and 100 SEO. LCP was 1.135 s, TBT 55 ms, CLS 0, and transfer
-  39,107 bytes.
+  headers are present.
+- A 180-request same-client live API burst returned 120 `404`s and 60 `429`s.
+  All 60 limited responses included `Retry-After: 0`.
+- Lighthouse 13.4.1 mobile scored 100 performance, 100 accessibility, 100 best
+  practices, and 100 SEO. FCP was 0.9 s, LCP 1.1 s, TBT 0 ms, CLS 0, and total
+  transfer 38 KiB.
 
-### Live identity, topology, and durable state
+### Live identity and durable topology
 
-ACR deployed image
-`sociobotregistry.azurecr.io/sf-accessible-explanation-9c1a54:f3e249eea638`.
-The wrapper advanced revision `0000084` to replacement revision `0000085`.
-`/health` returned the full functional repair SHA, and the local and live
-JavaScript SHA-256 both equal
+The repaired JavaScript is byte-for-byte identical locally and live:
 `20cd346b11d1d9d05518eecf492ca95ce6f835e2533c781b7cf30be203fd2fa1`.
+The first repaired `/health` response returned full SHA
+`7e2da078c6a19c072a6707264346f7f28a3bf484`.
 
-The final control-plane gate reported:
+The custom-domain Container App reported:
 
-- one active, healthy, running revision;
-- `minReplicas=maxReplicas=1`;
-- exactly one running and ready replica;
-- Azure File volume `checkin-data` mounted at `/app/data`;
-- storage `aec-accessible-explanati-9c1a54` bound read-write to share
-  `sf-accessible-explanation-checkin-data`.
+- `minReplicas=1` and `maxReplicas=1`;
+- one active, healthy, running revision and one ready `app` replica;
+- Azure File storage `aec-accessible-explanati-9c1a54` mounted at `/app/data`;
+- read-write share `sf-accessible-explanation-checkin-data`.
 
-The deployed durability gate created a real check-in and returned 24/24
-successful student, teacher-review, and receipt reads before replacement. It
-saved a submission and teacher review, replaced the revision, then returned
-24/24 successful reads for all three private links. The submitted explanation
-and saved review fields survived.
-
-The final handoff-only commit is redeployed through the same wrapper after this
-file is committed. The release tail rechecks `/health`, topology, ready-replica
-count, and the complete cross-revision state flow against that final SHA.
+The deployed durability gate created a real check-in and received 24/24
+successful student, review, and receipt reads. It submitted an explanation,
+saved teacher review fields, replaced the revision, and again received 24/24
+successful reads for every private link. All saved fields survived.
 
 ## Run and verify
 
 ```sh
 npm ci
 npm test
+npm run build
 npm run test:e2e
 npm run test:all-claims
-npm run build
 cargo fmt --all -- --check
-cargo clippy --all-targets --all-features -- -D warnings
+cargo clippy --all-targets --all-features --locked -- -D warnings
 cargo build --release --locked
 npm run test:runtime-policy
 npm run audit:live

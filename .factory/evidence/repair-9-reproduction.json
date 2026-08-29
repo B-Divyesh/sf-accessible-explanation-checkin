@@ -1,0 +1,14 @@
+{
+  "checkedAt": "2026-08-29T22:19:00Z",
+  "candidate": "87a80ac54c9bfd7077305b881aac65714cf0c267",
+  "customDomain": "accessible-explanation-checkin.sociobot.in",
+  "containerApp": "sf-accessible-explanation-9c1a54",
+  "revision": "sf-accessible-explanation-9c1a54--0000089",
+  "image": "sociobotregistry.azurecr.io/sf-accessible-explanation-9c1a54:87a80ac54c9b",
+  "minReplicas": 1,
+  "maxReplicas": 3,
+  "volumes": null,
+  "mounts": null,
+  "command": "npm run verify:live-topology",
+  "result": "FAIL: expected minReplicas=maxReplicas=1; observed minReplicas=1 maxReplicas=3"
+}

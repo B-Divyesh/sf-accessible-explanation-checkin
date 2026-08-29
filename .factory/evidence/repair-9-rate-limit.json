@@ -1,0 +1,8 @@
+{
+  "checkedAt": "2026-08-29T22:46:00Z",
+  "url": "https://accessible-explanation-checkin.sociobot.in/api/checkins/00000000000000000000000000000000",
+  "requests": 180,
+  "statuses": {"404": 120, "429": 60},
+  "limitedWithRetryAfter": 60,
+  "retryAfterValues": ["0"]
+}
