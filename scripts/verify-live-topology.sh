@@ -19,8 +19,20 @@ fail() {
   exit 1
 }
 
+custom_domain=${base_url#*://}
+custom_domain=${custom_domain%%/*}
+custom_domain=${custom_domain%%:*}
+
 topology=$($az_bin containerapp show --resource-group "$resource_group" \
   --name "$app_name" --output json)
+resource_name=$(jq -er '.name' <<<"$topology")
+[[ "$resource_name" == "$app_name" ]] || \
+  fail "queried Container App reports name $resource_name instead of $app_name"
+if ! jq -e --arg domain "$custom_domain" '
+  any(.properties.configuration.ingress.customDomains[]?; .name == $domain)
+' >/dev/null <<<"$topology"; then
+  fail "Container App $app_name does not own custom domain $custom_domain"
+fi
 revision=$(jq -er '.properties.latestRevisionName' <<<"$topology")
 ready_revision=$(jq -er '.properties.latestReadyRevisionName' <<<"$topology")
 [[ "$revision" == "$ready_revision" ]] || \
@@ -111,8 +123,11 @@ jq -n \
   --arg build_sha "$health_sha" \
   --arg storage_name "$expected_storage_name" \
   --arg share_name "$expected_share_name" \
+  --arg custom_domain "$custom_domain" \
   --arg revision_health "$revision_health" \
   --arg revision_state "$revision_state" \
+  --argjson min_replicas "$min_replicas" \
+  --argjson max_replicas "$max_replicas" \
   '{
     result: "PASS",
     base_url: $base_url,
@@ -121,8 +136,9 @@ jq -n \
     image: $image,
     build_sha: $build_sha,
     topology: {
-      min_replicas: 1,
-      max_replicas: 1,
+      custom_domain: $custom_domain,
+      min_replicas: $min_replicas,
+      max_replicas: $max_replicas,
       active_revisions: 1,
       running_replicas: 1,
       ready_replicas: 1,
