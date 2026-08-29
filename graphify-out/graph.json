@@ -52,6 +52,18 @@
       "source_location": "L15"
     },
     {
+      "id": "frontend_src_playwright_config_test_claim",
+      "label": "Claim",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 8,
+      "file_type": "code",
+      "norm_label": "claim",
+      "source_file": "frontend/src/playwright-config.test.ts",
+      "source_location": "L6"
+    },
+    {
       "id": "frontend_src_main_announce",
       "label": "announce()",
       "_callable": true,
@@ -677,6 +689,46 @@
       "norm_label": "tabto()",
       "source_file": "frontend/tests/claims.spec.ts",
       "source_location": "L18"
+    },
+    {
+      "id": "frontend_src_config",
+      "label": "config.ts",
+      "_origin": "ast",
+      "community": 0,
+      "file_type": "code",
+      "norm_label": "config.ts",
+      "source_file": "frontend/src/config.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_config_billing_base_url",
+      "label": "BILLING_BASE_URL",
+      "_origin": "ast",
+      "community": 0,
+      "file_type": "code",
+      "norm_label": "billing_base_url",
+      "source_file": "frontend/src/config.ts",
+      "source_location": "L5"
+    },
+    {
+      "id": "frontend_src_config_product_slug",
+      "label": "PRODUCT_SLUG",
+      "_origin": "ast",
+      "community": 0,
+      "file_type": "code",
+      "norm_label": "product_slug",
+      "source_file": "frontend/src/config.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_config_test",
+      "label": "config.test.ts",
+      "_origin": "ast",
+      "community": 0,
+      "file_type": "code",
+      "norm_label": "config.test.ts",
+      "source_file": "frontend/src/config.test.ts",
+      "source_location": "L1"
     },
     {
       "id": "frontend_src_main",
@@ -1563,24 +1615,27 @@
       "source_location": "L1"
     },
     {
-      "id": "frontend_playwright_config",
-      "label": "playwright.config.ts",
-      "_origin": "ast",
-      "community": 18,
-      "file_type": "code",
-      "norm_label": "playwright.config.ts",
-      "source_file": "frontend/playwright.config.ts",
-      "source_location": "L1"
-    },
-    {
       "id": "frontend_vite_config",
       "label": "vite.config.ts",
       "_origin": "ast",
-      "community": 19,
+      "community": 18,
       "file_type": "code",
       "norm_label": "vite.config.ts",
       "source_file": "frontend/vite.config.ts",
       "source_location": "L1"
+    },
+    {
+      "id": "pkg_accessible_explanation_checkin",
+      "label": "accessible-explanation-checkin",
+      "_origin": "ast",
+      "community": 19,
+      "ecosystem": "cargo",
+      "file_type": "code",
+      "norm_label": "accessible-explanation-checkin",
+      "source_file": "Cargo.toml",
+      "source_location": "L1",
+      "type": "package",
+      "version": "0.1.0"
     },
     {
       "id": "package",
@@ -1923,23 +1978,10 @@
       "source_location": "L28"
     },
     {
-      "id": "pkg_accessible_explanation_checkin",
-      "label": "accessible-explanation-checkin",
-      "_origin": "ast",
-      "community": 20,
-      "ecosystem": "cargo",
-      "file_type": "code",
-      "norm_label": "accessible-explanation-checkin",
-      "source_file": "Cargo.toml",
-      "source_location": "L1",
-      "type": "package",
-      "version": "0.1.0"
-    },
-    {
       "id": "response",
       "label": "Response",
       "_origin": "ast",
-      "community": 21,
+      "community": 20,
       "file_type": "code",
       "norm_label": "response",
       "source_file": "",
@@ -1949,7 +1991,7 @@
       "id": "src_db_rs_error",
       "label": "Error",
       "_origin": "ast",
-      "community": 22,
+      "community": 21,
       "file_type": "code",
       "norm_label": "error",
       "source_file": "",
@@ -1959,7 +2001,7 @@
       "id": "src_db_rs_option",
       "label": "Option",
       "_origin": "ast",
-      "community": 23,
+      "community": 22,
       "file_type": "code",
       "norm_label": "option",
       "source_file": "",
@@ -1969,7 +2011,7 @@
       "id": "src_db_rs_path",
       "label": "Path",
       "_origin": "ast",
-      "community": 24,
+      "community": 23,
       "file_type": "code",
       "norm_label": "path",
       "source_file": "",
@@ -1979,7 +2021,7 @@
       "id": "src_db_rs_pathbuf",
       "label": "PathBuf",
       "_origin": "ast",
-      "community": 25,
+      "community": 24,
       "file_type": "code",
       "norm_label": "pathbuf",
       "source_file": "",
@@ -1989,7 +2031,7 @@
       "id": "src_db_rs_result",
       "label": "Result",
       "_origin": "ast",
-      "community": 26,
+      "community": 25,
       "file_type": "code",
       "norm_label": "result",
       "source_file": "",
@@ -1999,7 +2041,7 @@
       "id": "src_db_rs_sqlitepool",
       "label": "SqlitePool",
       "_origin": "ast",
-      "community": 27,
+      "community": 26,
       "file_type": "code",
       "norm_label": "sqlitepool",
       "source_file": "",
@@ -2009,7 +2051,7 @@
       "id": "src_routes_rs_option",
       "label": "Option",
       "_origin": "ast",
-      "community": 28,
+      "community": 27,
       "file_type": "code",
       "norm_label": "option",
       "source_file": "",
@@ -2019,9 +2061,19 @@
       "id": "src_routes_rs_path",
       "label": "Path",
       "_origin": "ast",
-      "community": 29,
+      "community": 28,
       "file_type": "code",
       "norm_label": "path",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "src_routes_rs_pathbuf",
+      "label": "PathBuf",
+      "_origin": "ast",
+      "community": 29,
+      "file_type": "code",
+      "norm_label": "pathbuf",
       "source_file": "",
       "source_location": ""
     },
@@ -2256,20 +2308,10 @@
       "source_location": "L14"
     },
     {
-      "id": "src_routes_rs_pathbuf",
-      "label": "PathBuf",
-      "_origin": "ast",
-      "community": 30,
-      "file_type": "code",
-      "norm_label": "pathbuf",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
       "id": "src_routes_rs_sqlitepool",
       "label": "SqlitePool",
       "_origin": "ast",
-      "community": 31,
+      "community": 30,
       "file_type": "code",
       "norm_label": "sqlitepool",
       "source_file": "",
@@ -2279,7 +2321,7 @@
       "id": "state",
       "label": "State",
       "_origin": "ast",
-      "community": 32,
+      "community": 31,
       "file_type": "code",
       "norm_label": "state",
       "source_file": "",
@@ -2289,7 +2331,7 @@
       "id": "string",
       "label": "String",
       "_origin": "ast",
-      "community": 33,
+      "community": 32,
       "file_type": "code",
       "norm_label": "string",
       "source_file": "",
@@ -2603,7 +2645,7 @@
       "file_type": "code",
       "norm_label": "consoleerrors",
       "source_file": ".factory/live-audit.mjs",
-      "source_location": "L23"
+      "source_location": "L24"
     },
     {
       "id": "factory_live_audit_crawledlinks",
@@ -2613,7 +2655,7 @@
       "file_type": "code",
       "norm_label": "crawledlinks",
       "source_file": ".factory/live-audit.mjs",
-      "source_location": "L87"
+      "source_location": "L88"
     },
     {
       "id": "factory_live_audit_darkthemeresults",
@@ -2623,7 +2665,7 @@
       "file_type": "code",
       "norm_label": "darkthemeresults",
       "source_file": ".factory/live-audit.mjs",
-      "source_location": "L27"
+      "source_location": "L28"
     },
     {
       "id": "factory_live_audit_demorequests",
@@ -2633,7 +2675,7 @@
       "file_type": "code",
       "norm_label": "demorequests",
       "source_file": ".factory/live-audit.mjs",
-      "source_location": "L122"
+      "source_location": "L123"
     },
     {
       "id": "factory_live_audit_evidencedir",
@@ -2643,7 +2685,7 @@
       "file_type": "code",
       "norm_label": "evidencedir",
       "source_file": ".factory/live-audit.mjs",
-      "source_location": "L7"
+      "source_location": "L8"
     },
     {
       "id": "factory_live_audit_expected",
@@ -2653,7 +2695,7 @@
       "file_type": "code",
       "norm_label": "expected",
       "source_file": ".factory/live-audit.mjs",
-      "source_location": "L10"
+      "source_location": "L11"
     },
     {
       "id": "factory_live_audit_report",
@@ -2663,7 +2705,7 @@
       "file_type": "code",
       "norm_label": "report",
       "source_file": ".factory/live-audit.mjs",
-      "source_location": "L197"
+      "source_location": "L198"
     },
     {
       "id": "factory_live_audit_routeresults",
@@ -2673,7 +2715,7 @@
       "file_type": "code",
       "norm_label": "routeresults",
       "source_file": ".factory/live-audit.mjs",
-      "source_location": "L26"
+      "source_location": "L27"
     },
     {
       "id": "factory_live_audit_unexpectedconsoleerrors",
@@ -2683,7 +2725,7 @@
       "file_type": "code",
       "norm_label": "unexpectedconsoleerrors",
       "source_file": ".factory/live-audit.mjs",
-      "source_location": "L195"
+      "source_location": "L196"
     },
     {
       "id": "factory_live_audit_workflowrequests",
@@ -2693,7 +2735,7 @@
       "file_type": "code",
       "norm_label": "workflowrequests",
       "source_file": ".factory/live-audit.mjs",
-      "source_location": "L148"
+      "source_location": "L149"
     },
     {
       "id": "headermap",
@@ -2776,43 +2818,33 @@
       "source_location": "L39"
     },
     {
-      "id": "frontend_src_config",
-      "label": "config.ts",
+      "id": "frontend_playwright_config",
+      "label": "playwright.config.ts",
       "_origin": "ast",
       "community": 8,
       "file_type": "code",
-      "norm_label": "config.ts",
-      "source_file": "frontend/src/config.ts",
+      "norm_label": "playwright.config.ts",
+      "source_file": "frontend/playwright.config.ts",
       "source_location": "L1"
     },
     {
-      "id": "frontend_src_config_billing_base_url",
-      "label": "BILLING_BASE_URL",
+      "id": "frontend_playwright_config_cold_server_start_timeout_ms",
+      "label": "COLD_SERVER_START_TIMEOUT_MS",
       "_origin": "ast",
       "community": 8,
       "file_type": "code",
-      "norm_label": "billing_base_url",
-      "source_file": "frontend/src/config.ts",
-      "source_location": "L5"
+      "norm_label": "cold_server_start_timeout_ms",
+      "source_file": "frontend/playwright.config.ts",
+      "source_location": "L7"
     },
     {
-      "id": "frontend_src_config_product_slug",
-      "label": "PRODUCT_SLUG",
+      "id": "frontend_src_playwright_config_test",
+      "label": "playwright-config.test.ts",
       "_origin": "ast",
       "community": 8,
       "file_type": "code",
-      "norm_label": "product_slug",
-      "source_file": "frontend/src/config.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "frontend_src_config_test",
-      "label": "config.test.ts",
-      "_origin": "ast",
-      "community": 8,
-      "file_type": "code",
-      "norm_label": "config.test.ts",
-      "source_file": "frontend/src/config.test.ts",
+      "norm_label": "playwright-config.test.ts",
+      "source_file": "frontend/src/playwright-config.test.ts",
       "source_location": "L1"
     },
     {
@@ -5936,6 +5968,18 @@
       "weight": 1.0
     },
     {
+      "source": "frontend_src_playwright_config_test",
+      "target": "frontend_playwright_config_cold_server_start_timeout_ms",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "frontend/src/playwright-config.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
       "source": "frontend_src_utils_test",
       "target": "frontend_src_utils_escapehtml",
       "relation": "imports",
@@ -6089,6 +6133,18 @@
       "context": "import",
       "source_file": "frontend/src/main.ts",
       "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "frontend_src_playwright_config_test",
+      "target": "frontend_playwright_config",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "frontend/src/playwright-config.test.ts",
+      "source_location": "L4",
       "weight": 1.0
     },
     {
@@ -6891,7 +6947,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": ".factory/live-audit.mjs",
-      "source_location": "L10",
+      "source_location": "L11",
       "weight": 1.0
     },
     {
@@ -6902,7 +6958,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": ".factory/live-audit.mjs",
-      "source_location": "L122",
+      "source_location": "L123",
       "weight": 1.0
     },
     {
@@ -6913,7 +6969,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": ".factory/live-audit.mjs",
-      "source_location": "L148",
+      "source_location": "L149",
       "weight": 1.0
     },
     {
@@ -6924,7 +6980,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": ".factory/live-audit.mjs",
-      "source_location": "L195",
+      "source_location": "L196",
       "weight": 1.0
     },
     {
@@ -6935,7 +6991,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": ".factory/live-audit.mjs",
-      "source_location": "L197",
+      "source_location": "L198",
       "weight": 1.0
     },
     {
@@ -6946,7 +7002,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": ".factory/live-audit.mjs",
-      "source_location": "L23",
+      "source_location": "L24",
       "weight": 1.0
     },
     {
@@ -6957,7 +7013,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": ".factory/live-audit.mjs",
-      "source_location": "L26",
+      "source_location": "L27",
       "weight": 1.0
     },
     {
@@ -6968,7 +7024,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": ".factory/live-audit.mjs",
-      "source_location": "L27",
+      "source_location": "L28",
       "weight": 1.0
     },
     {
@@ -6979,7 +7035,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": ".factory/live-audit.mjs",
-      "source_location": "L7",
+      "source_location": "L8",
       "weight": 1.0
     },
     {
@@ -6990,7 +7046,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": ".factory/live-audit.mjs",
-      "source_location": "L87",
+      "source_location": "L88",
+      "weight": 1.0
+    },
+    {
+      "source": "frontend_playwright_config",
+      "target": "frontend_playwright_config_cold_server_start_timeout_ms",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "frontend/playwright.config.ts",
+      "source_location": "L7",
       "weight": 1.0
     },
     {
@@ -7640,6 +7707,17 @@
       "confidence_score": 1.0,
       "source_file": "frontend/src/main.ts",
       "source_location": "L98",
+      "weight": 1.0
+    },
+    {
+      "source": "frontend_src_playwright_config_test",
+      "target": "frontend_src_playwright_config_test_claim",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "frontend/src/playwright-config.test.ts",
+      "source_location": "L6",
       "weight": 1.0
     },
     {
@@ -9001,5 +9079,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "1b0395efd1b74712f8cbed0cf8b37a5c5d5eb769"
+  "built_at_commit": "771b1f4f9f6dc80b89a949cf1f63473f7690ea55"
 }
