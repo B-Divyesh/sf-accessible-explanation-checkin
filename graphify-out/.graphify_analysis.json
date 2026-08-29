@@ -132,42 +132,6 @@
       "vec"
     ],
     "2": [
-      "axe_core_playwright",
-      "concurrently",
-      "package",
-      "package_devdependencies",
-      "package_devdependencies_axe_core_playwright",
-      "package_devdependencies_concurrently",
-      "package_devdependencies_playwright_test",
-      "package_devdependencies_types_node",
-      "package_devdependencies_typescript",
-      "package_devdependencies_vite",
-      "package_devdependencies_vitest",
-      "package_name",
-      "package_private",
-      "package_scripts",
-      "package_scripts_audit_live",
-      "package_scripts_build",
-      "package_scripts_dev",
-      "package_scripts_preview",
-      "package_scripts_start",
-      "package_scripts_test",
-      "package_scripts_test_all_claims",
-      "package_scripts_test_claims",
-      "package_scripts_test_container_identity",
-      "package_scripts_test_deploy_helper",
-      "package_scripts_test_deployment_policy",
-      "package_scripts_test_e2e",
-      "package_scripts_test_runtime_policy",
-      "package_type",
-      "package_version",
-      "playwright_test",
-      "types_node",
-      "typescript",
-      "vite",
-      "vitest"
-    ],
-    "3": [
       "frontend_tsconfig",
       "frontend_tsconfig_compileroptions",
       "frontend_tsconfig_compileroptions_allowimportingtsextensions",
@@ -192,6 +156,28 @@
       "ref_vite_config_ts",
       "ref_vitest_globals"
     ],
+    "3": [
+      "axe_core_playwright",
+      "concurrently",
+      "package",
+      "package_devdependencies",
+      "package_devdependencies_axe_core_playwright",
+      "package_devdependencies_concurrently",
+      "package_devdependencies_playwright_test",
+      "package_devdependencies_types_node",
+      "package_devdependencies_typescript",
+      "package_devdependencies_vite",
+      "package_devdependencies_vitest",
+      "package_name",
+      "package_private",
+      "package_type",
+      "package_version",
+      "playwright_test",
+      "types_node",
+      "typescript",
+      "vite",
+      "vitest"
+    ],
     "4": [
       "box",
       "next",
@@ -211,6 +197,23 @@
       "src_main_shutdown"
     ],
     "5": [
+      "package_scripts",
+      "package_scripts_audit_live",
+      "package_scripts_build",
+      "package_scripts_dev",
+      "package_scripts_preview",
+      "package_scripts_start",
+      "package_scripts_test",
+      "package_scripts_test_all_claims",
+      "package_scripts_test_claims",
+      "package_scripts_test_container_identity",
+      "package_scripts_test_deploy_helper",
+      "package_scripts_test_deployment_policy",
+      "package_scripts_test_e2e",
+      "package_scripts_test_live_durability_checker",
+      "package_scripts_test_runtime_policy"
+    ],
+    "6": [
       "error",
       "pathbuf",
       "result",
@@ -225,7 +228,7 @@
       "src_db_save_snapshot",
       "src_db_sqlite_path"
     ],
-    "6": [
+    "7": [
       "factory_live_audit",
       "factory_live_audit_consoleerrors",
       "factory_live_audit_crawledlinks",
@@ -238,7 +241,7 @@
       "factory_live_audit_unexpectedconsoleerrors",
       "factory_live_audit_workflowrequests"
     ],
-    "7": [
+    "8": [
       "headermap",
       "intoresponse",
       "src_http_policy",
@@ -248,114 +251,126 @@
       "src_http_policy_rs_response",
       "src_http_policy_set_etag"
     ],
-    "8": [
+    "9": [
+      "scripts_verify_live_durable_workflow",
+      "scripts_verify_live_durable_workflow_expect_status",
+      "scripts_verify_live_durable_workflow_fail",
+      "scripts_verify_live_durable_workflow_read_private_links",
+      "scripts_verify_live_durable_workflow_request",
+      "scripts_verify_live_durable_workflow_sh__entry"
+    ],
+    "10": [
       "frontend_playwright_config",
       "frontend_playwright_config_cold_server_start_timeout_ms",
       "frontend_src_playwright_config_test",
       "frontend_src_playwright_config_test_claim"
     ],
-    "9": [
+    "11": [
       "frontend_tests_claims_spec",
       "frontend_tests_claims_spec_createcheckin",
       "frontend_tests_claims_spec_desktoponly",
       "frontend_tests_claims_spec_tabto"
     ],
-    "10": [
+    "12": [
       "scripts_test_all_claims",
       "scripts_test_all_claims_claims",
       "scripts_test_all_claims_ids",
       "scripts_test_all_claims_root"
     ],
-    "11": [
+    "13": [
       "scripts_test_nonroot_runtime",
       "scripts_test_nonroot_runtime_cleanup",
       "scripts_test_nonroot_runtime_sh__entry"
     ],
-    "12": [
+    "14": [
       "frontend_public_sw",
       "frontend_public_sw_shell"
     ],
-    "13": [
+    "15": [
       "frontend_tests_app_spec",
       "frontend_tests_app_spec_expectaccessible"
     ],
-    "14": [
+    "16": [
       "scripts_deploy_durable_container",
       "scripts_deploy_durable_container_sh__entry"
     ],
-    "15": [
+    "17": [
       "scripts_test_container_build_identity",
       "scripts_test_container_build_identity_sh__entry"
     ],
-    "16": [
+    "18": [
       "scripts_test_deploy_container_name",
       "scripts_test_deploy_container_name_sh__entry"
     ],
-    "17": [
+    "19": [
       "scripts_test_durable_deploy",
       "scripts_test_durable_deploy_sh__entry"
     ],
-    "18": [
-      "frontend_vite_config"
-    ],
-    "19": [
-      "pkg_accessible_explanation_checkin"
-    ],
     "20": [
-      "response"
+      "scripts_test_live_durable_workflow",
+      "scripts_test_live_durable_workflow_sh__entry"
     ],
     "21": [
-      "src_db_rs_error"
+      "frontend_vite_config"
     ],
     "22": [
-      "src_db_rs_option"
+      "pkg_accessible_explanation_checkin"
     ],
     "23": [
-      "src_db_rs_path"
+      "response"
     ],
     "24": [
-      "src_db_rs_pathbuf"
+      "src_db_rs_error"
     ],
     "25": [
-      "src_db_rs_result"
+      "src_db_rs_option"
     ],
     "26": [
-      "src_db_rs_sqlitepool"
+      "src_db_rs_path"
     ],
     "27": [
-      "src_routes_rs_option"
+      "src_db_rs_pathbuf"
     ],
     "28": [
-      "src_routes_rs_path"
+      "src_db_rs_result"
     ],
     "29": [
-      "src_routes_rs_pathbuf"
+      "src_db_rs_sqlitepool"
     ],
     "30": [
-      "src_routes_rs_sqlitepool"
+      "src_routes_rs_option"
     ],
     "31": [
-      "state"
+      "src_routes_rs_path"
     ],
     "32": [
+      "src_routes_rs_pathbuf"
+    ],
+    "33": [
+      "src_routes_rs_sqlitepool"
+    ],
+    "34": [
+      "state"
+    ],
+    "35": [
       "string"
     ]
   },
   "cohesion": {
     "0": 0.07972027972027972,
     "1": 0.11912568306010929,
-    "2": 0.058823529411764705,
-    "3": 0.08695652173913043,
+    "2": 0.08695652173913043,
+    "3": 0.1,
     "4": 0.15833333333333333,
-    "5": 0.3333333333333333,
-    "6": 0.18181818181818182,
-    "7": 0.35714285714285715,
-    "8": 0.6666666666666666,
-    "9": 0.5,
-    "10": 0.5,
-    "11": 0.6666666666666666,
-    "12": 1.0,
-    "13": 1.0,
+    "5": 0.13333333333333333,
+    "6": 0.3333333333333333,
+    "7": 0.18181818181818182,
+    "8": 0.35714285714285715,
+    "9": 0.6666666666666666,
+    "10": 0.6666666666666666,
+    "11": 0.5,
+    "12": 0.5,
+    "13": 0.6666666666666666,
     "14": 1.0,
     "15": 1.0,
     "16": 1.0,
@@ -374,7 +389,10 @@
     "29": 1.0,
     "30": 1.0,
     "31": 1.0,
-    "32": 1.0
+    "32": 1.0,
+    "33": 1.0,
+    "34": 1.0,
+    "35": 1.0
   },
   "gods": [
     {
@@ -410,7 +428,7 @@
     {
       "id": "package_scripts",
       "label": "scripts",
-      "degree": 14
+      "degree": 15
     },
     {
       "id": "src_routes_export_csv",
