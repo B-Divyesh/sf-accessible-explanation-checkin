@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-08-29T12:04:00Z",
+  "live_build_sha": "976328637bdfe5cdec53afa4e4303882351ef760",
+  "create_status": 201,
+  "independent_connection_reads": {
+    "student_link": {"requests": 24, "status_counts": {"200": 11, "404": 13}},
+    "teacher_review": {"requests": 24, "status_counts": {"200": 12, "404": 12}},
+    "receipt": {"requests": 24, "status_counts": {"200": 12, "404": 12}}
+  },
+  "student_submission_status": 201,
+  "method": "Fresh check-in and submission; 24 parallel curl processes per private URL; Connection: close; --no-keepalive; one forwarded test client. Tokens were not retained in evidence.",
+  "result": "FAIL"
+}
