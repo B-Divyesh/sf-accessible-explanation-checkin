@@ -28,6 +28,18 @@ elif [[ "$args" == "storage share create"* || "$args" == "containerapp env stora
   exit 0
 elif [[ "$args" == "account show"* ]]; then
   printf '%s\n' '00000000-0000-0000-0000-000000000000'
+elif [[ "$args" == "containerapp revision deactivate"* ]]; then
+  printf '%s\n' "$args" > "$MOCK_STATE_DIR/deactivated"
+elif [[ "$args" == "containerapp revision list"* && "$args" == *"[?properties.active].name"* ]]; then
+  if [[ -f "$MOCK_STATE_DIR/deactivated" ]]; then
+    printf '%s\n' 'sf-accessible-explanation-9c1a54--0000002'
+  else
+    printf '%s\n' 'sf-accessible-explanation-9c1a54--0000001' 'sf-accessible-explanation-9c1a54--0000002'
+  fi
+elif [[ "$args" == "containerapp revision list"* && "$args" == *"length([?properties.active])"* ]]; then
+  printf '%s\n' '1'
+elif [[ "$args" == "containerapp replica list"* ]]; then
+  printf '%s\n' '1'
 elif [[ "$args" == "rest --method patch"* ]]; then
   body=''
   while (($#)); do
@@ -58,11 +70,11 @@ MOCK
 chmod +x "$test_dir/fleet-deploy" "$test_dir/bin/az"
 
 cat > "$test_dir/stateless-app.json" <<'JSON'
-{"properties":{"template":{"scale":{"minReplicas":1,"maxReplicas":3},"volumes":null,"containers":[{"name":"app","image":"example.invalid/app:before"}]}}}
+{"properties":{"latestRevisionName":"sf-accessible-explanation-9c1a54--0000001","latestReadyRevisionName":"sf-accessible-explanation-9c1a54--0000001","template":{"scale":{"minReplicas":1,"maxReplicas":3},"volumes":null,"containers":[{"name":"app","image":"example.invalid/app:before"}]}}}
 JSON
 
 cat > "$test_dir/patched-app.json" <<'JSON'
-{"properties":{"template":{"scale":{"minReplicas":1,"maxReplicas":1},"volumes":[{"name":"checkin-data","storageType":"AzureFile","storageName":"aec-accessible-explanati-9c1a54"}],"containers":[{"name":"app","image":"example.invalid/app:after","volumeMounts":[{"volumeName":"checkin-data","mountPath":"/app/data"}]}]}}}
+{"properties":{"latestRevisionName":"sf-accessible-explanation-9c1a54--0000002","latestReadyRevisionName":"sf-accessible-explanation-9c1a54--0000002","template":{"scale":{"minReplicas":1,"maxReplicas":1},"volumes":[{"name":"checkin-data","storageType":"AzureFile","storageName":"aec-accessible-explanati-9c1a54"}],"containers":[{"name":"app","image":"example.invalid/app:after","volumeMounts":[{"volumeName":"checkin-data","mountPath":"/app/data"}]}]}}}
 JSON
 
 output=$(PATH="$test_dir/bin:$PATH" \
@@ -85,6 +97,7 @@ jq -e '
 ' "$test_dir/patch.json" >/dev/null
 
 grep -Fxq "accessible-explanation-checkin $repo_root Dockerfile 8080" "$test_dir/fleet-args"
+grep -Fq 'sf-accessible-explanation-9c1a54--0000001' "$test_dir/deactivated"
 [[ "$output" == *"PASS: deployed and verified sf-accessible-explanation-9c1a54"* ]]
 
 rm -f "$test_dir/patched"
@@ -99,6 +112,6 @@ if PATH="$test_dir/bin:$PATH" \
   echo 'deployment helper succeeded without the required durable topology' >&2
   exit 1
 fi
-grep -Fq 'did not converge to one replica with durable /app/data' "$test_dir/nonconverged.out"
+grep -Fq 'did not reach a ready revision with one replica and durable /app/data' "$test_dir/nonconverged.out"
 
 echo 'PASS @claim:durable-deployment-policy: executed deployment converges to one Azure File-backed SQLite replica'

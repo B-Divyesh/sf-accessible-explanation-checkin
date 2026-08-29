@@ -57,7 +57,9 @@ verified=false
 for _ in $(seq 1 "${DEPLOY_VERIFY_ATTEMPTS:-30}"); do
   effective=$(az containerapp show --resource-group "$resource_group" --name "$app_name" --output json)
   if jq -e --arg storage "$storage_name" '
-    .properties.template.scale.minReplicas == 1
+    (.properties.latestRevisionName | length) > 0
+    and .properties.latestRevisionName == .properties.latestReadyRevisionName
+    and .properties.template.scale.minReplicas == 1
     and .properties.template.scale.maxReplicas == 1
     and any(.properties.template.volumes[]?;
       .name == "checkin-data"
@@ -76,7 +78,34 @@ for _ in $(seq 1 "${DEPLOY_VERIFY_ATTEMPTS:-30}"); do
 done
 
 if [[ "$verified" != true ]]; then
-  echo "ERROR: $app_name did not converge to one replica with durable /app/data" >&2
+  echo "ERROR: $app_name did not reach a ready revision with one replica and durable /app/data" >&2
+  exit 1
+fi
+
+latest_revision=$(jq -r '.properties.latestRevisionName' <<<"$effective")
+while IFS= read -r stale_revision; do
+  [[ -z "$stale_revision" || "$stale_revision" == "$latest_revision" ]] && continue
+  az containerapp revision deactivate --resource-group "$resource_group" \
+    --name "$app_name" --revision "$stale_revision" --output none
+done < <(az containerapp revision list --resource-group "$resource_group" \
+  --name "$app_name" --query '[?properties.active].name' --output tsv)
+
+replicas_verified=false
+for _ in $(seq 1 "${DEPLOY_VERIFY_ATTEMPTS:-30}"); do
+  active_revisions=$(az containerapp revision list --resource-group "$resource_group" \
+    --name "$app_name" --query 'length([?properties.active])' --output tsv)
+  running_replicas=$(az containerapp replica list --resource-group "$resource_group" \
+    --name "$app_name" --revision "$latest_revision" \
+    --query "length([?properties.runningState=='Running'])" --output tsv)
+  if [[ "$active_revisions" == 1 && "$running_replicas" == 1 ]]; then
+    replicas_verified=true
+    break
+  fi
+  sleep "${DEPLOY_VERIFY_INTERVAL_SECONDS:-10}"
+done
+
+if [[ "$replicas_verified" != true ]]; then
+  echo "ERROR: $app_name did not converge to exactly one active, running replica" >&2
   exit 1
 fi
 
