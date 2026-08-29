@@ -92,6 +92,26 @@ cat > "$test_dir/patched-app.json" <<'JSON'
 {"properties":{"latestRevisionName":"sf-accessible-explanation-9c1a54--0000002","latestReadyRevisionName":"sf-accessible-explanation-9c1a54--0000002","template":{"scale":{"minReplicas":1,"maxReplicas":1},"volumes":[{"name":"checkin-data","storageType":"AzureFile","storageName":"aec-accessible-explanati-9c1a54"}],"containers":[{"name":"app","image":"example.invalid/app:after","volumeMounts":[{"volumeName":"checkin-data","mountPath":"/app/data"}]}]}}}
 JSON
 
+# The factory's generic Container Apps helper deliberately creates a stateless
+# 1–3 replica template. The public deployment command must therefore run the
+# durable wrapper, rather than exposing that helper as this product's deploy
+# entry point. Execute the actual package command against that unsafe fixture.
+package_output=$(cd "$repo_root" && \
+  PATH="$test_dir/bin:$PATH" \
+  MOCK_STATE_DIR="$test_dir" \
+  FLEET_DEPLOY_CONTAINER_HELPER="$test_dir/fleet-deploy" \
+  LIVE_DURABILITY_CHECKER="$test_dir/live-checker" \
+  LIVE_TOPOLOGY_CHECKER="$test_dir/topology-checker" \
+  DEPLOY_VERIFY_ATTEMPTS=1 \
+  npm run deploy --silent)
+
+jq -e '
+  .properties.template.scale == {minReplicas: 1, maxReplicas: 1}
+  and (.properties.template.volumes[] | select(.name == "checkin-data") | .storageType) == "AzureFile"
+  and (.properties.template.containers[] | select(.name == "app") | .volumeMounts[] | select(.mountPath == "/app/data") | .volumeName) == "checkin-data"
+' "$test_dir/patch.json" >/dev/null
+[[ "$package_output" == *"PASS: deployed and verified sf-accessible-explanation-9c1a54"* ]]
+
 output=$(PATH="$test_dir/bin:$PATH" \
   MOCK_STATE_DIR="$test_dir" \
   FLEET_DEPLOY_CONTAINER_HELPER="$test_dir/fleet-deploy" \
