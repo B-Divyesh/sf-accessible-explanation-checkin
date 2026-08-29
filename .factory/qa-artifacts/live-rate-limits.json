@@ -1,0 +1,47 @@
+{
+  "checkedAt": "2026-08-29T19:07:03.402Z",
+  "product": {
+    "url": "https://accessible-explanation-checkin.sociobot.in/api/checkins/qa-unknown-token",
+    "count": 180,
+    "durationMs": 880,
+    "counts": {
+      "404": 120,
+      "429": 60
+    },
+    "retryAfterValues": [
+      "0"
+    ],
+    "sample429": {
+      "status": 429,
+      "retryAfter": "0",
+      "body": "Too Many Requests! Wait for 0s"
+    },
+    "sampleNormal": {
+      "status": 404,
+      "retryAfter": null,
+      "body": "{\"error\":\"That private link is not valid. Check that you copied the whole link.\"}"
+    }
+  },
+  "billing": {
+    "url": "https://api.sociobot.in/api/v1/products/accessible-explanation-checkin/verify?license=qa-invalid-token",
+    "count": 100,
+    "durationMs": 750,
+    "counts": {
+      "200": 30,
+      "429": 70
+    },
+    "retryAfterValues": [
+      "4"
+    ],
+    "sample429": {
+      "status": 429,
+      "retryAfter": "4",
+      "body": "Too Many Requests! Wait for 4s"
+    },
+    "sampleNormal": {
+      "status": 200,
+      "retryAfter": null,
+      "body": "{\"expires_at\":null,\"reason\":\"invalid\",\"valid\":false}"
+    }
+  }
+}

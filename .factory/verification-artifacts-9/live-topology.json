@@ -1,0 +1,18 @@
+{
+  "result": "PASS",
+  "base_url": "https://accessible-explanation-checkin.sociobot.in",
+  "container_app": "sf-accessible-explanation-9c1a54",
+  "revision": "sf-accessible-explanation-9c1a54--0000075",
+  "image": "sociobotregistry.azurecr.io/sf-accessible-explanation-9c1a54:d47130dbb614",
+  "build_sha": "d47130dbb61411ce9dfb3c832500b361ca9b66cb",
+  "topology": {
+    "min_replicas": 1,
+    "max_replicas": 1,
+    "active_revisions": 1,
+    "running_replicas": 1,
+    "volume": "checkin-data",
+    "mount_path": "/app/data",
+    "storage_name": "aec-accessible-explanati-9c1a54",
+    "share_name": "sf-accessible-explanation-checkin-data"
+  }
+}

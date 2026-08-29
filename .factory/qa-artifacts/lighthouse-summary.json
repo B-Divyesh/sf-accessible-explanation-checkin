@@ -1,0 +1,18 @@
+{
+  "fetchedAt": "2026-08-29T19:07:53.556Z",
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+  "categories": {
+    "performance": 96,
+    "accessibility": 100,
+    "best-practices": 100,
+    "seo": 100
+  },
+  "metrics": {
+    "fcp": 2000.898,
+    "lcp": 2402.517,
+    "tbt": 0,
+    "cls": 0,
+    "speedIndex": 1891,
+    "totalByteWeight": 38875
+  }
+}

@@ -1,0 +1,170 @@
+[
+  {
+    "id": "demo-isolation",
+    "command": "npm run test:claims -- --grep @claim:demo-isolation",
+    "exitCode": 0,
+    "durationMs": 175859,
+    "error": null
+  },
+  {
+    "id": "demo-reset",
+    "command": "npm run test:claims -- --grep @claim:demo-reset",
+    "exitCode": 0,
+    "durationMs": 12637,
+    "error": null
+  },
+  {
+    "id": "demo-exit-disposal",
+    "command": "npm run test:claims -- --grep @claim:demo-exit-disposal",
+    "exitCode": 0,
+    "durationMs": 12339,
+    "error": null
+  },
+  {
+    "id": "sample-csv-export",
+    "command": "npm run test:claims -- --grep @claim:sample-csv-export",
+    "exitCode": 0,
+    "durationMs": 9091,
+    "error": null
+  },
+  {
+    "id": "keyboard-demo",
+    "command": "npm run test:claims -- --grep @claim:keyboard-demo",
+    "exitCode": 0,
+    "durationMs": 8949,
+    "error": null
+  },
+  {
+    "id": "offline-demo",
+    "command": "npm run test:claims -- --grep @claim:offline-demo",
+    "exitCode": 0,
+    "durationMs": 9458,
+    "error": null
+  },
+  {
+    "id": "no-account-needed",
+    "command": "npm run test:claims -- --grep @claim:no-account-needed",
+    "exitCode": 0,
+    "durationMs": 9731,
+    "error": null
+  },
+  {
+    "id": "stored-record-shape",
+    "command": "cargo test routes::tests::claim_stored_record_shape -- --exact --nocapture",
+    "exitCode": 0,
+    "durationMs": 21187,
+    "error": null
+  },
+  {
+    "id": "recent-links-local",
+    "command": "npm run test:claims -- --grep @claim:recent-links-local",
+    "exitCode": 0,
+    "durationMs": 9540,
+    "error": null
+  },
+  {
+    "id": "voice-retention-control",
+    "command": "npm run test:claims -- --grep @claim:voice-retention-control",
+    "exitCode": 0,
+    "durationMs": 8561,
+    "error": null
+  },
+  {
+    "id": "voice-recording-limits",
+    "command": "npm run test:claims -- --grep @claim:voice-recording-limits",
+    "exitCode": 0,
+    "durationMs": 9663,
+    "error": null
+  },
+  {
+    "id": "voice-retention-deletion",
+    "command": "cargo test routes::tests::claim_voice_retention_deletion -- --exact --nocapture",
+    "exitCode": 0,
+    "durationMs": 365,
+    "error": null
+  },
+  {
+    "id": "teacher-voice-deletion",
+    "command": "cargo test routes::tests::claim_teacher_voice_deletion -- --exact --nocapture",
+    "exitCode": 0,
+    "durationMs": 345,
+    "error": null
+  },
+  {
+    "id": "free-response-limit",
+    "command": "npm run test:claims -- --grep @claim:free-response-limit",
+    "exitCode": 0,
+    "durationMs": 8608,
+    "error": null
+  },
+  {
+    "id": "no-automated-judgment",
+    "command": "npm run test:claims -- --grep @claim:no-automated-judgment",
+    "exitCode": 0,
+    "durationMs": 8070,
+    "error": null
+  },
+  {
+    "id": "student-keyboard-flow",
+    "command": "npm run test:claims -- --grep @claim:student-keyboard-flow",
+    "exitCode": 0,
+    "durationMs": 12068,
+    "error": null
+  },
+  {
+    "id": "student-review-workflow",
+    "command": "npm run test:claims -- --grep @claim:student-review-workflow",
+    "exitCode": 0,
+    "durationMs": 12385,
+    "error": null
+  },
+  {
+    "id": "privacy-request-boundary",
+    "command": "npm run test:claims -- --grep @claim:privacy-request-boundary",
+    "exitCode": 0,
+    "durationMs": 10405,
+    "error": null
+  },
+  {
+    "id": "classroom-plus-limits",
+    "command": "cargo test routes::tests::claim_classroom_plus_limits -- --exact --nocapture",
+    "exitCode": 0,
+    "durationMs": 315,
+    "error": null
+  },
+  {
+    "id": "billing-license-fixture",
+    "command": "npm run test:claims -- --grep @claim:billing-license-fixture",
+    "exitCode": 0,
+    "durationMs": 12954,
+    "error": null
+  },
+  {
+    "id": "refund-license-contract",
+    "command": "npm run test:claims -- --grep @claim:refund-license-contract",
+    "exitCode": 0,
+    "durationMs": 11714,
+    "error": null
+  },
+  {
+    "id": "external-checkout",
+    "command": "npm run test:claims -- --grep @claim:external-checkout",
+    "exitCode": 0,
+    "durationMs": 9870,
+    "error": null
+  },
+  {
+    "id": "runtime-container-policy",
+    "command": "npm run test:runtime-policy",
+    "exitCode": 0,
+    "durationMs": 345854,
+    "error": null
+  },
+  {
+    "id": "durable-deployment-policy",
+    "command": "npm run test:deployment-policy && npm run test:live-durability-checker && npm run test:live-topology && npm run verify:live-topology",
+    "exitCode": 0,
+    "durationMs": 9188,
+    "error": null
+  }
+]

@@ -1,0 +1,117 @@
+{
+  "checkedAt": "2026-08-29T19:09:09.139Z",
+  "nativeRequired": {
+    "requestMade": false,
+    "titleValid": false,
+    "validationMessage": "Please fill out this field."
+  },
+  "boundaries": {
+    "title121": {
+      "status": 400,
+      "body": {
+        "error": "Assignment name must be between 1 and 120 characters."
+      }
+    },
+    "prompt3": {
+      "status": 400,
+      "body": {
+        "error": "Prompt must be between 4 and 1200 characters."
+      }
+    },
+    "retention0": {
+      "status": 400,
+      "body": {
+        "error": "Voice retention must be between 1 and 7 days for this tier."
+      }
+    },
+    "retention8": {
+      "status": 400,
+      "body": {
+        "error": "Voice retention must be between 1 and 7 days for this tier."
+      }
+    },
+    "confidence0": {
+      "status": 400,
+      "body": {
+        "error": "Choose a confidence from 1 to 5."
+      }
+    },
+    "noExplanation": {
+      "status": 400,
+      "body": {
+        "error": "Add a text explanation, a voice explanation, or both."
+      }
+    }
+  },
+  "emptyExplanation": {
+    "alert": "Please check your response.\n\nAdd a text explanation, a voice explanation, or both.",
+    "focused": true
+  },
+  "recovery": {
+    "url": "https://accessible-explanation-checkin.sociobot.in/receipt/<redacted>",
+    "receiptVisible": true
+  },
+  "persistence": {
+    "reads": 50,
+    "statusCounts": {
+      "200": 50
+    }
+  },
+  "headers": {
+    "root": {
+      "status": 200,
+      "cacheControl": "no-cache, max-age=0, must-revalidate",
+      "etag": "W/\"d47130dbb61411ce9dfb3c832500b361ca9b66cb\"",
+      "contentType": "text/html"
+    },
+    "asset": {
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "etag": "W/\"d47130dbb61411ce9dfb3c832500b361ca9b66cb\"",
+      "contentType": "text/javascript"
+    },
+    "sw": {
+      "status": 200,
+      "cacheControl": "no-cache, max-age=0, must-revalidate",
+      "etag": "W/\"d47130dbb61411ce9dfb3c832500b361ca9b66cb\"",
+      "contentType": "text/javascript"
+    },
+    "api": {
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "etag": null,
+      "contentType": "application/json"
+    },
+    "privateNav": {
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "etag": null,
+      "contentType": "text/html"
+    }
+  },
+  "focus": {
+    "text": "Skip to main content",
+    "outline": {
+      "style": "solid",
+      "width": "3px",
+      "color": "rgb(157, 66, 28)",
+      "display": "block"
+    },
+    "animations": 0
+  },
+  "serviceWorker": {
+    "controlled": true,
+    "scope": "https://accessible-explanation-checkin.sociobot.in/",
+    "scriptURL": "https://accessible-explanation-checkin.sociobot.in/sw.js"
+  },
+  "offline": {
+    "h1": "Watershed reasoning",
+    "sampleCount": 3
+  },
+  "requestOrigins": [
+    "https://accessible-explanation-checkin.sociobot.in"
+  ],
+  "requestCount": 9,
+  "consoleErrors": [],
+  "pageErrors": []
+}

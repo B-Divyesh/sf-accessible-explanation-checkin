@@ -1,0 +1,1000 @@
+
+=== CLAIM demo-isolation ===
+$ npm run test:claims -- --grep @claim:demo-isolation
+
+> accessible-explanation-checkin@1.0.0 test:claims
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --grep @claim:demo-isolation
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Running 2 tests using 1 worker
+
+
+
+
+
+[1A[2K[1/2] [desktop-chromium] › frontend/tests/claims.spec.ts:26:1 › @claim:demo-isolation starts with a populated review and keeps mutations in the demo namespace
+
+
+
+
+[1A[2K[2/2] [mobile-chromium] › frontend/tests/claims.spec.ts:26:1 › @claim:demo-isolation starts with a populated review and keeps mutations in the demo namespace
+[1A[2K  2 passed (2.9m)
+=== RESULT {"id":"demo-isolation","command":"npm run test:claims -- --grep @claim:demo-isolation","exitCode":0,"durationMs":175859,"error":null} ===
+
+=== CLAIM demo-reset ===
+$ npm run test:claims -- --grep @claim:demo-reset
+
+> accessible-explanation-checkin@1.0.0 test:claims
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --grep @claim:demo-reset
+
+
+
+
+
+Running 2 tests using 1 worker
+
+
+
+
+
+[1A[2K[1/2] [desktop-chromium] › frontend/tests/claims.spec.ts:39:1 › @claim:demo-reset restores the shipped sample
+
+
+
+
+[1A[2K[2/2] [mobile-chromium] › frontend/tests/claims.spec.ts:39:1 › @claim:demo-reset restores the shipped sample
+[1A[2K  2 passed (10.5s)
+=== RESULT {"id":"demo-reset","command":"npm run test:claims -- --grep @claim:demo-reset","exitCode":0,"durationMs":12637,"error":null} ===
+
+=== CLAIM demo-exit-disposal ===
+$ npm run test:claims -- --grep @claim:demo-exit-disposal
+
+> accessible-explanation-checkin@1.0.0 test:claims
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --grep @claim:demo-exit-disposal
+
+
+
+
+
+Running 2 tests using 1 worker
+
+
+
+
+
+[1A[2K[1/2] [desktop-chromium] › frontend/tests/claims.spec.ts:47:1 › @claim:demo-exit-disposal discards edits before starting a real check-in
+
+
+
+
+[1A[2K[2/2] [mobile-chromium] › frontend/tests/claims.spec.ts:47:1 › @claim:demo-exit-disposal discards edits before starting a real check-in
+[1A[2K  2 passed (10.7s)
+=== RESULT {"id":"demo-exit-disposal","command":"npm run test:claims -- --grep @claim:demo-exit-disposal","exitCode":0,"durationMs":12339,"error":null} ===
+
+=== CLAIM sample-csv-export ===
+$ npm run test:claims -- --grep @claim:sample-csv-export
+
+> accessible-explanation-checkin@1.0.0 test:claims
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --grep @claim:sample-csv-export
+
+
+
+
+
+Running 2 tests using 1 worker
+
+
+
+
+
+[1A[2K[1/2] [desktop-chromium] › frontend/tests/claims.spec.ts:59:1 › @claim:sample-csv-export downloads each shipped sample response
+
+
+
+
+[1A[2K[2/2] [mobile-chromium] › frontend/tests/claims.spec.ts:59:1 › @claim:sample-csv-export downloads each shipped sample response
+[1A[2K  2 passed (7.3s)
+=== RESULT {"id":"sample-csv-export","command":"npm run test:claims -- --grep @claim:sample-csv-export","exitCode":0,"durationMs":9091,"error":null} ===
+
+=== CLAIM keyboard-demo ===
+$ npm run test:claims -- --grep @claim:keyboard-demo
+
+> accessible-explanation-checkin@1.0.0 test:claims
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --grep @claim:keyboard-demo
+
+
+
+
+
+Running 2 tests using 1 worker
+
+
+
+
+
+[1A[2K[1/2] [desktop-chromium] › frontend/tests/claims.spec.ts:71:1 › @claim:keyboard-demo lets a teacher use the sample review with a keyboard
+
+
+
+
+[1A[2K[2/2] [mobile-chromium] › frontend/tests/claims.spec.ts:71:1 › @claim:keyboard-demo lets a teacher use the sample review with a keyboard
+[1A[2K  2 passed (7.3s)
+=== RESULT {"id":"keyboard-demo","command":"npm run test:claims -- --grep @claim:keyboard-demo","exitCode":0,"durationMs":8949,"error":null} ===
+
+=== CLAIM offline-demo ===
+$ npm run test:claims -- --grep @claim:offline-demo
+
+> accessible-explanation-checkin@1.0.0 test:claims
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --grep @claim:offline-demo
+
+
+
+
+
+Running 2 tests using 1 worker
+
+
+
+
+
+[1A[2K[1/2] [desktop-chromium] › frontend/tests/claims.spec.ts:254:1 › @claim:offline-demo reloads after its first visit
+
+
+
+
+[1A[2K[2/2] [mobile-chromium] › frontend/tests/claims.spec.ts:254:1 › @claim:offline-demo reloads after its first visit
+[1A[2K  2 passed (7.8s)
+=== RESULT {"id":"offline-demo","command":"npm run test:claims -- --grep @claim:offline-demo","exitCode":0,"durationMs":9458,"error":null} ===
+
+=== CLAIM no-account-needed ===
+$ npm run test:claims -- --grep @claim:no-account-needed
+
+> accessible-explanation-checkin@1.0.0 test:claims
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --grep @claim:no-account-needed
+
+
+
+
+
+Running 2 tests using 1 worker
+
+
+
+
+
+[1A[2K[1/2] [desktop-chromium] › frontend/tests/claims.spec.ts:81:1 › @claim:no-account-needed creates a check-in without a sign-in step
+
+
+
+
+[1A[2K[2/2] [mobile-chromium] › frontend/tests/claims.spec.ts:81:1 › @claim:no-account-needed creates a check-in without a sign-in step
+[1A[2K  2 passed (8.1s)
+=== RESULT {"id":"no-account-needed","command":"npm run test:claims -- --grep @claim:no-account-needed","exitCode":0,"durationMs":9731,"error":null} ===
+
+=== CLAIM stored-record-shape ===
+$ cargo test routes::tests::claim_stored_record_shape -- --exact --nocapture
+
+running 1 test
+test routes::tests::claim_stored_record_shape ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.11s
+
+=== RESULT {"id":"stored-record-shape","command":"cargo test routes::tests::claim_stored_record_shape -- --exact --nocapture","exitCode":0,"durationMs":21187,"error":null} ===
+
+=== CLAIM recent-links-local ===
+$ npm run test:claims -- --grep @claim:recent-links-local
+
+> accessible-explanation-checkin@1.0.0 test:claims
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --grep @claim:recent-links-local
+
+
+
+
+
+Running 2 tests using 1 worker
+
+
+
+
+
+[1A[2K[1/2] [desktop-chromium] › frontend/tests/claims.spec.ts:96:1 › @claim:recent-links-local keeps recent review links in one browser only
+
+
+
+
+[1A[2K[2/2] [mobile-chromium] › frontend/tests/claims.spec.ts:96:1 › @claim:recent-links-local keeps recent review links in one browser only
+[1A[2K  1 skipped
+  1 passed (7.8s)
+=== RESULT {"id":"recent-links-local","command":"npm run test:claims -- --grep @claim:recent-links-local","exitCode":0,"durationMs":9540,"error":null} ===
+
+=== CLAIM voice-retention-control ===
+$ npm run test:claims -- --grep @claim:voice-retention-control
+
+> accessible-explanation-checkin@1.0.0 test:claims
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --grep @claim:voice-retention-control
+
+
+
+
+
+Running 2 tests using 1 worker
+
+
+
+
+
+[1A[2K[1/2] [desktop-chromium] › frontend/tests/claims.spec.ts:122:1 › @claim:voice-retention-control applies the selected free voice schedule
+
+
+
+
+[1A[2K[2/2] [mobile-chromium] › frontend/tests/claims.spec.ts:122:1 › @claim:voice-retention-control applies the selected free voice schedule
+[1A[2K  1 skipped
+  1 passed (6.9s)
+=== RESULT {"id":"voice-retention-control","command":"npm run test:claims -- --grep @claim:voice-retention-control","exitCode":0,"durationMs":8561,"error":null} ===
+
+=== CLAIM voice-recording-limits ===
+$ npm run test:claims -- --grep @claim:voice-recording-limits
+
+> accessible-explanation-checkin@1.0.0 test:claims
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --grep @claim:voice-recording-limits
+
+
+
+
+
+Running 2 tests using 1 worker
+
+
+
+
+
+[1A[2K[1/2] [desktop-chromium] › frontend/tests/claims.spec.ts:138:1 › @claim:voice-recording-limits stops at 120 seconds and enforces the 4 MB boundary
+
+
+
+
+[1A[2K[2/2] [mobile-chromium] › frontend/tests/claims.spec.ts:138:1 › @claim:voice-recording-limits stops at 120 seconds and enforces the 4 MB boundary
+[1A[2K  1 skipped
+  1 passed (8.0s)
+=== RESULT {"id":"voice-recording-limits","command":"npm run test:claims -- --grep @claim:voice-recording-limits","exitCode":0,"durationMs":9663,"error":null} ===
+
+=== CLAIM voice-retention-deletion ===
+$ cargo test routes::tests::claim_voice_retention_deletion -- --exact --nocapture
+
+running 1 test
+test routes::tests::claim_voice_retention_deletion ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.11s
+
+=== RESULT {"id":"voice-retention-deletion","command":"cargo test routes::tests::claim_voice_retention_deletion -- --exact --nocapture","exitCode":0,"durationMs":365,"error":null} ===
+
+=== CLAIM teacher-voice-deletion ===
+$ cargo test routes::tests::claim_teacher_voice_deletion -- --exact --nocapture
+
+running 1 test
+test routes::tests::claim_teacher_voice_deletion ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.11s
+
+=== RESULT {"id":"teacher-voice-deletion","command":"cargo test routes::tests::claim_teacher_voice_deletion -- --exact --nocapture","exitCode":0,"durationMs":345,"error":null} ===
+
+=== CLAIM free-response-limit ===
+$ npm run test:claims -- --grep @claim:free-response-limit
+
+> accessible-explanation-checkin@1.0.0 test:claims
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --grep @claim:free-response-limit
+
+
+
+
+
+Running 2 tests using 1 worker
+
+
+
+
+
+[1A[2K[1/2] [desktop-chromium] › frontend/tests/claims.spec.ts:214:1 › @claim:free-response-limit enforces 35 responses under concurrent submissions
+
+
+
+
+[1A[2K[2/2] [mobile-chromium] › frontend/tests/claims.spec.ts:214:1 › @claim:free-response-limit enforces 35 responses under concurrent submissions
+[1A[2K  1 skipped
+  1 passed (6.9s)
+=== RESULT {"id":"free-response-limit","command":"npm run test:claims -- --grep @claim:free-response-limit","exitCode":0,"durationMs":8608,"error":null} ===
+
+=== CLAIM no-automated-judgment ===
+$ npm run test:claims -- --grep @claim:no-automated-judgment
+
+> accessible-explanation-checkin@1.0.0 test:claims
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --grep @claim:no-automated-judgment
+
+
+
+
+
+Running 2 tests using 1 worker
+
+
+
+
+
+[1A[2K[1/2] [desktop-chromium] › frontend/tests/claims.spec.ts:234:1 › @claim:no-automated-judgment returns only student input and teacher-authored review fields
+
+
+
+
+[1A[2K[2/2] [mobile-chromium] › frontend/tests/claims.spec.ts:234:1 › @claim:no-automated-judgment returns only student input and teacher-authored review fields
+[1A[2K  1 skipped
+  1 passed (6.4s)
+=== RESULT {"id":"no-automated-judgment","command":"npm run test:claims -- --grep @claim:no-automated-judgment","exitCode":0,"durationMs":8070,"error":null} ===
+
+=== CLAIM student-keyboard-flow ===
+$ npm run test:claims -- --grep @claim:student-keyboard-flow
+
+> accessible-explanation-checkin@1.0.0 test:claims
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --grep @claim:student-keyboard-flow
+
+
+
+
+
+Running 2 tests using 1 worker
+
+
+
+
+
+[1A[2K[1/2] [desktop-chromium] › frontend/tests/claims.spec.ts:264:1 › @claim:student-keyboard-flow submits every required student field using only the keyboard
+
+
+
+
+[1A[2K[2/2] [mobile-chromium] › frontend/tests/claims.spec.ts:264:1 › @claim:student-keyboard-flow submits every required student field using only the keyboard
+[1A[2K  1 skipped
+  1 passed (10.4s)
+=== RESULT {"id":"student-keyboard-flow","command":"npm run test:claims -- --grep @claim:student-keyboard-flow","exitCode":0,"durationMs":12068,"error":null} ===
+
+=== CLAIM student-review-workflow ===
+$ npm run test:claims -- --grep @claim:student-review-workflow
+
+> accessible-explanation-checkin@1.0.0 test:claims
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --grep @claim:student-review-workflow
+
+
+
+
+
+Running 2 tests using 1 worker
+
+
+
+
+
+[1A[2K[1/2] [desktop-chromium] › frontend/tests/claims.spec.ts:292:1 › @claim:student-review-workflow carries the explanation into a saved teacher review and free outputs
+
+
+
+
+[1A[2K[2/2] [mobile-chromium] › frontend/tests/claims.spec.ts:292:1 › @claim:student-review-workflow carries the explanation into a saved teacher review and free outputs
+[1A[2K  1 skipped
+  1 passed (10.4s)
+=== RESULT {"id":"student-review-workflow","command":"npm run test:claims -- --grep @claim:student-review-workflow","exitCode":0,"durationMs":12385,"error":null} ===
+
+=== CLAIM privacy-request-boundary ===
+$ npm run test:claims -- --grep @claim:privacy-request-boundary
+
+> accessible-explanation-checkin@1.0.0 test:claims
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --grep @claim:privacy-request-boundary
+
+
+
+
+
+Running 2 tests using 1 worker
+
+
+
+
+
+[1A[2K[1/2] [desktop-chromium] › frontend/tests/claims.spec.ts:328:1 › @claim:privacy-request-boundary keeps the demo and classroom flow on the product origin
+
+
+
+
+[1A[2K[2/2] [mobile-chromium] › frontend/tests/claims.spec.ts:328:1 › @claim:privacy-request-boundary keeps the demo and classroom flow on the product origin
+[1A[2K  1 skipped
+  1 passed (8.8s)
+=== RESULT {"id":"privacy-request-boundary","command":"npm run test:claims -- --grep @claim:privacy-request-boundary","exitCode":0,"durationMs":10405,"error":null} ===
+
+=== CLAIM classroom-plus-limits ===
+$ cargo test routes::tests::claim_classroom_plus_limits -- --exact --nocapture
+
+running 1 test
+test routes::tests::claim_classroom_plus_limits ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.08s
+
+=== RESULT {"id":"classroom-plus-limits","command":"cargo test routes::tests::claim_classroom_plus_limits -- --exact --nocapture","exitCode":0,"durationMs":315,"error":null} ===
+
+=== CLAIM billing-license-fixture ===
+$ npm run test:claims -- --grep @claim:billing-license-fixture
+
+> accessible-explanation-checkin@1.0.0 test:claims
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --grep @claim:billing-license-fixture
+
+
+
+
+
+Running 2 tests using 1 worker
+
+
+
+
+
+[1A[2K[1/2] [desktop-chromium] › frontend/tests/claims.spec.ts:344:1 › @claim:billing-license-fixture handles an active and then revoked license verdict
+
+
+
+
+[1A[2K[2/2] [mobile-chromium] › frontend/tests/claims.spec.ts:344:1 › @claim:billing-license-fixture handles an active and then revoked license verdict
+[1A[2K  2 passed (11.3s)
+=== RESULT {"id":"billing-license-fixture","command":"npm run test:claims -- --grep @claim:billing-license-fixture","exitCode":0,"durationMs":12954,"error":null} ===
+
+=== CLAIM refund-license-contract ===
+$ npm run test:claims -- --grep @claim:refund-license-contract
+
+> accessible-explanation-checkin@1.0.0 test:claims
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --grep @claim:refund-license-contract
+
+
+
+
+
+Running 2 tests using 1 worker
+
+
+
+
+
+[1A[2K[1/2] [desktop-chromium] › frontend/tests/claims.spec.ts:364:1 › @claim:refund-license-contract treats a recorded refunded license as revoked
+
+
+
+
+[1A[2K[2/2] [mobile-chromium] › frontend/tests/claims.spec.ts:364:1 › @claim:refund-license-contract treats a recorded refunded license as revoked
+[1A[2K  2 passed (10.0s)
+=== RESULT {"id":"refund-license-contract","command":"npm run test:claims -- --grep @claim:refund-license-contract","exitCode":0,"durationMs":11714,"error":null} ===
+
+=== CLAIM external-checkout ===
+$ npm run test:claims -- --grep @claim:external-checkout
+
+> accessible-explanation-checkin@1.0.0 test:claims
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --grep @claim:external-checkout
+
+
+
+
+
+Running 2 tests using 1 worker
+
+
+
+
+
+[1A[2K[1/2] [desktop-chromium] › frontend/tests/claims.spec.ts:382:1 › @claim:external-checkout verifies the live $39 checkout before leaving the product
+
+
+
+
+[1A[2K[2/2] [mobile-chromium] › frontend/tests/claims.spec.ts:382:1 › @claim:external-checkout verifies the live $39 checkout before leaving the product
+[1A[2K  1 skipped
+  1 passed (8.2s)
+=== RESULT {"id":"external-checkout","command":"npm run test:claims -- --grep @claim:external-checkout","exitCode":0,"durationMs":9870,"error":null} ===
+
+=== CLAIM runtime-container-policy ===
+$ npm run test:runtime-policy
+
+> accessible-explanation-checkin@1.0.0 test:runtime-policy
+> bash scripts/test-nonroot-runtime.sh
+
+Building the production frontend and release server for the runtime policy claim
+PASS @claim:runtime-container-policy: release server ran non-root and wrote its durable snapshot
+=== RESULT {"id":"runtime-container-policy","command":"npm run test:runtime-policy","exitCode":0,"durationMs":345854,"error":null} ===
+
+=== CLAIM durable-deployment-policy ===
+$ npm run test:deployment-policy && npm run test:live-durability-checker && npm run test:live-topology && npm run verify:live-topology
+
+> accessible-explanation-checkin@1.0.0 test:deployment-policy
+> bash scripts/test-durable-deploy.sh
+
+PASS @claim:durable-deployment-policy: executed deployment converges to one Azure File-backed SQLite replica
+
+> accessible-explanation-checkin@1.0.0 test:live-durability-checker
+> bash scripts/test-live-durable-workflow.sh
+
+PASS: live durability checker covers student, review, and receipt reads across a new revision
+
+> accessible-explanation-checkin@1.0.0 test:live-topology
+> bash scripts/test-live-topology.sh
+
+PASS: live topology gate rejects verifier 8 state and accepts one mounted SQLite replica
+
+> accessible-explanation-checkin@1.0.0 verify:live-topology
+> bash scripts/verify-live-topology.sh https://accessible-explanation-checkin.sociobot.in sf-accessible-explanation-9c1a54 sociobot $(git rev-parse HEAD) aec-accessible-explanati-9c1a54 sf-accessible-explanation-checkin-data
+
+{
+  "result": "PASS",
+  "base_url": "https://accessible-explanation-checkin.sociobot.in",
+  "container_app": "sf-accessible-explanation-9c1a54",
+  "revision": "sf-accessible-explanation-9c1a54--0000075",
+  "image": "sociobotregistry.azurecr.io/sf-accessible-explanation-9c1a54:d47130dbb614",
+  "build_sha": "d47130dbb61411ce9dfb3c832500b361ca9b66cb",
+  "topology": {
+    "min_replicas": 1,
+    "max_replicas": 1,
+    "active_revisions": 1,
+    "running_replicas": 1,
+    "volume": "checkin-data",
+    "mount_path": "/app/data",
+    "storage_name": "aec-accessible-explanati-9c1a54",
+    "share_name": "sf-accessible-explanation-checkin-data"
+  }
+}
+=== RESULT {"id":"durable-deployment-policy","command":"npm run test:deployment-policy && npm run test:live-durability-checker && npm run test:live-topology && npm run verify:live-topology","exitCode":0,"durationMs":9188,"error":null} ===
+
+SUMMARY {"total":24,"passed":24,"failed":[]}

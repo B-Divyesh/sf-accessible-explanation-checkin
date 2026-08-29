@@ -1,0 +1,5 @@
+
+> accessible-explanation-checkin@1.0.0 test:container-identity
+> bash scripts/test-container-build-identity.sh
+
+PASS: runtime image accepts BUILD_SHA, exposes it to /health, and runs as checkin

@@ -1,0 +1,209 @@
+
+> accessible-explanation-checkin@1.0.0 test:e2e
+> npm run test:e2e:desktop && npm run test:e2e:mobile
+
+
+> accessible-explanation-checkin@1.0.0 test:e2e:desktop
+> npm run test:e2e:desktop:app && npm run test:e2e:desktop:claims-a && npm run test:e2e:desktop:claims-b
+
+
+> accessible-explanation-checkin@1.0.0 test:e2e:desktop:app
+> playwright test --config frontend/playwright.config.ts frontend/tests/app.spec.ts --project=desktop-chromium
+
+[1A[2K[WebServer] (node:16230) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+[1A[2K[WebServer]     Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.22s
+
+[1A[2K[WebServer]      Running `target/debug/accessible-explanation-checkin`
+
+
+Running 10 tests using 1 worker
+
+[1A[2K(node:16264) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K(node:16264) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K[1/10] [desktop-chromium] › frontend/tests/app.spec.ts:11:1 › landing and legal screens are semantic and console-clean
+[1A[2K[2/10] [desktop-chromium] › frontend/tests/app.spec.ts:26:1 › navigation moves focus to the new heading and updates route metadata
+[1A[2K[3/10] [desktop-chromium] › frontend/tests/app.spec.ts:39:1 › every public route keeps Privacy in the primary navigation
+[1A[2K[4/10] [desktop-chromium] › frontend/tests/app.spec.ts:47:1 › unknown paths return the designed 404 with an HTTP 404 status
+[1A[2K[5/10] [desktop-chromium] › frontend/tests/app.spec.ts:66:1 › mobile theme and legal controls meet the 44px touch-target contract
+[1A[2K[6/10] [desktop-chromium] › frontend/tests/app.spec.ts:90:1 › shared footer identifies the builder and release version
+[1A[2K[7/10] [desktop-chromium] › frontend/tests/app.spec.ts:95:1 › plans use the production billing endpoint
+[1A[2K[8/10] [desktop-chromium] › frontend/tests/app.spec.ts:103:1 › storage and legal copy stays precise and claim-backed
+[1A[2K[9/10] [desktop-chromium] › frontend/tests/app.spec.ts:118:1 › sample demo has no serious or critical accessibility findings
+[1A[2K[10/10] [desktop-chromium] › frontend/tests/app.spec.ts:123:1 › teacher creates, student explains, and teacher reviews
+[1A[2K  1 skipped
+  9 passed (23.9s)
+
+> accessible-explanation-checkin@1.0.0 test:e2e:desktop:claims-a
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --project=desktop-chromium --grep '@claim:(demo-isolation|demo-reset|demo-exit-disposal|sample-csv-export|keyboard-demo|offline-demo|no-account-needed|stored-record-shape|recent-links-local)'
+
+[1A[2K[WebServer] (node:16546) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+[1A[2K[WebServer]     Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.80s
+
+[1A[2K[WebServer]      Running `target/debug/accessible-explanation-checkin`
+
+
+Running 8 tests using 1 worker
+
+[1A[2K(node:16572) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K(node:16572) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K[1/8] [desktop-chromium] › frontend/tests/claims.spec.ts:26:1 › @claim:demo-isolation starts with a populated review and keeps mutations in the demo namespace
+[1A[2K[2/8] [desktop-chromium] › frontend/tests/claims.spec.ts:39:1 › @claim:demo-reset restores the shipped sample
+[1A[2K[3/8] [desktop-chromium] › frontend/tests/claims.spec.ts:47:1 › @claim:demo-exit-disposal discards edits before starting a real check-in
+[1A[2K[4/8] [desktop-chromium] › frontend/tests/claims.spec.ts:59:1 › @claim:sample-csv-export downloads each shipped sample response
+[1A[2K[5/8] [desktop-chromium] › frontend/tests/claims.spec.ts:71:1 › @claim:keyboard-demo lets a teacher use the sample review with a keyboard
+[1A[2K[6/8] [desktop-chromium] › frontend/tests/claims.spec.ts:81:1 › @claim:no-account-needed creates a check-in without a sign-in step
+[1A[2K[7/8] [desktop-chromium] › frontend/tests/claims.spec.ts:96:1 › @claim:recent-links-local keeps recent review links in one browser only
+[1A[2K[8/8] [desktop-chromium] › frontend/tests/claims.spec.ts:254:1 › @claim:offline-demo reloads after its first visit
+[1A[2K  8 passed (15.4s)
+
+> accessible-explanation-checkin@1.0.0 test:e2e:desktop:claims-b
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --project=desktop-chromium --grep '@claim:(voice-retention-control|voice-recording-limits|voice-retention-deletion|teacher-voice-deletion|free-response-limit|no-automated-judgment|student-keyboard-flow|student-review-workflow|privacy-request-boundary|classroom-plus-limits|billing-license-fixture|refund-license-contract|external-checkout|runtime-container-policy|durable-deployment-policy)'
+
+[1A[2K[WebServer] (node:16788) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+[1A[2K[WebServer]     Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.19s
+
+[1A[2K[WebServer]      Running `target/debug/accessible-explanation-checkin`
+
+
+Running 10 tests using 1 worker
+
+[1A[2K(node:16814) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K(node:16814) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K[1/10] [desktop-chromium] › frontend/tests/claims.spec.ts:122:1 › @claim:voice-retention-control applies the selected free voice schedule
+[1A[2K[2/10] [desktop-chromium] › frontend/tests/claims.spec.ts:138:1 › @claim:voice-recording-limits stops at 120 seconds and enforces the 4 MB boundary
+[1A[2K[3/10] [desktop-chromium] › frontend/tests/claims.spec.ts:214:1 › @claim:free-response-limit enforces 35 responses under concurrent submissions
+[1A[2K[4/10] [desktop-chromium] › frontend/tests/claims.spec.ts:234:1 › @claim:no-automated-judgment returns only student input and teacher-authored review fields
+[1A[2K[5/10] [desktop-chromium] › frontend/tests/claims.spec.ts:264:1 › @claim:student-keyboard-flow submits every required student field using only the keyboard
+[1A[2K[6/10] [desktop-chromium] › frontend/tests/claims.spec.ts:292:1 › @claim:student-review-workflow carries the explanation into a saved teacher review and free outputs
+[1A[2K[7/10] [desktop-chromium] › frontend/tests/claims.spec.ts:328:1 › @claim:privacy-request-boundary keeps the demo and classroom flow on the product origin
+[1A[2K[8/10] [desktop-chromium] › frontend/tests/claims.spec.ts:344:1 › @claim:billing-license-fixture handles an active and then revoked license verdict
+[1A[2K[9/10] [desktop-chromium] › frontend/tests/claims.spec.ts:364:1 › @claim:refund-license-contract treats a recorded refunded license as revoked
+[1A[2K[10/10] [desktop-chromium] › frontend/tests/claims.spec.ts:382:1 › @claim:external-checkout verifies the live $39 checkout before leaving the product
+[1A[2K  10 passed (24.4s)
+
+> accessible-explanation-checkin@1.0.0 test:e2e:mobile
+> npm run test:e2e:mobile:app && npm run test:e2e:mobile:claims-a && npm run test:e2e:mobile:claims-b
+
+
+> accessible-explanation-checkin@1.0.0 test:e2e:mobile:app
+> playwright test --config frontend/playwright.config.ts frontend/tests/app.spec.ts --project=mobile-chromium
+
+[1A[2K[WebServer] (node:17053) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+[1A[2K[WebServer]     Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.33s
+
+[1A[2K[WebServer]      Running `target/debug/accessible-explanation-checkin`
+
+
+Running 10 tests using 1 worker
+
+[1A[2K(node:17078) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K(node:17078) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K[1/10] [mobile-chromium] › frontend/tests/app.spec.ts:11:1 › landing and legal screens are semantic and console-clean
+[1A[2K[2/10] [mobile-chromium] › frontend/tests/app.spec.ts:26:1 › navigation moves focus to the new heading and updates route metadata
+[1A[2K[3/10] [mobile-chromium] › frontend/tests/app.spec.ts:39:1 › every public route keeps Privacy in the primary navigation
+[1A[2K[4/10] [mobile-chromium] › frontend/tests/app.spec.ts:47:1 › unknown paths return the designed 404 with an HTTP 404 status
+[1A[2K[5/10] [mobile-chromium] › frontend/tests/app.spec.ts:66:1 › mobile theme and legal controls meet the 44px touch-target contract
+[1A[2K[6/10] [mobile-chromium] › frontend/tests/app.spec.ts:90:1 › shared footer identifies the builder and release version
+[1A[2K[7/10] [mobile-chromium] › frontend/tests/app.spec.ts:95:1 › plans use the production billing endpoint
+[1A[2K[8/10] [mobile-chromium] › frontend/tests/app.spec.ts:103:1 › storage and legal copy stays precise and claim-backed
+[1A[2K[9/10] [mobile-chromium] › frontend/tests/app.spec.ts:118:1 › sample demo has no serious or critical accessibility findings
+[1A[2K[10/10] [mobile-chromium] › frontend/tests/app.spec.ts:123:1 › teacher creates, student explains, and teacher reviews
+[1A[2K  10 passed (21.2s)
+
+> accessible-explanation-checkin@1.0.0 test:e2e:mobile:claims-a
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --project=mobile-chromium --grep '@claim:(demo-isolation|demo-reset|demo-exit-disposal|sample-csv-export|keyboard-demo|offline-demo|no-account-needed|stored-record-shape|recent-links-local)'
+
+[1A[2K[WebServer] (node:17371) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+[1A[2K[WebServer]     Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.68s
+
+[1A[2K[WebServer]      Running `target/debug/accessible-explanation-checkin`
+
+
+Running 8 tests using 1 worker
+
+[1A[2K(node:17396) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K(node:17396) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K[1/8] [mobile-chromium] › frontend/tests/claims.spec.ts:26:1 › @claim:demo-isolation starts with a populated review and keeps mutations in the demo namespace
+[1A[2K[2/8] [mobile-chromium] › frontend/tests/claims.spec.ts:39:1 › @claim:demo-reset restores the shipped sample
+[1A[2K[3/8] [mobile-chromium] › frontend/tests/claims.spec.ts:47:1 › @claim:demo-exit-disposal discards edits before starting a real check-in
+[1A[2K[4/8] [mobile-chromium] › frontend/tests/claims.spec.ts:59:1 › @claim:sample-csv-export downloads each shipped sample response
+[1A[2K[5/8] [mobile-chromium] › frontend/tests/claims.spec.ts:71:1 › @claim:keyboard-demo lets a teacher use the sample review with a keyboard
+[1A[2K[6/8] [mobile-chromium] › frontend/tests/claims.spec.ts:81:1 › @claim:no-account-needed creates a check-in without a sign-in step
+[1A[2K[7/8] [mobile-chromium] › frontend/tests/claims.spec.ts:96:1 › @claim:recent-links-local keeps recent review links in one browser only
+[1A[2K[8/8] [mobile-chromium] › frontend/tests/claims.spec.ts:254:1 › @claim:offline-demo reloads after its first visit
+[1A[2K  1 skipped
+  7 passed (10.8s)
+
+> accessible-explanation-checkin@1.0.0 test:e2e:mobile:claims-b
+> playwright test --config frontend/playwright.config.ts frontend/tests/claims.spec.ts --project=mobile-chromium --grep '@claim:(voice-retention-control|voice-recording-limits|voice-retention-deletion|teacher-voice-deletion|free-response-limit|no-automated-judgment|student-keyboard-flow|student-review-workflow|privacy-request-boundary|classroom-plus-limits|billing-license-fixture|refund-license-contract|external-checkout|runtime-container-policy|durable-deployment-policy)'
+
+[1A[2K[WebServer] (node:17594) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+[1A[2K[WebServer]     Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.19s
+
+[1A[2K[WebServer]      Running `target/debug/accessible-explanation-checkin`
+
+
+Running 10 tests using 1 worker
+
+[1A[2K(node:17619) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K(node:17619) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K[1/10] [mobile-chromium] › frontend/tests/claims.spec.ts:122:1 › @claim:voice-retention-control applies the selected free voice schedule
+[1A[2K[2/10] [mobile-chromium] › frontend/tests/claims.spec.ts:138:1 › @claim:voice-recording-limits stops at 120 seconds and enforces the 4 MB boundary
+[1A[2K[3/10] [mobile-chromium] › frontend/tests/claims.spec.ts:214:1 › @claim:free-response-limit enforces 35 responses under concurrent submissions
+[1A[2K[4/10] [mobile-chromium] › frontend/tests/claims.spec.ts:234:1 › @claim:no-automated-judgment returns only student input and teacher-authored review fields
+[1A[2K[5/10] [mobile-chromium] › frontend/tests/claims.spec.ts:264:1 › @claim:student-keyboard-flow submits every required student field using only the keyboard
+[1A[2K[6/10] [mobile-chromium] › frontend/tests/claims.spec.ts:292:1 › @claim:student-review-workflow carries the explanation into a saved teacher review and free outputs
+[1A[2K[7/10] [mobile-chromium] › frontend/tests/claims.spec.ts:328:1 › @claim:privacy-request-boundary keeps the demo and classroom flow on the product origin
+[1A[2K[8/10] [mobile-chromium] › frontend/tests/claims.spec.ts:344:1 › @claim:billing-license-fixture handles an active and then revoked license verdict
+[1A[2K[9/10] [mobile-chromium] › frontend/tests/claims.spec.ts:364:1 › @claim:refund-license-contract treats a recorded refunded license as revoked
+[1A[2K[10/10] [mobile-chromium] › frontend/tests/claims.spec.ts:382:1 › @claim:external-checkout verifies the live $39 checkout before leaving the product
+[1A[2K  8 skipped
+  2 passed (9.2s)

@@ -1,0 +1,19 @@
+{
+  "checkedAt": "2026-08-29T19:09:49.493Z",
+  "submissionStatuses": {
+    "201": 35,
+    "409": 5
+  },
+  "reviewStatus": 200,
+  "storedResponses": 35,
+  "limitedSamples": [
+    {
+      "status": 409,
+      "body": "{\"error\":\"This check-in has reached its submission limit. Ask your teacher for a new link.\"}"
+    },
+    {
+      "status": 409,
+      "body": "{\"error\":\"This check-in has reached its submission limit. Ask your teacher for a new link.\"}"
+    }
+  ]
+}

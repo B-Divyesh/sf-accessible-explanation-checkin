@@ -1,0 +1,39 @@
+
+> accessible-explanation-checkin@1.0.0 test
+> tsc --noEmit -p frontend/tsconfig.json && vitest run --config frontend/vite.config.ts && cargo test && bash scripts/test-durable-deploy.sh && bash scripts/test-live-durable-workflow.sh && bash scripts/test-live-topology.sh
+
+
+ RUN  v3.2.7 /work/repo/frontend
+
+ ✓ src/utils.test.ts (3 tests) 3ms
+ ✓ src/config.test.ts (1 test) 4ms
+ ✓ src/playwright-config.test.ts (1 test) 5ms
+
+ Test Files  3 passed (3)
+      Tests  5 passed (5)
+   Start at  19:01:36
+   Duration  2.92s (transform 448ms, setup 0ms, collect 1.90s, tests 12ms, environment 1ms, prepare 1.33s)
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.28s
+     Running unittests src/main.rs (target/debug/deps/accessible_explanation_checkin-e62c966565e9076b)
+
+running 13 tests
+test db::tests::durable_snapshot_replaces_bytes_without_copying_posix_permissions ... ok
+test db::tests::durable_snapshot_round_trips_a_local_database_file ... ok
+test http_policy::tests::assets_are_immutable_and_shell_is_revalidated ... ok
+test http_policy::tests::bearer_navigation_and_api_are_never_stored ... ok
+test routes::tests::claim_classroom_plus_limits ... ok
+test routes::tests::claim_stored_record_shape ... ok
+test routes::tests::claim_teacher_voice_deletion ... ok
+test routes::tests::claim_voice_retention_deletion ... ok
+test routes::tests::complete_free_checkin_flow ... ok
+test routes::tests::concurrent_submissions_stop_exactly_at_the_free_limit ... ok
+test routes::tests::escapes_csv_formula_and_quotes_as_text ... ok
+test routes::tests::trims_and_validates_input ... ok
+test tests::rate_limit_uses_forwarded_client_ip_and_returns_retry_after ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.86s
+
+PASS @claim:durable-deployment-policy: executed deployment converges to one Azure File-backed SQLite replica
+PASS: live durability checker covers student, review, and receipt reads across a new revision
+PASS: live topology gate rejects verifier 8 state and accepts one mounted SQLite replica

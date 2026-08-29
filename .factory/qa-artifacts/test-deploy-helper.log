@@ -1,0 +1,5 @@
+
+> accessible-explanation-checkin@1.0.0 test:deploy-helper
+> bash scripts/test-deploy-container-name.sh
+
+PASS: accessible-explanation-checkin maps deterministically to sf-accessible-explanation-9c1a54 (32 characters)

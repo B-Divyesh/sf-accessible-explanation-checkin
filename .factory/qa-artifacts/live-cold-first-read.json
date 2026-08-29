@@ -1,0 +1,73 @@
+{
+  "url": "https://accessible-explanation-checkin.sociobot.in/",
+  "status": 200,
+  "headers": {
+    "cache-control": "no-cache, max-age=0, must-revalidate",
+    "content-encoding": "gzip",
+    "content-security-policy": "default-src 'self'; img-src 'self' data:; media-src 'self' blob:; connect-src 'self' https://api.sociobot.in; style-src 'self' 'unsafe-inline'; script-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self' https://api.sociobot.in",
+    "content-type": "text/html",
+    "date": "Sat, 29 Aug 2026 18:48:45 GMT",
+    "etag": "W/\"d47130dbb61411ce9dfb3c832500b361ca9b66cb\"",
+    "last-modified": "Sat, 29 Aug 2026 18:22:12 GMT",
+    "permissions-policy": "camera=(), geolocation=(), payment=(), microphone=(self)",
+    "referrer-policy": "no-referrer",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "vary": "accept-encoding",
+    "x-content-type-options": "nosniff",
+    "x-request-id": "67300071-4392-4470-93db-c991f2f22784"
+  },
+  "consoleErrors": [],
+  "pageErrors": [],
+  "title": "Accessible Explanation Check-in — Collect student reasoning",
+  "lang": "en",
+  "h1s": [
+    "Collect student reasoning"
+  ],
+  "main": true,
+  "visibleText": "Skip to main content\nExplanation\nCheck-in\nDemo\nCreate\nPlans\nPrivacy\n◐\nTheme\n\nSTUDENT EXPLANATION CHECK-INS FOR TEACHERS\n\nCollect student reasoning\n\nFor teachers who need a low-stakes check-in, students explain one choice by text or voice.\n\nTry it with sample data\nOpen a populated teacher review; nothing is saved.\nRead the three steps\nNo accounts\nVoice deletes on your schedule\nFree check-ins accept 35 responses\n\nWHAT A TEACHER RECEIVES\n\nHow the check-in works\n\nReview a student’s explanation, confidence, and optional voice note. Use them to plan a follow-up conversation.\n\n01\nCreate one check-in\n\nAsk one question about a choice or step.\n\n02\nStudents explain their reasoning\n\nStudents can complete the form using only a keyboard.\n\n03\nReview each explanation\n\nSave tags and notes for your next conversation.\n\nWhat this tool does not do\n\nIt does not grade, detect AI use, proctor, or verify identity.\n\nPrivacy limits\n\nVoice deletes on the selected schedule. Keep private review links secure.\n\nStudent explanation check-ins for teachers.\nNo automated grading or identity checks.\n\nPrivacy\nTerms\n\nOriginal generated classroom art · Param Factory, 2026\nBuilt by Param Factory · version 1.0.0",
+  "links": [
+    {
+      "text": "Skip to main content",
+      "href": "https://accessible-explanation-checkin.sociobot.in/#main"
+    },
+    {
+      "text": "Explanation\nCheck-in",
+      "href": "https://accessible-explanation-checkin.sociobot.in/"
+    },
+    {
+      "text": "Demo",
+      "href": "https://accessible-explanation-checkin.sociobot.in/demo"
+    },
+    {
+      "text": "Create",
+      "href": "https://accessible-explanation-checkin.sociobot.in/create"
+    },
+    {
+      "text": "Plans",
+      "href": "https://accessible-explanation-checkin.sociobot.in/pricing"
+    },
+    {
+      "text": "Privacy",
+      "href": "https://accessible-explanation-checkin.sociobot.in/privacy"
+    },
+    {
+      "text": "Try it with sample data",
+      "href": "https://accessible-explanation-checkin.sociobot.in/demo"
+    },
+    {
+      "text": "Read the three steps",
+      "href": "https://accessible-explanation-checkin.sociobot.in/#how"
+    },
+    {
+      "text": "Privacy",
+      "href": "https://accessible-explanation-checkin.sociobot.in/privacy"
+    },
+    {
+      "text": "Terms",
+      "href": "https://accessible-explanation-checkin.sociobot.in/terms"
+    }
+  ],
+  "buttons": [
+    "◐\nTheme"
+  ]
+}
