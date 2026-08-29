@@ -1,0 +1,19 @@
+{
+  "checkedAt": "2026-08-29T11:47:00Z",
+  "candidate": "976328637bdfe5cdec53afa4e4303882351ef760",
+  "create": {"status": 201, "studentTokenShape": true, "reviewTokenShape": true},
+  "persistenceBoundary": {
+    "studentReadsBeforeSubmission": {"requests": 24, "statusCounts": {"200": 12, "404": 12}},
+    "studentSubmission": 201,
+    "teacherReviewFirstRead": 404,
+    "teacherReviewReadsAfterSubmission": {"requests": 24, "statusCounts": {"200": 12, "404": 12}},
+    "receiptRead": 404
+  },
+  "rateLimitBoundary": {
+    "oneClient160Requests": {"statusCounts": {"404": 160, "429": 0}},
+    "oneClient300Requests": {"statusCounts": {"404": 240, "429": 60}, "retryAfter": "0", "every429HadRetryAfter": true},
+    "differentClientStatus": 404,
+    "observedAllowance": 240
+  },
+  "health": {"status": 200, "build_sha": "976328637bdfe5cdec53afa4e4303882351ef760"}
+}

@@ -126,3 +126,26 @@ No release-blocking product gap remains. Future production releases must use
 `scripts/deploy-durable-container.sh`; the generic stateless helper alone is
 not a valid deployment path for this SQLite service. Keep the exact share,
 single-replica, cross-connection, and new-revision checks as release gates.
+
+## Independent verifier addendum — 2026-08-29 — FAIL
+
+**Tested candidate:** `976328637bdfe5cdec53afa4e4303882351ef760`
+**Tested URL:** https://accessible-explanation-checkin.sociobot.in
+
+**Do not release.** Fresh independent QA found that the live service identifies
+as this candidate, but it still serves two isolated backend replicas. A fresh
+private student link returned 12/24 successful reads and 12/24 404s. After a
+successful student submission, teacher-review reads had the same 12/12 split
+and the receipt returned 404. This is a critical persistence failure.
+
+The rate boundary confirms the topology defect: 160 reads from one forwarded
+client all returned 404, while 300 returned 240 × 404 then 60 × 429 with
+`Retry-After: 0`. The observed live allowance is 240 (two 120-request bursts),
+not the intended one-writer allowance.
+
+All local claim commands (18/18), `npm test`, production build, full E2E,
+format/clippy, runtime policy, deployment fixtures, and live UI/accessibility/
+privacy audit passed. The successful normal live flow stayed on one replica and
+does not mitigate this defect. Full evidence and re-verification detail are in
+`.factory/verification-6.md` and
+`evidence/verification-6-server-boundaries.json`.
