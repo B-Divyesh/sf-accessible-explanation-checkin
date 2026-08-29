@@ -67,10 +67,19 @@ active_revisions=$(jq '[.[] | select(.properties.active == true)] | length' <<<"
 [[ "$active_revisions" == 1 ]] || \
   fail "expected one active revision; observed $active_revisions"
 if ! jq -e --arg revision "$revision" '
-  any(.[]; .name == $revision and .properties.active == true)
+  any(.[];
+    .name == $revision
+    and .properties.active == true
+    and .properties.healthState == "Healthy"
+    and .properties.provisioningState == "Provisioned"
+    and (.properties.runningState | startswith("Running")))
 ' >/dev/null <<<"$revisions"; then
-  fail "ready revision $revision is not the sole active revision"
+  fail "ready revision $revision is not the sole active, healthy, running revision"
 fi
+revision_health=$(jq -er --arg revision "$revision" \
+  '.[] | select(.name == $revision) | .properties.healthState' <<<"$revisions")
+revision_state=$(jq -er --arg revision "$revision" \
+  '.[] | select(.name == $revision) | .properties.runningState' <<<"$revisions")
 
 replicas=$($az_bin containerapp replica list --resource-group "$resource_group" \
   --name "$app_name" --revision "$revision" --output json)
@@ -78,6 +87,15 @@ running_replicas=$(jq '[.[] | select(.properties.runningState == "Running")] | l
   <<<"$replicas")
 [[ "$running_replicas" == 1 ]] || \
   fail "expected one running replica; observed $running_replicas"
+ready_replicas=$(jq '[.[] | select(
+  .properties.runningState == "Running"
+  and any(.properties.containers[]?;
+    .name == "app"
+    and .ready == true
+    and .started == true
+    and .runningState == "Running"))] | length' <<<"$replicas")
+[[ "$ready_replicas" == 1 ]] || \
+  fail "expected one ready app replica; observed $ready_replicas"
 
 health=$($curl_bin --fail --silent --show-error --no-keepalive \
   --header 'Cache-Control: no-cache' "$base_url/health")
@@ -93,6 +111,8 @@ jq -n \
   --arg build_sha "$health_sha" \
   --arg storage_name "$expected_storage_name" \
   --arg share_name "$expected_share_name" \
+  --arg revision_health "$revision_health" \
+  --arg revision_state "$revision_state" \
   '{
     result: "PASS",
     base_url: $base_url,
@@ -105,6 +125,9 @@ jq -n \
       max_replicas: 1,
       active_revisions: 1,
       running_replicas: 1,
+      ready_replicas: 1,
+      revision_health: $revision_health,
+      revision_state: $revision_state,
       volume: "checkin-data",
       mount_path: "/app/data",
       storage_name: $storage_name,
