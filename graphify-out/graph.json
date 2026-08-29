@@ -2921,7 +2921,7 @@
       },
       "norm_label": "expect_status()",
       "source_file": "scripts/verify-live-durable-workflow.sh",
-      "source_location": "L38"
+      "source_location": "L43"
     },
     {
       "id": "scripts_verify_live_durable_workflow_fail",
@@ -2935,7 +2935,7 @@
       },
       "norm_label": "fail()",
       "source_file": "scripts/verify-live-durable-workflow.sh",
-      "source_location": "L21"
+      "source_location": "L25"
     },
     {
       "id": "scripts_verify_live_durable_workflow_read_private_links",
@@ -2949,7 +2949,7 @@
       },
       "norm_label": "read_private_links()",
       "source_file": "scripts/verify-live-durable-workflow.sh",
-      "source_location": "L79"
+      "source_location": "L105"
     },
     {
       "id": "scripts_verify_live_durable_workflow_request",
@@ -2963,7 +2963,7 @@
       },
       "norm_label": "request()",
       "source_file": "scripts/verify-live-durable-workflow.sh",
-      "source_location": "L26"
+      "source_location": "L30"
     },
     {
       "id": "scripts_verify_live_durable_workflow_sh__entry",
@@ -4106,7 +4106,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "scripts/verify-live-durable-workflow.sh",
-      "source_location": "L43",
+      "source_location": "L48",
       "weight": 1.0
     },
     {
@@ -4118,19 +4118,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "scripts/verify-live-durable-workflow.sh",
-      "source_location": "L84",
-      "weight": 1.0
-    },
-    {
-      "source": "scripts_verify_live_durable_workflow_sh__entry",
-      "target": "scripts_verify_live_durable_workflow_fail",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "scripts/verify-live-durable-workflow.sh",
-      "source_location": "L59",
+      "source_location": "L110",
       "weight": 1.0
     },
     {
@@ -4142,7 +4130,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "scripts/verify-live-durable-workflow.sh",
-      "source_location": "L75",
+      "source_location": "L101",
       "weight": 1.0
     },
     {
@@ -4154,7 +4142,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "scripts/verify-live-durable-workflow.sh",
-      "source_location": "L90",
+      "source_location": "L116",
+      "weight": 1.0
+    },
+    {
+      "source": "scripts_verify_live_durable_workflow_sh__entry",
+      "target": "scripts_verify_live_durable_workflow_fail",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "scripts/verify-live-durable-workflow.sh",
+      "source_location": "L66",
       "weight": 1.0
     },
     {
@@ -9202,13 +9202,24 @@
     },
     {
       "source": "scripts_verify_live_durable_workflow",
+      "target": "scripts_verify_live_durable_workflow_read_private_links",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/verify-live-durable-workflow.sh",
+      "source_location": "L105",
+      "weight": 1.0
+    },
+    {
+      "source": "scripts_verify_live_durable_workflow",
       "target": "scripts_verify_live_durable_workflow_fail",
       "relation": "defines",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "scripts/verify-live-durable-workflow.sh",
-      "source_location": "L21",
+      "source_location": "L25",
       "weight": 1.0
     },
     {
@@ -9219,7 +9230,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "scripts/verify-live-durable-workflow.sh",
-      "source_location": "L26",
+      "source_location": "L30",
       "weight": 1.0
     },
     {
@@ -9230,18 +9241,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "scripts/verify-live-durable-workflow.sh",
-      "source_location": "L38",
-      "weight": 1.0
-    },
-    {
-      "source": "scripts_verify_live_durable_workflow",
-      "target": "scripts_verify_live_durable_workflow_read_private_links",
-      "relation": "defines",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "scripts/verify-live-durable-workflow.sh",
-      "source_location": "L79",
+      "source_location": "L43",
       "weight": 1.0
     },
     {
@@ -9338,5 +9338,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "31178d896709a4851c53776e757a7dbe59ee0a9f"
+  "built_at_commit": "976328637bdfe5cdec53afa4e4303882351ef760"
 }
