@@ -17,7 +17,11 @@ if [[ "$args" == "containerapp show"* ]]; then
 {"properties":{"latestRevisionName":"app--0000040","latestReadyRevisionName":"app--0000040","template":{"scale":{"minReplicas":1,"maxReplicas":1},"volumes":[{"name":"checkin-data","storageType":"AzureFile","storageName":"durable"}],"containers":[{"name":"app","volumeMounts":[{"volumeName":"checkin-data","mountPath":"/app/data"}]}]}}}
 JSON
 elif [[ "$args" == "containerapp replica list"* ]]; then
-  printf '1\n'
+  if [[ -f "$MOCK_STATE_DIR/restarted" ]]; then
+    printf '%s\n' '[{"name":"app--0000040-new","properties":{"runningState":"Running"}}]'
+  else
+    printf '%s\n' '[{"name":"app--0000040-old","properties":{"runningState":"Running"}}]'
+  fi
 elif [[ "$args" == "containerapp revision restart"* ]]; then
   : > "$MOCK_STATE_DIR/restarted"
 else
@@ -83,7 +87,7 @@ chmod +x "$sed_checker"
 
 output=$(MOCK_STATE_DIR="$test_dir/state" \
   AZ_BIN="$test_dir/bin/az" CURL_BIN="$test_dir/bin/curl" \
-  DURABILITY_READ_ATTEMPTS=3 DURABILITY_RESTART_ATTEMPTS=1 \
+  DURABILITY_READ_ATTEMPTS=3 DURABILITY_RESTART_ATTEMPTS=2 \
   DURABILITY_RESTART_INTERVAL_SECONDS=0 \
   "$sed_checker" https://example.test app group expected-sha)
 
@@ -105,7 +109,7 @@ rm -rf "$test_dir/state"
 mkdir -p "$test_dir/state"
 if MOCK_STATE_DIR="$test_dir/state" MOCK_FAIL_PRIVATE_READ=1 \
   AZ_BIN="$test_dir/bin/az" CURL_BIN="$test_dir/bin/curl" \
-  DURABILITY_READ_ATTEMPTS=1 DURABILITY_RESTART_ATTEMPTS=1 \
+  DURABILITY_READ_ATTEMPTS=1 DURABILITY_RESTART_ATTEMPTS=2 \
   DURABILITY_RESTART_INTERVAL_SECONDS=0 \
   "$sed_checker" https://example.test app group expected-sha \
   >"$test_dir/failure.out" 2>&1; then

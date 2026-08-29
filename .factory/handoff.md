@@ -29,13 +29,16 @@ cannot succeed unless the live service completes all of these checks:
 - submit a student explanation, read it in the teacher review, and save a tag,
   note, and follow-up state;
 - restart the actual Container Apps revision;
+- wait for the original replica to disappear and require its sole replacement
+  to remain healthy across consecutive control-plane polls;
 - receive another 12/12 successful reads for each private link and recover the
   student receipt plus the saved teacher review after restart;
 - match `/health.build_sha` to the deployed repository commit.
 
 `scripts/test-live-durable-workflow.sh` executes that exact gate against
-recorded Azure and HTTP fixtures. It also injects the reported 404 failure and
-proves that the gate rejects it. `scripts/test-durable-deploy.sh` proves the
+recorded Azure and HTTP fixtures. It distinguishes the old replica from its
+replacement, injects the reported 404 failure, and proves that the gate rejects
+it. `scripts/test-durable-deploy.sh` proves the
 deployment wrapper invokes the live gate and still fails if Azure does not
 apply the durable topology.
 

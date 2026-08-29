@@ -59,10 +59,11 @@ if ! jq -e '
   fail "Azure control plane does not show the ready one-replica Azure Files topology"
 fi
 revision=$(jq -r '.properties.latestRevisionName' <<<"$topology")
-running=$($az_bin containerapp replica list --resource-group "$resource_group" \
-  --name "$app_name" --revision "$revision" \
-  --query "length([?properties.runningState=='Running'])" --output tsv)
+replicas=$($az_bin containerapp replica list --resource-group "$resource_group" \
+  --name "$app_name" --revision "$revision" --output json)
+running=$(jq '[.[] | select(.properties.runningState == "Running")] | length' <<<"$replicas")
 [[ "$running" == 1 ]] || fail "revision $revision has $running running replicas, expected 1"
+original_replica=$(jq -er '.[] | select(.properties.runningState == "Running") | .name' <<<"$replicas")
 
 marker="durability-$(date -u +%Y%m%dT%H%M%SZ)-$$"
 create_payload=$(jq -nc --arg marker "$marker" '{
@@ -114,21 +115,30 @@ $az_bin containerapp revision restart --resource-group "$resource_group" \
   --name "$app_name" --revision "$revision" --output none
 
 restarted=false
+stable_observations=0
 for _ in $(seq 1 "$restart_attempts"); do
-  running=$($az_bin containerapp replica list --resource-group "$resource_group" \
-    --name "$app_name" --revision "$revision" \
-    --query "length([?properties.runningState=='Running'])" --output tsv 2>/dev/null || printf 0)
+  replicas=$($az_bin containerapp replica list --resource-group "$resource_group" \
+    --name "$app_name" --revision "$revision" --output json 2>/dev/null || printf '[]')
+  running=$(jq '[.[] | select(.properties.runningState == "Running")] | length' <<<"$replicas")
+  replacement_replica=$(jq -r '[.[] | select(.properties.runningState == "Running") | .name][0] // empty' <<<"$replicas")
   status=$(request GET "$base_url/health" || true)
-  if [[ "$running" == 1 && "$status" == 200 ]]; then
+  if [[ "$running" == 1 && -n "$replacement_replica" && "$replacement_replica" != "$original_replica" && "$status" == 200 ]]; then
     health_sha=$(jq -r '.build_sha // empty' "$body_file")
     if [[ -z "$expected_build_sha" || "$health_sha" == "$expected_build_sha" ]]; then
-      restarted=true
-      break
+      stable_observations=$((stable_observations + 1))
+      if [[ "$stable_observations" -ge 2 ]]; then
+        restarted=true
+        break
+      fi
+    else
+      stable_observations=0
     fi
+  else
+    stable_observations=0
   fi
   sleep "$restart_interval"
 done
-[[ "$restarted" == true ]] || fail "revision $revision did not return healthy with build $expected_build_sha"
+[[ "$restarted" == true ]] || fail "revision $revision did not replace $original_replica and stabilize at one healthy replica with build $expected_build_sha"
 
 read_private_links after-restart
 status=$(request GET "$base_url/api/reviews/$review_token")
