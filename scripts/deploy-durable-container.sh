@@ -10,6 +10,7 @@ dockerfile=${3:-Dockerfile}
 port=${4:-8080}
 fleet_deploy_helper=${FLEET_DEPLOY_CONTAINER_HELPER:-/opt/fleet/lib/deploy-container.sh}
 live_durability_checker=${LIVE_DURABILITY_CHECKER:-$repo/scripts/verify-live-durable-workflow.sh}
+live_topology_checker=${LIVE_TOPOLOGY_CHECKER:-$repo/scripts/verify-live-topology.sh}
 resource_group=${AZURE_RESOURCE_GROUP:-sociobot}
 environment=${AZURE_CONTAINERAPP_ENV:-factory-env}
 storage_account=${AZURE_STORAGE_ACCOUNT:-sociobotblob}
@@ -114,6 +115,17 @@ fi
 
 expected_build_sha=$(git -C "$repo" rev-parse HEAD)
 "$live_durability_checker" \
+  "https://$slug.sociobot.in" \
+  "$app_name" \
+  "$resource_group" \
+  "$expected_build_sha" \
+  "$storage_name" \
+  "$share_name"
+
+# Re-read production after the replacement-revision workflow. This is the
+# release check that catches a generic deployment overwriting the mount or
+# replica limits; it intentionally uses real control-plane state.
+"$live_topology_checker" \
   "https://$slug.sociobot.in" \
   "$app_name" \
   "$resource_group" \

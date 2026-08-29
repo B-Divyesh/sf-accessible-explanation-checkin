@@ -24,6 +24,13 @@ printf '%s\n' "$*" > "$MOCK_STATE_DIR/live-checker-args"
 echo '{"result":"PASS"}'
 MOCK
 
+cat > "$test_dir/topology-checker" <<'MOCK'
+#!/usr/bin/env bash
+set -euo pipefail
+printf '%s\n' "$*" > "$MOCK_STATE_DIR/topology-checker-args"
+echo '{"result":"PASS"}'
+MOCK
+
 cat > "$test_dir/bin/az" <<'MOCK'
 #!/usr/bin/env bash
 set -euo pipefail
@@ -74,7 +81,8 @@ else
 fi
 MOCK
 
-chmod +x "$test_dir/fleet-deploy" "$test_dir/live-checker" "$test_dir/bin/az"
+chmod +x "$test_dir/fleet-deploy" "$test_dir/live-checker" \
+  "$test_dir/topology-checker" "$test_dir/bin/az"
 
 cat > "$test_dir/stateless-app.json" <<'JSON'
 {"properties":{"latestRevisionName":"sf-accessible-explanation-9c1a54--0000001","latestReadyRevisionName":"sf-accessible-explanation-9c1a54--0000001","template":{"scale":{"minReplicas":1,"maxReplicas":3},"volumes":null,"containers":[{"name":"app","image":"example.invalid/app:before"}]}}}
@@ -88,6 +96,7 @@ output=$(PATH="$test_dir/bin:$PATH" \
   MOCK_STATE_DIR="$test_dir" \
   FLEET_DEPLOY_CONTAINER_HELPER="$test_dir/fleet-deploy" \
   LIVE_DURABILITY_CHECKER="$test_dir/live-checker" \
+  LIVE_TOPOLOGY_CHECKER="$test_dir/topology-checker" \
   DEPLOY_VERIFY_ATTEMPTS=1 \
   "$script" accessible-explanation-checkin "$repo_root" Dockerfile 8080)
 
@@ -106,6 +115,7 @@ jq -e '
 
 grep -Fxq "accessible-explanation-checkin $repo_root Dockerfile 8080" "$test_dir/fleet-args"
 grep -Eq "^https://accessible-explanation-checkin.sociobot.in sf-accessible-explanation-9c1a54 sociobot [a-f0-9]{40} aec-accessible-explanati-9c1a54 sf-accessible-explanation-checkin-data$" "$test_dir/live-checker-args"
+grep -Eq "^https://accessible-explanation-checkin.sociobot.in sf-accessible-explanation-9c1a54 sociobot [a-f0-9]{40} aec-accessible-explanati-9c1a54 sf-accessible-explanation-checkin-data$" "$test_dir/topology-checker-args"
 grep -Fq 'sf-accessible-explanation-9c1a54--0000001' "$test_dir/deactivated"
 [[ "$output" == *"PASS: deployed and verified sf-accessible-explanation-9c1a54"* ]]
 
@@ -115,6 +125,7 @@ if PATH="$test_dir/bin:$PATH" \
   MOCK_APPLY_PATCH=0 \
   FLEET_DEPLOY_CONTAINER_HELPER="$test_dir/fleet-deploy" \
   LIVE_DURABILITY_CHECKER="$test_dir/live-checker" \
+  LIVE_TOPOLOGY_CHECKER="$test_dir/topology-checker" \
   DEPLOY_VERIFY_ATTEMPTS=1 \
   DEPLOY_VERIFY_INTERVAL_SECONDS=0 \
   "$script" accessible-explanation-checkin "$repo_root" Dockerfile 8080 \

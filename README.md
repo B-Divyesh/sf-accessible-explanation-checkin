@@ -36,6 +36,6 @@ The image declares port 8080 and the non-root `checkin` user. Its claim test exe
 
 Use `scripts/deploy-durable-container.sh` for Container Apps. It mounts a product-specific Azure File share at `/app/data`.
 
-The deployment uses one SQLite replica. The deployment gate checks private links, submission, and teacher review. It repeats those checks after replacing the production revision. The deployment test checks the storage mount, one-replica setting, and repeated private-link reads.
+The deployment uses one SQLite replica. The deployment gate checks private links, submission, and teacher review. It repeats those checks after replacing the production revision. Run `npm run verify:live-topology` to check the live mount, replica, and build identity.
 
 See [privacy](https://accessible-explanation-checkin.sociobot.in/privacy), [terms](https://accessible-explanation-checkin.sociobot.in/terms), [demo notes](.factory/demo.md), and the [MIT license](LICENSE).

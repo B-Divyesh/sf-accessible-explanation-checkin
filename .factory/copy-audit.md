@@ -64,7 +64,7 @@ The inaccurate storage-only sentence and unproved infrastructure, completed-dele
 | Nothing recorded. Maximum 2 minutes / 4 MB. | 8 | exact tested recording limit |
 | Your teacher can delete it sooner. | 6 | exact tested deletion control |
 | Teachers can delete voice sooner. | 5 | exact tested deletion control |
-| The deployment test checks the storage mount, one-replica setting, and repeated private-link reads. | 13 | concrete operator instruction |
+| Run npm run verify:live-topology to check the live mount, replica, and build identity. | 12 | concrete operator instruction |
 | Collect student reasoning in private text or voice check-ins for teachers. | 11 | verb-first catalog description |
 
 No round 6 sentence exceeds 22 words or contains a banned word. The three
