@@ -1,18 +1,14 @@
-# Handoff — adversarial review 2
+# Handoff — perfection loop round 2
 
 ## Work completed
 
-Performed the required no-code-change review of the deployed product at
-`6430b28613d0a32700fde782519188a5b57cced3`. The report is
-`.factory/review-2.md`.
+Closed every cumulative finding in `.factory/review-1.md` and `.factory/review-2.md`. The implementation keeps the cinematic classroom visual system and the Rust/Vite container architecture.
 
-The first screen is clear on fresh 390 px mobile and desktop contexts. The
-sample demo is populated, resettable, uses only the `demo:` localStorage
-namespace, and made no API or third-party requests during the reviewed flow.
+The repair completes the static 404 shell and metadata, uses task-naming route headings, labels checkout as external, and aligns the demo’s review tags with the backend. The claims inventory now contains 18 observable tests covering the demo, student and teacher workflows, retention cleanup, free and paid limits, privacy requests, billing verdicts, non-root execution, and durable deployment policy.
 
-## Verification run
+## Verification
 
-In a fresh detached worktree:
+Run locally:
 
 ```sh
 npm ci
@@ -20,20 +16,23 @@ npm test
 npm run build
 npm run test:e2e
 npm run test:claims
+npm run test:runtime-policy
+cargo fmt --all -- --check
+cargo clippy --all-targets --locked -- -D warnings
 ```
 
-All passed: 4 TypeScript tests, 7 Rust tests, build output, 31 browser checks
-with one expected desktop-only skip, and 18 desktop/mobile claim checks.
+Every command passed. Every `test` command in `.factory/claims.json` also passed independently from clean clone `/tmp/tmp.mlGoZLbNKF/repo`.
 
-## Known gaps
+Browser totals: 35 full-suite checks passed with 7 intentional mobile skips for state-changing single-run fixtures. The dedicated claim suite passed 22 checks with 6 matching skips. Unit totals are 4 Vitest and 10 Rust tests.
 
-The review verdict is **FAIL**. See `F-2-1` through `F-2-4` in
-`.factory/review-2.md`:
+The production build emits 12.45 kB gzip JavaScript and 5.13 kB gzip CSS. Local mobile Lighthouse scores are 100 performance, 100 accessibility, 100 best practices, and 100 SEO. LCP is 1.3 s, TBT is 70 ms, and CLS is 0.
 
-- public promises outside `.factory/claims.json` have no observable tests;
-- the actual HTTP 404 lacks the shared shell and route metadata;
-- `/create` and `/pricing` use non-informational slogan headings.
-- the external billing button does not name its destination.
+Evidence is under `.factory/evidence/polish-2-local-home/`, `.factory/evidence/polish-2-local-demo/`, `.factory/evidence/polish-2-local-404-mobile.png`, and `.factory/evidence/polish-2-lighthouse-mobile.json`.
 
-No product code was modified. This commit contains only the review and this
-handoff.
+## Deployment and live recheck
+
+Deployment evidence and the final live build SHA are recorded after the work-order deployment in this file’s next commit.
+
+## Known gaps and next steps
+
+No review finding or known product gap remains. The factory owns routine monitoring and future deployment operations.
