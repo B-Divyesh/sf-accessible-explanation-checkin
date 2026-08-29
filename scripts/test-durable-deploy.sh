@@ -105,7 +105,7 @@ jq -e '
 ' "$test_dir/patch.json" >/dev/null
 
 grep -Fxq "accessible-explanation-checkin $repo_root Dockerfile 8080" "$test_dir/fleet-args"
-grep -Eq "^https://accessible-explanation-checkin.sociobot.in sf-accessible-explanation-9c1a54 sociobot [a-f0-9]{40}$" "$test_dir/live-checker-args"
+grep -Eq "^https://accessible-explanation-checkin.sociobot.in sf-accessible-explanation-9c1a54 sociobot [a-f0-9]{40} aec-accessible-explanati-9c1a54 sf-accessible-explanation-checkin-data$" "$test_dir/live-checker-args"
 grep -Fq 'sf-accessible-explanation-9c1a54--0000001' "$test_dir/deactivated"
 [[ "$output" == *"PASS: deployed and verified sf-accessible-explanation-9c1a54"* ]]
 

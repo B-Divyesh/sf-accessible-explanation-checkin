@@ -13,17 +13,30 @@ set -euo pipefail
 args="$*"
 printf '%s\n' "$args" >> "$MOCK_STATE_DIR/az.log"
 if [[ "$args" == "containerapp show"* ]]; then
-  cat <<'JSON'
-{"properties":{"latestRevisionName":"app--0000040","latestReadyRevisionName":"app--0000040","template":{"scale":{"minReplicas":1,"maxReplicas":1},"volumes":[{"name":"checkin-data","storageType":"AzureFile","storageName":"durable"}],"containers":[{"name":"app","volumeMounts":[{"volumeName":"checkin-data","mountPath":"/app/data"}]}]}}}
+  if [[ -f "$MOCK_STATE_DIR/revised" ]]; then
+    revision='app--0000041'
+  else
+    revision='app--0000040'
+  fi
+  cat <<JSON
+{"properties":{"latestRevisionName":"$revision","latestReadyRevisionName":"$revision","template":{"scale":{"minReplicas":1,"maxReplicas":1},"volumes":[{"name":"checkin-data","storageType":"AzureFile","storageName":"durable"}],"containers":[{"name":"app","volumeMounts":[{"volumeName":"checkin-data","mountPath":"/app/data"}]}]}}}
 JSON
+elif [[ "$args" == "containerapp env storage show"* ]]; then
+  printf '%s\n' '{"properties":{"azureFile":{"accessMode":"ReadWrite","accountName":"storage","shareName":"durable-share"}}}'
+elif [[ "$args" == "containerapp revision list"* ]]; then
+  if [[ -f "$MOCK_STATE_DIR/revised" ]]; then
+    printf '%s\n' '[{"name":"app--0000040","properties":{"active":false}},{"name":"app--0000041","properties":{"active":true}}]'
+  else
+    printf '%s\n' '[{"name":"app--0000040","properties":{"active":true}}]'
+  fi
 elif [[ "$args" == "containerapp replica list"* ]]; then
-  if [[ -f "$MOCK_STATE_DIR/restarted" ]]; then
-    printf '%s\n' '[{"name":"app--0000040-new","properties":{"runningState":"Running"}}]'
+  if [[ -f "$MOCK_STATE_DIR/revised" ]]; then
+    printf '%s\n' '[{"name":"app--0000041-new","properties":{"runningState":"Running"}}]'
   else
     printf '%s\n' '[{"name":"app--0000040-old","properties":{"runningState":"Running"}}]'
   fi
-elif [[ "$args" == "containerapp revision restart"* ]]; then
-  : > "$MOCK_STATE_DIR/restarted"
+elif [[ "$args" == "containerapp update"* ]]; then
+  : > "$MOCK_STATE_DIR/revised"
 else
   echo "unexpected az command: $args" >&2
   exit 1
@@ -41,7 +54,7 @@ while (($#)); do
     --request) method=$2; shift 2 ;;
     --output) output=$2; shift 2 ;;
     --header|--data|--write-out) shift 2 ;;
-    --silent|--show-error) shift ;;
+    --silent|--show-error|--no-keepalive) shift ;;
     *) url=$1; shift ;;
   esac
 done
@@ -61,7 +74,7 @@ case "$method $url" in
     status=201; body='{"receipt_token":"receipt-token","created_at":"2026-08-29T00:00:00Z"}' ;;
   'GET https://example.test/api/reviews/review-token')
     if [[ -f "$MOCK_STATE_DIR/reviewed" ]]; then
-      body='{"submissions":[{"id":"submission-id","student_name":"Deployment verifier","explanation_text":"I compared both examples before choosing the second result. durability-test","confidence":4,"teacher_tags":["Clear reasoning"],"teacher_note":"Restart persistence verified for durability-test","follow_up":true}]}'
+      body='{"submissions":[{"id":"submission-id","student_name":"Deployment verifier","explanation_text":"I compared both examples before choosing the second result. durability-test","confidence":4,"teacher_tags":["Clear reasoning"],"teacher_note":"Revision persistence verified for durability-test","follow_up":true}]}'
     else
       body='{"submissions":[{"id":"submission-id","student_name":"Deployment verifier","explanation_text":"I compared both examples before choosing the second result. durability-test","confidence":4,"teacher_tags":[],"teacher_note":"","follow_up":false}]}'
     fi ;;
@@ -87,21 +100,26 @@ chmod +x "$sed_checker"
 
 output=$(MOCK_STATE_DIR="$test_dir/state" \
   AZ_BIN="$test_dir/bin/az" CURL_BIN="$test_dir/bin/curl" \
-  DURABILITY_READ_ATTEMPTS=3 DURABILITY_RESTART_ATTEMPTS=2 \
-  DURABILITY_RESTART_INTERVAL_SECONDS=0 \
-  "$sed_checker" https://example.test app group expected-sha)
+  DURABILITY_READ_ATTEMPTS=3 DURABILITY_REVISION_ATTEMPTS=2 \
+  DURABILITY_REVISION_INTERVAL_SECONDS=0 \
+  "$sed_checker" https://example.test app group expected-sha durable durable-share)
 
 jq -e '
   .result == "PASS"
-  and .before_restart.student_reads_200 == 3
-  and .before_restart.review_reads_200 == 3
-  and .before_restart.submission_status == 201
-  and .before_restart.review_saved == true
-  and .after_revision_restart.student_reads_200 == 3
-  and .after_revision_restart.review_reads_200 == 3
-  and .after_revision_restart.submission_and_review_persisted == true
+  and .previous_revision == "app--0000040"
+  and .revision == "app--0000041"
+  and .topology.active_revisions == 1
+  and .topology.storage_name == "durable"
+  and .topology.share_name == "durable-share"
+  and .before_new_revision.student_reads_200 == 3
+  and .before_new_revision.review_reads_200 == 3
+  and .before_new_revision.submission_status == 201
+  and .before_new_revision.review_saved == true
+  and .after_new_revision.student_reads_200 == 3
+  and .after_new_revision.review_reads_200 == 3
+  and .after_new_revision.submission_and_review_persisted == true
 ' >/dev/null <<<"$output"
-grep -Fq 'containerapp revision restart' "$test_dir/state/az.log"
+grep -Fq 'containerapp update' "$test_dir/state/az.log"
 [[ $(grep -Fc 'GET https://example.test/api/checkins/student-token' "$test_dir/state/curl.log") == 6 ]]
 [[ $(grep -Fc 'GET https://example.test/api/reviews/review-token' "$test_dir/state/curl.log") == 8 ]]
 
@@ -109,13 +127,13 @@ rm -rf "$test_dir/state"
 mkdir -p "$test_dir/state"
 if MOCK_STATE_DIR="$test_dir/state" MOCK_FAIL_PRIVATE_READ=1 \
   AZ_BIN="$test_dir/bin/az" CURL_BIN="$test_dir/bin/curl" \
-  DURABILITY_READ_ATTEMPTS=1 DURABILITY_RESTART_ATTEMPTS=2 \
-  DURABILITY_RESTART_INTERVAL_SECONDS=0 \
-  "$sed_checker" https://example.test app group expected-sha \
+  DURABILITY_READ_ATTEMPTS=1 DURABILITY_REVISION_ATTEMPTS=2 \
+  DURABILITY_REVISION_INTERVAL_SECONDS=0 \
+  "$sed_checker" https://example.test app group expected-sha durable durable-share \
   >"$test_dir/failure.out" 2>&1; then
   echo 'live durability checker accepted a reproduced private-link 404' >&2
   exit 1
 fi
 grep -Fq 'student-link read 1/1 returned 404, expected 200' "$test_dir/failure.out"
 
-echo 'PASS: live durability checker covers repeated private reads, submit/review, and revision-restart persistence'
+echo 'PASS: live durability checker covers cross-connection private reads, submit/review, and new-revision persistence'

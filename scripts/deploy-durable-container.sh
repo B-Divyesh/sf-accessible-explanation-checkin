@@ -113,6 +113,12 @@ if [[ "$replicas_verified" != true ]]; then
 fi
 
 expected_build_sha=$(git -C "$repo" rev-parse HEAD)
-"$live_durability_checker" "https://$slug.sociobot.in" "$app_name" "$resource_group" "$expected_build_sha"
+"$live_durability_checker" \
+  "https://$slug.sociobot.in" \
+  "$app_name" \
+  "$resource_group" \
+  "$expected_build_sha" \
+  "$storage_name" \
+  "$share_name"
 
-echo "PASS: deployed and verified $app_name with durable /app/data, exactly one SQLite replica, and restart persistence"
+echo "PASS: deployed and verified $app_name with durable /app/data, exactly one SQLite replica, and new-revision persistence"
