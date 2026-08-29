@@ -40,7 +40,9 @@ elif [[ "$args" == "rest --method patch"* ]]; then
   done
   [[ -n "$body" ]]
   printf '%s\n' "$body" > "$MOCK_STATE_DIR/patch.json"
-  : > "$MOCK_STATE_DIR/patched"
+  if [[ "${MOCK_APPLY_PATCH:-1}" == 1 ]]; then
+    : > "$MOCK_STATE_DIR/patched"
+  fi
 elif [[ "$args" == "containerapp show"* ]]; then
   if [[ -f "$MOCK_STATE_DIR/patched" ]]; then
     cat "$MOCK_STATE_DIR/patched-app.json"
@@ -84,5 +86,19 @@ jq -e '
 
 grep -Fxq "accessible-explanation-checkin $repo_root Dockerfile 8080" "$test_dir/fleet-args"
 [[ "$output" == *"PASS: deployed and verified sf-accessible-explanation-9c1a54"* ]]
+
+rm -f "$test_dir/patched"
+if PATH="$test_dir/bin:$PATH" \
+  MOCK_STATE_DIR="$test_dir" \
+  MOCK_APPLY_PATCH=0 \
+  FLEET_DEPLOY_CONTAINER_HELPER="$test_dir/fleet-deploy" \
+  DEPLOY_VERIFY_ATTEMPTS=1 \
+  DEPLOY_VERIFY_INTERVAL_SECONDS=0 \
+  "$script" accessible-explanation-checkin "$repo_root" Dockerfile 8080 \
+  >"$test_dir/nonconverged.out" 2>&1; then
+  echo 'deployment helper succeeded without the required durable topology' >&2
+  exit 1
+fi
+grep -Fq 'did not converge to one replica with durable /app/data' "$test_dir/nonconverged.out"
 
 echo 'PASS @claim:durable-deployment-policy: executed deployment converges to one Azure File-backed SQLite replica'
