@@ -1,6 +1,7 @@
 # Polish 4 — cumulative finding closure
 
-Reviewed candidate: `4d64cc563b09798e80701e427aa5c7df7d8d3da3`.
+Reviewed release candidate: `4d64cc563b09798e80701e427aa5c7df7d8d3da3`.
+Repair source: `0400d23952a7f91447d5b1a51f68f732c25ef242`.
 
 Every review and earlier polish record was read before this repair. The sole
 open issue was F-4-1. Earlier closures below were re-executed rather than
