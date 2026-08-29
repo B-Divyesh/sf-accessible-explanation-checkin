@@ -1,0 +1,12 @@
+{
+  "checked_at": "2026-08-29T09:28:00Z",
+  "candidate": "6c0209c9f783f69e9c6a90fb34aa1ef9765415cf",
+  "single_forwarded_client_concurrent_requests": 300,
+  "live_replicas_during_test": 2,
+  "responses": {"404": 240, "429": 60},
+  "observed_live_allowance": 240,
+  "configured_allowance_per_process": 120,
+  "retry_after_values": ["0"],
+  "all_429_responses_had_retry_after": true,
+  "different_client_status": 404
+}

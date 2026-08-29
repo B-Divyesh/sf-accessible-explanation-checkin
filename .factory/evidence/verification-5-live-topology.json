@@ -1,0 +1,22 @@
+{
+  "checked_at": "2026-08-29T09:26:41Z",
+  "candidate": "6c0209c9f783f69e9c6a90fb34aa1ef9765415cf",
+  "container_app": "sf-accessible-explanation-9c1a54",
+  "revision": "sf-accessible-explanation-9c1a54--0000046",
+  "image": "sociobotregistry.azurecr.io/sf-accessible-explanation-9c1a54:6c0209c9f783",
+  "scale": {"min_replicas": 1, "max_replicas": 3},
+  "running_replicas": [
+    "sf-accessible-explanation-9c1a54--0000046-56b8c987-6kd8t",
+    "sf-accessible-explanation-9c1a54--0000046-56b8c987-jxm5k"
+  ],
+  "volumes": null,
+  "volume_mounts": null,
+  "later_observation": {
+    "checked_at": "2026-08-29T09:48:35Z",
+    "running_replicas": 1,
+    "max_replicas_remained": 3,
+    "volumes_remained": null,
+    "volume_mounts_remained": null
+  },
+  "result": "FAIL"
+}

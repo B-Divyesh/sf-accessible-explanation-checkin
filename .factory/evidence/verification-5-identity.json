@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-08-29T09:26:53Z",
+  "candidate": "6c0209c9f783f69e9c6a90fb34aa1ef9765415cf",
+  "health_status": 200,
+  "health_build_sha": "6c0209c9f783f69e9c6a90fb34aa1ef9765415cf",
+  "root_etag": "W/\"6c0209c9f783f69e9c6a90fb34aa1ef9765415cf\"",
+  "files": {
+    "index.html": {"sha256": "8ff3e0f37547a093e9a3876b3a46b46277728bc874d3eadc15e3785485b05996", "matches_local_build": true},
+    "assets/index-BCVrwGDy.js": {"sha256": "49650e93578cc609cadc6f2bcd4082c1ee166b012e73f9bbc348115b9ed9c314", "matches_local_build": true},
+    "assets/index-CkYimbxM.css": {"sha256": "afa9c4a8402f44e2bc2368210f5a32d9411e4bb099af786fcc188b4fc83c578c", "matches_local_build": true},
+    "manifest.webmanifest": {"sha256": "75b4f6e9d45bdc37543b05160032fcbd5f77b6b83969c06ba9562398476ec8b7", "matches_local_build": true}
+  }
+}
