@@ -261,6 +261,51 @@ test('@claim:offline-demo reloads after its first visit', async ({ context, page
   await context.setOffline(false);
 });
 
+test('@claim:student-draft-local keeps offline edits in the browser and restores them after reconnecting', async ({ context, page }) => {
+  await page.goto('/demo');
+  const { studentUrl } = await createCheckin(page, 'Offline student draft proof');
+  const token = new URL(studentUrl).pathname.split('/').pop();
+  const draftKey = `checkin-draft:${token}`;
+  const submissionRequests: string[] = [];
+  page.on('request', request => {
+    if (request.method() === 'POST' && new URL(request.url()).pathname.endsWith('/submissions')) {
+      submissionRequests.push(request.url());
+    }
+  });
+
+  await page.goto(studentUrl);
+  await page.getByLabel('Your name').fill('Riley Morgan');
+  await page.getByLabel('Write your explanation').fill('I compared both examples.');
+  await page.getByLabel('Mostly').check();
+  expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key) || 'null'), draftKey)).toEqual({
+    student_name: 'Riley Morgan',
+    explanation_text: 'I compared both examples.',
+    confidence: '4',
+  });
+
+  await context.setOffline(true);
+  await expect(page.getByText('Offline. You can keep writing; submission needs a connection.')).toBeVisible();
+  await page.getByLabel('Write your explanation').fill('I compared both examples and changed my conclusion while offline.');
+  await page.getByLabel('Very').check();
+  await expect(page.locator('#announcer')).toHaveText('Draft saved on this device.');
+  expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key) || 'null'), draftKey)).toEqual({
+    student_name: 'Riley Morgan',
+    explanation_text: 'I compared both examples and changed my conclusion while offline.',
+    confidence: '5',
+  });
+
+  await page.getByRole('button', { name: 'Send my explanation' }).click();
+  await expect(page.getByText('Your writing is saved on this device; reconnect and send again.')).toBeVisible();
+  expect(submissionRequests).toEqual([]);
+
+  await context.setOffline(false);
+  await page.reload();
+  await expect(page.getByLabel('Your name')).toHaveValue('Riley Morgan');
+  await expect(page.getByLabel('Write your explanation')).toHaveValue('I compared both examples and changed my conclusion while offline.');
+  await expect(page.getByLabel('Very')).toBeChecked();
+  expect(await page.evaluate(key => localStorage.getItem(key), draftKey)).not.toBeNull();
+});
+
 test('@claim:student-keyboard-flow submits every required student field using only the keyboard', async ({ page }, testInfo) => {
   desktopOnly(testInfo);
   await page.goto('/demo');

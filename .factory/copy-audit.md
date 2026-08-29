@@ -70,3 +70,15 @@ The inaccurate storage-only sentence and unproved infrastructure, completed-dele
 No round 6 sentence exceeds 22 words or contains a banned word. The three
 behavior statements map to `demo-exit-disposal`, `voice-recording-limits`, and
 `teacher-voice-deletion` in `.factory/claims.json`.
+
+## Repair 7 student-flow copy
+
+| Text | Words | Result |
+| --- | ---: | --- |
+| Offline. | 1 | tested connection state |
+| You can keep writing; submission needs a connection. | 8 | tested offline draft behavior |
+| Your writing is saved on this device; reconnect and send again. | 10 | tested local draft and recovery behavior |
+| Draft saved on this device. | 5 | tested browser-local save status |
+
+No student-flow sentence exceeds 22 words or contains a banned word. All four
+statements map to `student-draft-local` in `.factory/claims.json`.
