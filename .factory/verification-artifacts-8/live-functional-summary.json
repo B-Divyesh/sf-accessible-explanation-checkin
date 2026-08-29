@@ -1,0 +1,12 @@
+{
+  "demo": {"banner": true, "sample_responses": 3, "api_requests": 0},
+  "keyboard_focus": {"first": "Skip to main content", "outline": "3px solid rgb(157, 66, 28)"},
+  "axe_serious_critical": 0,
+  "blank_form_validation": "Please fill out this field.",
+  "overlong_title": {"status": 400, "error": "Assignment name must be between 1 and 120 characters."},
+  "missing_explanation": "Add a text explanation, a voice explanation, or both.",
+  "review_reload": {"tag": true, "note": true, "follow_up": true},
+  "csv": {"bytes": 345, "rows": 2, "student_present": true, "teacher_note_present": true},
+  "request_origins": ["https://accessible-explanation-checkin.sociobot.in"],
+  "console_or_page_errors": []
+}

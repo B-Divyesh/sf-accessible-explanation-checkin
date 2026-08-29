@@ -1,0 +1,19 @@
+{
+  "product_api": {
+    "requests": 150,
+    "normal_responses": 127,
+    "http_429": 23,
+    "http_429_with_retry_after": 23,
+    "retry_after_example": "0",
+    "configured_burst": 120,
+    "configured_refill_per_second": 1
+  },
+  "sociobot_license_verify": {
+    "requests": 180,
+    "normal_responses": 31,
+    "http_429": 149,
+    "http_429_with_retry_after": 149,
+    "retry_after_example": "4",
+    "observed_initial_allowance_approx": 30
+  }
+}

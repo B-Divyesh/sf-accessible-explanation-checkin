@@ -1,0 +1,26 @@
+{
+  "checked_at": "2026-08-29T16:49:00Z",
+  "candidate": "33cc77d99a11d16010227138259a90d5cd24c073",
+  "health": {
+    "status": 200,
+    "build_sha": "33cc77d99a11d16010227138259a90d5cd24c073"
+  },
+  "azure": {
+    "revision": "sf-accessible-explanation-9c1a54--0000065",
+    "latest_ready_revision": "sf-accessible-explanation-9c1a54--0000065",
+    "image": "sociobotregistry.azurecr.io/sf-accessible-explanation-9c1a54:33cc77d99a11",
+    "min_replicas": 1,
+    "max_replicas": 3,
+    "running_replicas": 2,
+    "volumes": null,
+    "volume_mounts": null,
+    "environment": ["PORT=8080"]
+  },
+  "fresh_completed_checkin_reads": {
+    "attempts_per_resource": 36,
+    "student": {"http_200": 17, "http_404": 19},
+    "review": {"http_200": 19, "http_404": 17},
+    "receipt": {"http_200": 18, "http_404": 18}
+  },
+  "result": "FAIL"
+}
