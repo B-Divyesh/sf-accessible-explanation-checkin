@@ -1,0 +1,17 @@
+{
+  "checkedAt": "2026-08-29T23:53:16Z",
+  "url": "https://accessible-explanation-checkin.sociobot.in",
+  "tool": "lighthouse 12.8.2",
+  "scores": {
+    "performance": 100,
+    "accessibility": 100,
+    "bestPractices": 100,
+    "seo": 100
+  },
+  "metrics": {
+    "largestContentfulPaintMs": 1080,
+    "cumulativeLayoutShift": 0,
+    "interactionToNextPaintMs": null
+  },
+  "notes": "Passed on retry with Chromium --disable-dev-shm-usage --disable-gpu after the first tab process crashed."
+}
