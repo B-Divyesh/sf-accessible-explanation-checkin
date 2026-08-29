@@ -1,0 +1,20 @@
+{
+  "checked_at": "2026-08-29T15:16:00Z",
+  "method": "fresh check-in followed by 24 no-keepalive reads per private URL",
+  "student_link": {
+    "http_200": 12,
+    "http_404": 12
+  },
+  "teacher_review_link": {
+    "http_200": 13,
+    "http_404": 11
+  },
+  "additional_reproduction": {
+    "created_checkins": 12,
+    "student_link_http_200": 0,
+    "student_link_http_404": 12,
+    "review_link_http_200": 12,
+    "student_submission_http_201": 0,
+    "student_submission_http_404": 12
+  }
+}

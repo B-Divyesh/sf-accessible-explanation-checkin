@@ -1,0 +1,12 @@
+{
+  "checked_at": "2026-08-29T15:13:00Z",
+  "container_app": "sf-accessible-explanation-9c1a54",
+  "latest_revision": "sf-accessible-explanation-9c1a54--0000061",
+  "latest_ready_revision": "sf-accessible-explanation-9c1a54--0000061",
+  "min_replicas": 1,
+  "max_replicas": 3,
+  "volumes": null,
+  "volume_mounts": null,
+  "active_revisions": 1,
+  "running_replicas_observed": 1
+}
