@@ -1,0 +1,10 @@
+{
+  "checkedAt": "2026-08-29T16:07:18.432Z",
+  "requests": 150,
+  "statuses": {
+    "404": 120,
+    "429": 30
+  },
+  "retryAfterOn429": 30,
+  "pass": true
+}

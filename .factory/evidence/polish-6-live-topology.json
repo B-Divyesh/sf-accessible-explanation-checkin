@@ -1,0 +1,29 @@
+{
+  "checkedAt": "2026-08-29T16:08:37Z",
+  "containerApp": "sf-accessible-explanation-9c1a54",
+  "image": "sociobotregistry.azurecr.io/sf-accessible-explanation-9c1a54:5e7a9644efc4",
+  "latestRevision": "sf-accessible-explanation-9c1a54--0000064",
+  "latestReadyRevision": "sf-accessible-explanation-9c1a54--0000064",
+  "minReplicas": 1,
+  "maxReplicas": 1,
+  "volume": {
+    "name": "checkin-data",
+    "storageName": "aec-accessible-explanati-9c1a54",
+    "storageType": "AzureFile",
+    "mountPath": "/app/data"
+  },
+  "activeRevisions": [
+    {
+      "name": "sf-accessible-explanation-9c1a54--0000064",
+      "active": true,
+      "healthState": "Healthy",
+      "provisioningState": "Provisioned",
+      "replicas": 1
+    }
+  ],
+  "runningReplicas": 1,
+  "health": {
+    "status": "ok",
+    "build_sha": "5e7a9644efc483fb226c43cbf024708ef99d91cb"
+  }
+}

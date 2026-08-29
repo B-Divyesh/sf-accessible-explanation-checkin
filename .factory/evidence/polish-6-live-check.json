@@ -1,0 +1,132 @@
+{
+  "checkedAt": "2026-08-29T16:06:49.919Z",
+  "base": "https://accessible-explanation-checkin.sociobot.in",
+  "buildSha": "5e7a9644efc483fb226c43cbf024708ef99d91cb",
+  "routes": [
+    {
+      "route": "/",
+      "status": 200,
+      "title": "Accessible Explanation Check-in — Collect student reasoning",
+      "axeSeriousCritical": 0,
+      "undersizedTargets": 0
+    },
+    {
+      "route": "/demo",
+      "status": 200,
+      "title": "Demo — Accessible Explanation Check-in",
+      "axeSeriousCritical": 0,
+      "undersizedTargets": 0
+    },
+    {
+      "route": "/create",
+      "status": 200,
+      "title": "Create a check-in — Accessible Explanation Check-in",
+      "axeSeriousCritical": 0,
+      "undersizedTargets": 0
+    },
+    {
+      "route": "/pricing",
+      "status": 200,
+      "title": "Plans — Accessible Explanation Check-in",
+      "axeSeriousCritical": 0,
+      "undersizedTargets": 0
+    },
+    {
+      "route": "/privacy",
+      "status": 200,
+      "title": "Privacy — Accessible Explanation Check-in",
+      "axeSeriousCritical": 0,
+      "undersizedTargets": 0
+    },
+    {
+      "route": "/terms",
+      "status": 200,
+      "title": "Terms — Accessible Explanation Check-in",
+      "axeSeriousCritical": 0,
+      "undersizedTargets": 0
+    },
+    {
+      "route": "/no-such-page",
+      "status": 404,
+      "title": "Page not found — Accessible Explanation Check-in",
+      "axeSeriousCritical": 0,
+      "undersizedTargets": 0
+    }
+  ],
+  "darkThemeRoutes": [
+    {
+      "route": "/",
+      "axeSeriousCritical": 0
+    },
+    {
+      "route": "/demo",
+      "axeSeriousCritical": 0
+    },
+    {
+      "route": "/create",
+      "axeSeriousCritical": 0
+    },
+    {
+      "route": "/pricing",
+      "axeSeriousCritical": 0
+    },
+    {
+      "route": "/privacy",
+      "axeSeriousCritical": 0
+    },
+    {
+      "route": "/terms",
+      "axeSeriousCritical": 0
+    },
+    {
+      "route": "/no-such-page",
+      "axeSeriousCritical": 0
+    }
+  ],
+  "crawledLinks": 14,
+  "focus": {
+    "forward": "h1",
+    "back": "h1",
+    "forwardAnnouncement": "Opened Create a student explanation check-in.",
+    "backAnnouncement": "Opened Collect student reasoning."
+  },
+  "demo": {
+    "entry": "/?demo=1",
+    "sampleResponses": 3,
+    "isolatedStorage": true,
+    "reset": true,
+    "exitDiscardsAllDemoKeys": true,
+    "apiRequests": 0,
+    "offlineReload": true
+  },
+  "workflow": {
+    "created": true,
+    "submitted": true,
+    "reviewed": true,
+    "reloadedSavedReview": true,
+    "origins": [
+      "https://accessible-explanation-checkin.sociobot.in"
+    ]
+  },
+  "voice": {
+    "autoStopMilliseconds": 120000,
+    "acceptedBytes": 4194304,
+    "rejectedBytes": 4194305,
+    "earlyDelete": true,
+    "textReceiptAndReviewRetained": true
+  },
+  "checkout": {
+    "catalogPriceMinor": 3900,
+    "currency": "USD",
+    "status": 303,
+    "destination": "checkout.dodopayments.com"
+  },
+  "securityHeaders": [
+    "content-security-policy",
+    "strict-transport-security",
+    "permissions-policy",
+    "x-content-type-options",
+    "referrer-policy"
+  ],
+  "consoleErrors": []
+}

@@ -1,49 +1,114 @@
-# Adversarial review 6 handoff — FAIL
+# Accessible Explanation Check-in — polish 6 handoff
 
-- Work order: `accessible-explanation-checkin-review-6`
-- Repository revision reviewed: `9595291790ab0a928072be63029962e5e0690946`
-- Live build: `483d53c459b569633ce8682503b76447aee4fe19`
+- Work order: `accessible-explanation-checkin-polish-6`
+- Reviewed candidate: `9595291790ab0a928072be63029962e5e0690946`
+- Repair source deployed: `5e7a9644efc483fb226c43cbf024708ef99d91cb`
+- Live revision: `sf-accessible-explanation-9c1a54--0000064`
 - Live URL: <https://accessible-explanation-checkin.sociobot.in>
 - Completed: 2026-08-29 UTC
 
-## Outcome
+## What changed
 
-Review 6 is recorded in `.factory/review-6.md`. No product code was changed.
+- Added the missing 120-second and 4 MiB voice-limit claim. The browser timer,
+  exact accepted boundary, oversized 413 response, and single accepted record
+  are tested.
+- Added the missing teacher voice-deletion claim. Its backend test proves the
+  audio file and metadata are removed while text, receipt, tags, note, and
+  follow-up remain.
+- Demo exit now clears every `demo:` storage key. Returning to `/demo` restores
+  the shipped sample rather than edited state.
+- Replaced the remaining deployment jargon and updated the verb-first catalog
+  description.
+- Added one fresh-worker Playwright retry for isolated Chromium process
+  crashes. The release shards remain serial and fail deterministic assertions.
+- Extended the live audit to cover demo disposal, the recording timer, exact
+  upload boundaries, and early voice deletion against production.
+- Preserved the product-specific classroom doorway, field-note palette, type,
+  layout, and motion system.
 
-The verdict is FAIL. The live deployment has regressed to `minReplicas: 1`,
-`maxReplicas: 3` with no volume or `/app/data` mount. A fresh private student
-link returned 12 successful reads and 12 false 404s; its review link returned
-13 successful reads and 11 false 404s. A second 12-check-in probe reproduced
-student-link and submission 404s on every fresh request context. This reopens
-the earlier F-5-1 durability failure.
+The complete finding-by-finding map is in `.factory/polish-6.md`. The claim
+inventory now contains 24 entries.
 
-The review also records unlisted claims for the 2-minute/4-MB voice limits and
-teacher-initiated early voice deletion, demo edits surviving the transition to
-the real workflow, and one jargon-heavy README sentence.
+## Clean-clone verification
 
-## Verification completed
+Fresh clone: `/tmp/aec-polish6-final.PrzYNP/repo` at
+`0dc87fe3a578a96de0e3451b3aa9811bcf1e33e8`.
 
-- Fresh clone: `/tmp/aec-review6.BvQYAn/repo` at `9595291`.
-- `npm ci`: passed; 86 packages, zero vulnerabilities.
-- `npm run test:all-claims`: passed all 21 listed commands independently.
-- `npm test`: passed; 5 Vitest tests, 12 Rust tests, and deployment fixtures.
-- `npm run build`: passed and produced `dist/`; JS 12.31 kB gzip.
-- `npm run test:e2e`: passed; 43 passed and 9 intentional device skips.
-- Rust formatting and clippy with warnings denied: passed.
-- Live route, metadata, link, focus, demo, offline, request-origin, checkout,
-  security-header, mobile, dark-theme, and Axe audit: passed.
-- Factory `verify-url.sh`: passed with no console errors.
-- Azure topology inspection and fresh cross-connection private-link probes:
-  failed as described above.
+| Command | Result |
+| --- | --- |
+| `npm ci` | Pass: 86 packages, zero vulnerabilities |
+| `npm run test:all-claims` | Pass: 24/24 claim commands |
+| `npm test` | Pass: 5 Vitest tests, 13 Rust tests, and 2 deployment fixtures |
+| `npm run build` | Pass: `dist/` produced; JS 12.43 kB gzip; CSS 5.16 kB gzip |
+| `npm run test:e2e` | Pass: 46 tests; 10 intentional device/fixture skips |
+| `cargo fmt --all -- --check` | Pass |
+| `cargo clippy --all-targets --locked -- -D warnings` | Pass |
 
-Evidence is in `.factory/evidence/review-6-*`.
+Receipt: `.factory/evidence/polish-6-clean-clone.json`.
 
-## Required next steps
+## Deployment and live verification
 
-1. Restore one replica and the Azure File `/app/data` mount through the durable
-   deployment wrapper; prevent later generic deploys from removing them.
-2. Gate release on 24/24 student, review, and receipt reads before and after an
-   actual new revision.
-3. Add tagged claims for recording limits and early teacher voice deletion.
-4. Clear demo state when leaving for the real workflow.
-5. Replace the README deployment jargon and repeat the full review.
+Deployed with:
+
+```sh
+scripts/deploy-durable-container.sh accessible-explanation-checkin /work/repo Dockerfile 8080
+```
+
+The wrapper created revision `0000063`, applied the durable topology, then
+forced a real replacement to revision `0000064`. The final Azure state has:
+
+- `minReplicas = 1` and `maxReplicas = 1`;
+- one active, healthy revision and one running replica;
+- Azure File storage `aec-accessible-explanati-9c1a54` mounted at `/app/data`;
+- `/health` build SHA `5e7a9644efc483fb226c43cbf024708ef99d91cb`.
+
+The deployment gate got 24/24 HTTP 200 reads for the new student, review, and
+receipt URLs before replacement. It repeated all three at 24/24 afterward and
+confirmed the submission and saved teacher review persisted.
+
+Post-deploy checks:
+
+- `npm run audit:live`: pass. Seven routes, real 404 status, 14 crawled links,
+  titles, metadata, focus/history announcements, 390 px touch targets, 200%
+  text, light/dark Axe, zero serious or critical findings, and zero console
+  errors.
+- Demo: pass at `/?demo=1`. Three records load in one click; edits stay in the
+  `demo:` namespace; reset, full exit disposal, and offline reload work.
+- Real workflow: pass. Create, student submission, receipt, teacher review,
+  saved review reload, and same-origin privacy boundary work.
+- Voice: pass. The live UI scheduled exactly 120000 ms; 4194304 decoded bytes
+  were accepted; 4194305 were rejected with 413. Early deletion returned 410
+  for audio while retaining text, receipt, and teacher review fields.
+- Checkout: pass. Public catalog price is USD 39 and checkout returns a 303 to
+  `checkout.dodopayments.com`.
+- Factory `verify-url.sh`: pass with title, `lang=en`, one h1, main landmark,
+  alt text, and no console errors.
+- Rate limiting: pass. A 150-request burst returned 30 HTTP 429 responses, all
+  with `Retry-After`.
+- Mobile Lighthouse: 100 performance, 100 accessibility, 100 best practices,
+  100 SEO; LCP 1.050 s, TBT 5 ms, CLS 0, total transfer 39,081 bytes.
+
+Evidence: `.factory/evidence/polish-6-live-check.json`,
+`.factory/evidence/polish-6-live-durability.json`,
+`.factory/evidence/polish-6-live-topology.json`,
+`.factory/evidence/polish-6-rate-limit.json`,
+`.factory/evidence/polish-6-lighthouse-mobile.json`, and the
+`.factory/evidence/polish-6-*` screenshots.
+
+## Run and deploy
+
+```sh
+npm ci
+npm test
+npm run test:all-claims
+npm run build
+npm run test:e2e
+```
+
+Always deploy with `scripts/deploy-durable-container.sh`; a generic container
+deploy temporarily recreates the unsafe stateless scaling template.
+
+## Known gaps and next steps
+
+None. All findings from reviews 1–6, including every minor finding and each
+reopened issue, are closed and verified on the live deployment.

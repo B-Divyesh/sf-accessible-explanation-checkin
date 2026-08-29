@@ -1,0 +1,32 @@
+{
+  "checkedAt": "2026-08-29T16:04:57Z",
+  "result": "PASS",
+  "baseUrl": "https://accessible-explanation-checkin.sociobot.in",
+  "containerApp": "sf-accessible-explanation-9c1a54",
+  "previousRevision": "sf-accessible-explanation-9c1a54--0000063",
+  "replacementRevision": "sf-accessible-explanation-9c1a54--0000064",
+  "buildSha": "5e7a9644efc483fb226c43cbf024708ef99d91cb",
+  "marker": "durability-20260829T160457Z-42223",
+  "topology": {
+    "minReplicas": 1,
+    "maxReplicas": 1,
+    "azureFilesMount": "/app/data",
+    "storageName": "aec-accessible-explanati-9c1a54",
+    "shareName": "sf-accessible-explanation-checkin-data",
+    "activeRevisions": 1,
+    "runningReplicas": 1
+  },
+  "beforeReplacement": {
+    "studentReads200": 24,
+    "reviewReads200": 24,
+    "receiptReads200": 24,
+    "submissionStatus": 201,
+    "reviewSaved": true
+  },
+  "afterReplacement": {
+    "studentReads200": 24,
+    "reviewReads200": 24,
+    "receiptReads200": 24,
+    "submissionAndReviewPersisted": true
+  }
+}
