@@ -8,6 +8,7 @@ slug=${1:-accessible-explanation-checkin}
 repo=${2:-/work/repo}
 dockerfile=${3:-Dockerfile}
 port=${4:-8080}
+fleet_deploy_helper=${FLEET_DEPLOY_CONTAINER_HELPER:-/opt/fleet/lib/deploy-container.sh}
 resource_group=${AZURE_RESOURCE_GROUP:-sociobot}
 environment=${AZURE_CONTAINERAPP_ENV:-factory-env}
 storage_account=${AZURE_STORAGE_ACCOUNT:-sociobotblob}
@@ -24,7 +25,7 @@ if [ ${#storage_name} -gt 32 ]; then
 fi
 share_name="sf-${slug}-data"
 
-/opt/fleet/lib/deploy-container.sh "$slug" "$repo" "$dockerfile" "$port"
+"$fleet_deploy_helper" "$slug" "$repo" "$dockerfile" "$port"
 
 # These operations are idempotent. The access key is handed only to Azure's
 # managed-environment storage registration, never to the container image.
@@ -48,4 +49,35 @@ az rest --method patch \
   --url "https://management.azure.com/subscriptions/$subscription/resourceGroups/$resource_group/providers/Microsoft.App/containerApps/$app_name?api-version=2024-03-01" \
   --body "$payload" --output none
 
-echo "PASS: deployed $app_name with durable /app/data and exactly one SQLite replica"
+# Do not report a successful deployment until the control plane returns the
+# effective topology. The generic factory deploy deliberately creates a
+# stateless 1–3 replica template, so this verification prevents that
+# intermediate template from being mistaken for the final SQLite deployment.
+verified=false
+for _ in $(seq 1 "${DEPLOY_VERIFY_ATTEMPTS:-30}"); do
+  effective=$(az containerapp show --resource-group "$resource_group" --name "$app_name" --output json)
+  if jq -e --arg storage "$storage_name" '
+    .properties.template.scale.minReplicas == 1
+    and .properties.template.scale.maxReplicas == 1
+    and any(.properties.template.volumes[]?;
+      .name == "checkin-data"
+      and .storageType == "AzureFile"
+      and .storageName == $storage)
+    and any(.properties.template.containers[]?;
+      .name == "app"
+      and any(.volumeMounts[]?;
+        .volumeName == "checkin-data"
+        and .mountPath == "/app/data"))
+  ' >/dev/null <<<"$effective"; then
+    verified=true
+    break
+  fi
+  sleep "${DEPLOY_VERIFY_INTERVAL_SECONDS:-10}"
+done
+
+if [[ "$verified" != true ]]; then
+  echo "ERROR: $app_name did not converge to one replica with durable /app/data" >&2
+  exit 1
+fi
+
+echo "PASS: deployed and verified $app_name with durable /app/data and exactly one SQLite replica"
