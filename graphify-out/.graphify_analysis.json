@@ -1,21 +1,85 @@
 {
   "communities": {
     "0": [
+      "frontend_src_main",
+      "frontend_src_main_announce",
+      "frontend_src_main_api",
+      "frontend_src_main_blobbase64",
+      "frontend_src_main_capturelicense",
+      "frontend_src_main_checkin",
+      "frontend_src_main_copytext",
+      "frontend_src_main_createcheckin",
+      "frontend_src_main_createpage",
+      "frontend_src_main_csvcell",
+      "frontend_src_main_demopage",
+      "frontend_src_main_demoseed",
+      "frontend_src_main_demosubmission",
+      "frontend_src_main_demosubmissions",
+      "frontend_src_main_downloaddemocsv",
+      "frontend_src_main_errormessage",
+      "frontend_src_main_focusandannounceroute",
+      "frontend_src_main_home",
+      "frontend_src_main_isdemo",
+      "frontend_src_main_loaderror",
+      "frontend_src_main_notfound",
+      "frontend_src_main_paidstatus",
+      "frontend_src_main_pricingpage",
+      "frontend_src_main_privacypage",
+      "frontend_src_main_receiptpage",
+      "frontend_src_main_recentlinks",
+      "frontend_src_main_removevoice",
+      "frontend_src_main_render",
+      "frontend_src_main_renderreceipt",
+      "frontend_src_main_renderreview",
+      "frontend_src_main_renderstudent",
+      "frontend_src_main_retentionoptions",
+      "frontend_src_main_review",
+      "frontend_src_main_reviewpage",
+      "frontend_src_main_routedescription",
+      "frontend_src_main_routeparts",
+      "frontend_src_main_savedemo",
+      "frontend_src_main_savedraft",
+      "frontend_src_main_saverecent",
+      "frontend_src_main_savereview",
+      "frontend_src_main_setmeta",
+      "frontend_src_main_setmetadata",
+      "frontend_src_main_setnetwork",
+      "frontend_src_main_setuprecorder",
+      "frontend_src_main_shell",
+      "frontend_src_main_showerror",
+      "frontend_src_main_studentpage",
+      "frontend_src_main_submission",
+      "frontend_src_main_submissioncard",
+      "frontend_src_main_submitstudent",
+      "frontend_src_main_tags",
+      "frontend_src_main_termspage",
+      "frontend_src_main_verifypastedlicense",
+      "frontend_src_main_wirecopy",
+      "frontend_src_main_wiredemocontrols",
+      "frontend_src_main_wirelinks",
+      "frontend_src_main_wiretheme",
+      "frontend_src_utils",
+      "frontend_src_utils_escapehtml",
+      "frontend_src_utils_formatdate",
+      "frontend_src_utils_test",
+      "frontend_src_utils_validretention"
+    ],
+    "1": [
       "arc",
       "client",
       "from",
       "json",
-      "self",
+      "option",
+      "path",
+      "pathbuf",
+      "sqlitepool",
       "sqliterow",
       "src_routes",
       "src_routes_apierror",
-      "src_routes_apierror_from",
       "src_routes_apierror_into_response",
       "src_routes_appstate",
       "src_routes_clean",
       "src_routes_cleanup_expired_voice",
-      "src_routes_complete_free_checkin_flow",
-      "src_routes_concurrent_submissions_stop_exactly_at_the_free_limit",
       "src_routes_create_checkin",
       "src_routes_create_submission",
       "src_routes_createcheckin",
@@ -31,7 +95,6 @@
       "src_routes_get_voice",
       "src_routes_health",
       "src_routes_io_error",
-      "src_routes_json_response",
       "src_routes_license_valid",
       "src_routes_newsubmission",
       "src_routes_not_found",
@@ -40,29 +103,23 @@
       "src_routes_publiccheckin",
       "src_routes_review",
       "src_routes_reviewupdate",
-      "src_routes_router",
       "src_routes_row_to_submission",
       "src_routes_rs_error",
-      "src_routes_rs_option",
-      "src_routes_rs_path",
-      "src_routes_rs_pathbuf",
       "src_routes_rs_response",
       "src_routes_rs_result",
-      "src_routes_rs_sqlitepool",
       "src_routes_rs_state",
       "src_routes_rs_string",
       "src_routes_submission",
-      "src_routes_test_app",
+      "src_routes_test_state",
       "src_routes_token",
       "src_routes_trims_and_validates_input",
       "src_routes_update_submission",
       "statuscode",
       "submission",
-      "tempdir",
       "value",
       "vec"
     ],
-    "1": [
+    "2": [
       "axe_core_playwright",
       "concurrently",
       "package",
@@ -87,6 +144,7 @@
       "package_scripts_test_deploy_helper",
       "package_scripts_test_deployment_policy",
       "package_scripts_test_e2e",
+      "package_scripts_test_runtime_policy",
       "package_type",
       "package_version",
       "playwright_test",
@@ -95,7 +153,7 @@
       "vite",
       "vitest"
     ],
-    "2": [
+    "3": [
       "frontend_tsconfig",
       "frontend_tsconfig_compileroptions",
       "frontend_tsconfig_compileroptions_allowimportingtsextensions",
@@ -120,61 +178,25 @@
       "ref_vite_config_ts",
       "ref_vitest_globals"
     ],
-    "3": [
-      "frontend_src_main",
-      "frontend_src_main_checkin",
-      "frontend_src_main_copytext",
-      "frontend_src_main_csvcell",
-      "frontend_src_main_demopage",
-      "frontend_src_main_demoseed",
-      "frontend_src_main_demosubmission",
-      "frontend_src_main_demosubmissions",
-      "frontend_src_main_downloaddemocsv",
-      "frontend_src_main_recentlinks",
-      "frontend_src_main_renderreceipt",
-      "frontend_src_main_review",
-      "frontend_src_main_savedemo",
-      "frontend_src_main_submission",
-      "frontend_src_main_submissioncard",
-      "frontend_src_main_tags",
-      "frontend_src_main_wirecopy",
-      "frontend_src_utils_formatdate"
-    ],
     "4": [
       "box",
-      "error",
       "next",
       "request",
-      "response",
-      "result",
       "src_main",
       "src_main_config_source",
       "src_main_config_value",
       "src_main_main",
       "src_main_not_found_page",
+      "src_main_rate_limit_uses_forwarded_client_ip_and_returns_retry_after",
       "src_main_response_policy",
-      "src_main_shutdown",
-      "state",
-      "string"
+      "src_main_rs_error",
+      "src_main_rs_response",
+      "src_main_rs_result",
+      "src_main_rs_state",
+      "src_main_rs_string",
+      "src_main_shutdown"
     ],
     "5": [
-      "frontend_src_main_home",
-      "frontend_src_main_isdemo",
-      "frontend_src_main_loaderror",
-      "frontend_src_main_notfound",
-      "frontend_src_main_privacypage",
-      "frontend_src_main_receiptpage",
-      "frontend_src_main_render",
-      "frontend_src_main_routedescription",
-      "frontend_src_main_routeparts",
-      "frontend_src_main_setmeta",
-      "frontend_src_main_setmetadata",
-      "frontend_src_main_setnetwork",
-      "frontend_src_main_shell",
-      "frontend_src_main_studentpage",
-      "frontend_src_main_termspage"
-    ],
-    "6": [
       "src_db",
       "src_db_connect",
       "src_db_durable_snapshot_round_trips_a_local_database_file",
@@ -189,6 +211,18 @@
       "src_db_save_snapshot",
       "src_db_sqlite_path"
     ],
+    "6": [
+      "self",
+      "src_routes_apierror_from",
+      "src_routes_claim_classroom_plus_limits",
+      "src_routes_claim_voice_retention_deletion",
+      "src_routes_complete_free_checkin_flow",
+      "src_routes_concurrent_submissions_stop_exactly_at_the_free_limit",
+      "src_routes_json_response",
+      "src_routes_router",
+      "src_routes_test_app",
+      "tempdir"
+    ],
     "7": [
       "headermap",
       "intoresponse",
@@ -200,126 +234,99 @@
       "src_http_policy_set_etag"
     ],
     "8": [
-      "frontend_src_main_announce",
-      "frontend_src_main_focusandannounceroute",
-      "frontend_src_main_renderstudent",
-      "frontend_src_main_savedraft",
-      "frontend_src_main_setuprecorder",
-      "frontend_src_main_wiredemocontrols",
-      "frontend_src_main_wiretheme"
-    ],
-    "9": [
-      "frontend_src_main_api",
-      "frontend_src_main_errormessage",
-      "frontend_src_main_removevoice",
-      "frontend_src_main_renderreview",
-      "frontend_src_main_reviewpage",
-      "frontend_src_main_savereview"
-    ],
-    "10": [
-      "frontend_src_main_blobbase64",
-      "frontend_src_main_createcheckin",
-      "frontend_src_main_saverecent",
-      "frontend_src_main_showerror",
-      "frontend_src_main_submitstudent",
-      "frontend_src_main_wirelinks"
-    ],
-    "11": [
-      "frontend_src_main_capturelicense",
-      "frontend_src_main_createpage",
-      "frontend_src_main_paidstatus",
-      "frontend_src_main_pricingpage",
-      "frontend_src_main_retentionoptions",
-      "frontend_src_main_verifypastedlicense"
-    ],
-    "12": [
       "frontend_src_config",
       "frontend_src_config_billing_base_url",
       "frontend_src_config_product_slug",
       "frontend_src_config_test"
     ],
-    "13": [
-      "frontend_src_utils",
-      "frontend_src_utils_escapehtml",
-      "frontend_src_utils_test",
-      "frontend_src_utils_validretention"
+    "9": [
+      "frontend_tests_claims_spec",
+      "frontend_tests_claims_spec_createcheckin",
+      "frontend_tests_claims_spec_desktoponly",
+      "frontend_tests_claims_spec_tabto"
     ],
-    "14": [
+    "10": [
+      "frontend_tests_app_spec",
+      "frontend_tests_app_spec_expectaccessible",
+      "test"
+    ],
+    "11": [
+      "scripts_test_nonroot_runtime",
+      "scripts_test_nonroot_runtime_cleanup",
+      "scripts_test_nonroot_runtime_sh__entry"
+    ],
+    "12": [
       "frontend_public_sw",
       "frontend_public_sw_shell"
     ],
-    "15": [
-      "frontend_tests_app_spec",
-      "frontend_tests_app_spec_expectaccessible"
-    ],
-    "16": [
+    "13": [
       "scripts_deploy_durable_container",
       "scripts_deploy_durable_container_sh__entry"
     ],
-    "17": [
+    "14": [
       "scripts_test_container_build_identity",
       "scripts_test_container_build_identity_sh__entry"
     ],
-    "18": [
+    "15": [
       "scripts_test_deploy_container_name",
       "scripts_test_deploy_container_name_sh__entry"
     ],
-    "19": [
+    "16": [
       "scripts_test_durable_deploy",
       "scripts_test_durable_deploy_sh__entry"
     ],
-    "20": [
+    "17": [
+      "error"
+    ],
+    "18": [
       "frontend_playwright_config"
     ],
-    "21": [
-      "frontend_tests_claims_spec"
-    ],
-    "22": [
+    "19": [
       "frontend_vite_config"
     ],
-    "23": [
-      "option"
-    ],
-    "24": [
-      "path"
-    ],
-    "25": [
-      "pathbuf"
-    ],
-    "26": [
+    "20": [
       "pkg_accessible_explanation_checkin"
     ],
+    "21": [
+      "response"
+    ],
+    "22": [
+      "result"
+    ],
+    "23": [
+      "src_routes_rs_option"
+    ],
+    "24": [
+      "src_routes_rs_path"
+    ],
+    "25": [
+      "src_routes_rs_pathbuf"
+    ],
+    "26": [
+      "src_routes_rs_sqlitepool"
+    ],
     "27": [
-      "src_main_rs_error"
+      "state"
     ],
     "28": [
-      "src_main_rs_response"
-    ],
-    "29": [
-      "src_main_rs_result"
-    ],
-    "30": [
-      "src_main_rs_state"
-    ],
-    "31": [
-      "src_main_rs_string"
+      "string"
     ]
   },
   "cohesion": {
-    "0": 0.1152542372881356,
-    "1": 0.06451612903225806,
-    "2": 0.08695652173913043,
-    "3": 0.17647058823529413,
-    "4": 0.17142857142857143,
-    "5": 0.22857142857142856,
-    "6": 0.28205128205128205,
+    "0": 0.08619777895293496,
+    "1": 0.13570391872278664,
+    "2": 0.0625,
+    "3": 0.08695652173913043,
+    "4": 0.15833333333333333,
+    "5": 0.28205128205128205,
+    "6": 0.3333333333333333,
     "7": 0.35714285714285715,
-    "8": 0.3333333333333333,
-    "9": 0.5333333333333333,
-    "10": 0.3333333333333333,
-    "11": 0.3333333333333333,
-    "12": 0.8333333333333334,
-    "13": 0.8333333333333334,
+    "8": 0.8333333333333334,
+    "9": 0.5,
+    "10": 0.6666666666666666,
+    "11": 0.6666666666666666,
+    "12": 1.0,
+    "13": 1.0,
     "14": 1.0,
     "15": 1.0,
     "16": 1.0,
@@ -334,10 +341,7 @@
     "25": 1.0,
     "26": 1.0,
     "27": 1.0,
-    "28": 1.0,
-    "29": 1.0,
-    "30": 1.0,
-    "31": 1.0
+    "28": 1.0
   },
   "gods": [
     {
@@ -346,14 +350,14 @@
       "degree": 23
     },
     {
-      "id": "src_routes_apierror",
-      "label": "ApiError",
+      "id": "src_routes_appstate",
+      "label": "AppState",
       "degree": 21
     },
     {
-      "id": "src_routes_appstate",
-      "label": "AppState",
-      "degree": 20
+      "id": "src_routes_apierror",
+      "label": "ApiError",
+      "degree": 21
     },
     {
       "id": "frontend_src_main_render",
@@ -371,8 +375,8 @@
       "degree": 15
     },
     {
-      "id": "src_routes_export_csv",
-      "label": "export_csv()",
+      "id": "frontend_tsconfig_compileroptions",
+      "label": "compilerOptions",
       "degree": 13
     },
     {
@@ -381,19 +385,19 @@
       "degree": 13
     },
     {
-      "id": "frontend_tsconfig_compileroptions",
-      "label": "compilerOptions",
+      "id": "src_routes_export_csv",
+      "label": "export_csv()",
       "degree": 13
     },
     {
-      "id": "frontend_src_main_announce",
-      "label": "announce()",
-      "degree": 11
+      "id": "package_scripts",
+      "label": "scripts",
+      "degree": 12
     }
   ],
   "surprises": [
     {
-      "source": "renderReceipt()",
+      "source": "recentLinks()",
       "target": "formatDate()",
       "source_files": [
         "frontend/src/main.ts",
@@ -404,7 +408,7 @@
       "why": "cross-file semantic connection"
     },
     {
-      "source": "recentLinks()",
+      "source": "renderReceipt()",
       "target": "formatDate()",
       "source_files": [
         "frontend/src/main.ts",
