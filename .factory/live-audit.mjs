@@ -4,6 +4,7 @@ import { chromium } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 const base = process.env.AUDIT_BASE_URL || 'https://accessible-explanation-checkin.sociobot.in';
+const evidencePrefix = process.env.AUDIT_EVIDENCE_PREFIX || 'repair-3';
 const evidenceDir = new URL('./evidence/', import.meta.url);
 await mkdir(evidenceDir, { recursive: true });
 
@@ -61,7 +62,7 @@ for (const [route, wanted] of expected) {
   const severe = axe.violations.filter(violation => ['serious', 'critical'].includes(violation.impact || ''));
   assert.deepEqual(severe, [], `${route} serious/critical axe findings`);
   if (route === '/no-such-page') {
-    await page.screenshot({ path: new URL('./evidence/polish-4-live-404-mobile.png', import.meta.url).pathname, fullPage: true });
+    await page.screenshot({ path: new URL(`./evidence/${evidencePrefix}-live-404-mobile.png`, import.meta.url).pathname, fullPage: true });
   }
   await page.evaluate(() => { document.documentElement.style.fontSize = '32px'; });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth), false, `${route} 200% text overflow`);
@@ -140,7 +141,7 @@ await demoContext.setOffline(true);
 await demo.reload({ waitUntil: 'domcontentloaded' });
 await demo.getByRole('heading', { name: 'Watershed reasoning' }).waitFor();
 await demoContext.setOffline(false);
-await demo.screenshot({ path: new URL('./evidence/polish-4-live-demo-cold-mobile.png', import.meta.url).pathname, fullPage: true });
+await demo.screenshot({ path: new URL(`./evidence/${evidencePrefix}-live-demo-mobile.png`, import.meta.url).pathname, fullPage: true });
 await demoContext.close();
 
 const flowContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
@@ -208,7 +209,7 @@ const report = {
   securityHeaders: ['content-security-policy', 'strict-transport-security', 'permissions-policy', 'x-content-type-options', 'referrer-policy'],
   consoleErrors: unexpectedConsoleErrors,
 };
-await writeFile(new URL('./evidence/polish-4-live-check.json', import.meta.url), `${JSON.stringify(report, null, 2)}\n`);
+await writeFile(new URL(`./evidence/${evidencePrefix}-live-check.json`, import.meta.url), `${JSON.stringify(report, null, 2)}\n`);
 console.log(JSON.stringify(report, null, 2));
 await context.close();
 await browser.close();
