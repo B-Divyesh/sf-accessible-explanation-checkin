@@ -6,8 +6,8 @@
   `npm run verify:live-topology`.
 - Live URL: <https://accessible-explanation-checkin.sociobot.in>
 - Verified UTC: 2026-08-30
-- Live revision after the durable replacement check:
-  `sf-accessible-explanation-9c1a54--0000107`
+- Live topology is verified against the current revision by
+  `npm run verify:live-topology`.
 
 ## Release blockers repaired
 
@@ -23,8 +23,8 @@
    The wrapper also ran its cross-revision private-record check. It created a
    record, submitted and reviewed it, replaced the revision, then re-read the
    student, review, and receipt links 24 times each before and after the
-   replacement. A further direct durability run advanced the app to revision
-   `0000107`. The final read-only gate reports a matching build and image
+   replacement. A further direct durability run repeated the same check. The
+   final read-only gate reports a matching build and image
    identity, one active/running/ready replica, and the expected
    `sf-accessible-explanation-checkin-data` share.
 
@@ -63,7 +63,7 @@
 | Container identity/runtime/deployment tests | PASS — non-root runtime, build identity, one-replica Azure File policy |
 | `npm run test:all-claims` | PASS — all 25 declared claim commands, including the real live topology claim |
 | `npm run test:e2e` | PASS — complete desktop and 390px Chromium app and claim suites |
-| `npm run verify:live-topology` | PASS — revision `0000107`, one active/ready/running replica, `/app/data` Azure File mount, live SHA matches |
+| `npm run verify:live-topology` | PASS — current revision, one active/ready/running replica, `/app/data` Azure File mount, live SHA matches |
 | `AUDIT_EVIDENCE_PREFIX=repair-11 npm run audit:live` | PASS — seven routes/light and dark themes, 200% text, axe, keyboard route focus, demo reset/isolation/offline reload, privacy boundary, workflow, voice limits, checkout, headers, and no console errors |
 | Lighthouse 12.8.2 mobile | PASS — Performance 99, Accessibility 100, Best Practices 100, SEO 100; LCP 1153 ms; CLS 0 |
 
