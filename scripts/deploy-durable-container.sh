@@ -28,7 +28,10 @@ share_name="sf-${slug}-data"
 # environment-storage limit, so reuse the product share already registered by
 # the factory and patch only the revision template. This wrapper never creates
 # a share, account key, or environment storage resource.
-"$fleet_deploy_helper" "$slug" "$repo" "$dockerfile" "$port"
+# The factory environment also exports WO_DATA_DIR. Do not let the generic
+# helper attempt to register its overlong derived storage name before this
+# wrapper attaches the existing, valid environment-storage resource below.
+WO_DATA_DIR= "$fleet_deploy_helper" "$slug" "$repo" "$dockerfile" "$port"
 
 app=$($az_bin containerapp show --resource-group "$resource_group" --name "$app_name" --output json)
 template=$(jq --arg storage "$storage_name" --arg mount "$data_dir" '

@@ -20,6 +20,7 @@ cat > "$test_dir/fleet-deploy" <<'MOCK'
 #!/usr/bin/env bash
 set -euo pipefail
 printf '%s\n' "$*" > "$MOCK_STATE_DIR/fleet-args"
+printf '%s\n' "${WO_DATA_DIR-unset}" > "$MOCK_STATE_DIR/fleet-data-dir"
 MOCK
 
 cat > "$test_dir/live-checker" <<'MOCK'
@@ -111,6 +112,7 @@ run_deploy() {
 
 output=$(run_deploy)
 grep -Fxq "accessible-explanation-checkin $repo_root Dockerfile 8080" "$test_dir/state/fleet-args"
+grep -Fxq '' "$test_dir/state/fleet-data-dir"
 grep -Eq "^https://accessible-explanation-checkin.sociobot.in sf-accessible-explanation-9c1a54 sociobot [a-f0-9]{40} $storage_name $share_name$" "$test_dir/state/live-checker-args"
 [[ "$output" == *"PASS: deployed and verified sf-accessible-explanation-9c1a54 with durable /data"* ]]
 [[ "$output" == *'"result": "PASS"'* ]]
@@ -144,6 +146,7 @@ if rg -q 'az storage|storage account keys|env storage set|storage share create' 
   exit 1
 fi
 rg -Fq 'data_dir=${DEPLOY_DATA_DIR:-/data}' "$script"
+rg -Fq 'WO_DATA_DIR= "$fleet_deploy_helper"' "$script"
 rg -Fq 'minReplicas: 1, maxReplicas: 1' "$script"
 
 echo 'PASS @claim:durable-deployment-policy: registered Azure Files mounts at /data, one replica is patched, and verifier-15 multi-replica state is rejected'
