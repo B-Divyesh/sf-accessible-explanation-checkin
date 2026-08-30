@@ -54,8 +54,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // copy the committed database to /data after every mutation. With the
     // deployment's one replica, this retains records across revisions without
     // exposing the database to Azure Files locking semantics.
-    let (persistence_dir, persistence_supplied) = config_value("PERSISTENCE_DIR", &data_dir);
-    let persistence_dir = Some(PathBuf::from(persistence_dir));
+    let (persistence_dir, persistence_supplied) = persistence_dir_for(
+        &data_dir,
+        database_supplied,
+        std::env::var("PERSISTENCE_DIR").ok().as_deref(),
+    );
     tracing::info!(
         database = config_source(database_supplied),
         data_dir = config_source(data_dir_supplied),
@@ -64,7 +67,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         dist = config_source(dist_supplied),
         billing = config_source(billing_supplied),
         build_sha = config_source(build_sha_supplied),
-        persistence = config_source(persistence_supplied),
+        persistence = if persistence_dir.is_some() {
+            config_source(persistence_supplied)
+        } else {
+            "disabled_for_database_override"
+        },
         "runtime configuration initialized"
     );
     let database_file = db::sqlite_path(&database_url);
@@ -207,6 +214,21 @@ fn database_url_for(runtime_dir: &Path) -> String {
     )
 }
 
+fn persistence_dir_for(
+    data_dir: &str,
+    database_supplied: bool,
+    persistence_override: Option<&str>,
+) -> (Option<PathBuf>, bool) {
+    match persistence_override.filter(|value| !value.trim().is_empty()) {
+        Some(value) => (Some(PathBuf::from(value)), true),
+        // Test and maintenance commands often point DATABASE_URL at a fresh
+        // database. They must not restore or overwrite the real snapshot
+        // unless PERSISTENCE_DIR was explicitly supplied too.
+        None if database_supplied => (None, false),
+        None => (Some(PathBuf::from(data_dir)), false),
+    }
+}
+
 fn data_dir_for(candidate: &Path) -> String {
     if candidate.is_dir() {
         candidate.display().to_string()
@@ -264,6 +286,19 @@ mod tests {
         assert_eq!(
             database_url_for(Path::new("/tmp/checkin-runtime")),
             "sqlite:/tmp/checkin-runtime/checkins.db?mode=rwc"
+        );
+    }
+
+    #[test]
+    fn database_override_does_not_restore_or_replace_the_default_snapshot() {
+        assert_eq!(
+            persistence_dir_for("/data", true, None),
+            (None, false),
+            "an explicit database needs an explicit persistence directory"
+        );
+        assert_eq!(
+            persistence_dir_for("/data", true, Some("/test-snapshot")),
+            (Some(PathBuf::from("/test-snapshot")), true)
         );
     }
 
