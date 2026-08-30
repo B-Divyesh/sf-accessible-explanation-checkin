@@ -18,7 +18,7 @@ FROM debian:bookworm-slim AS runtime
 ARG BUILD_SHA=development
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/* \
     && groupadd --system checkin && useradd --system --gid checkin --home-dir /app checkin \
-    && mkdir -p /data/uploads && chown -R checkin:checkin /app /data
+    && mkdir -p /app /data/uploads && chown -R checkin:checkin /app /data
 WORKDIR /app
 COPY --from=backend /app/target/release/accessible-explanation-checkin /app/server
 COPY --from=frontend /app/dist /app/dist
