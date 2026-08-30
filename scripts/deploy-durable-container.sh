@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Deploy through the factory helper with the work-order durable-data contract.
-# SQLite cannot safely be replicated across independent container filesystems.
+# Deploy through the factory helper, then apply this work order's /data mount
+# to the same revision template. SQLite cannot safely be replicated across
+# independent container filesystems.
 set -euo pipefail
 
 slug=${1:-accessible-explanation-checkin}
@@ -12,6 +13,8 @@ live_durability_checker=${LIVE_DURABILITY_CHECKER:-$repo/scripts/verify-live-dur
 live_topology_checker=${LIVE_TOPOLOGY_CHECKER:-$repo/scripts/verify-live-topology.sh}
 resource_group=${AZURE_RESOURCE_GROUP:-sociobot}
 data_dir=${DEPLOY_DATA_DIR:-/data}
+storage_name=${DEPLOY_STORAGE_NAME:-aec-accessible-explanati-9c1a54}
+az_bin=${AZ_BIN:-az}
 
 app_name="sf-$slug"
 if [ ${#app_name} -gt 32 ]; then
@@ -20,24 +23,29 @@ if [ ${#app_name} -gt 32 ]; then
 fi
 share_name="sf-${slug}-data"
 
-# The helper owns the Azure Files resource and the Container App template. It
-# must receive the work order's data_dir on the operation that builds the
-# revision; a later side patch can otherwise be overwritten by a generic
-# 1–3-replica deployment.
-WO_DATA_DIR="$data_dir" "$fleet_deploy_helper" "$slug" "$repo" "$dockerfile" "$port"
+# The factory helper builds the image and keeps the app's ingress, identity and
+# secrets. Its automatic Azure-storage resource name exceeds this product's
+# environment-storage limit, so reuse the product share already registered by
+# the factory and patch only the revision template. This wrapper never creates
+# a share, account key, or environment storage resource.
+"$fleet_deploy_helper" "$slug" "$repo" "$dockerfile" "$port"
 
-effective=$(az containerapp show --resource-group "$resource_group" --name "$app_name" --output json)
-storage_name=$(jq -er --arg mount "$data_dir" '
-  (.properties.template.volumes // []) as $volumes
-  | first(.properties.template.containers[]? | select(.name == "app")
-      | .volumeMounts[]? | select(.mountPath == $mount)
-      | .volumeName as $volume
-      | $volumes[]? | select(.name == $volume and .storageType == "AzureFile")
-      | .storageName)
-' <<<"$effective") || {
-  echo "ERROR: $app_name did not deploy an Azure File volume at $data_dir" >&2
-  exit 1
-}
+app=$($az_bin containerapp show --resource-group "$resource_group" --name "$app_name" --output json)
+template=$(jq --arg storage "$storage_name" --arg mount "$data_dir" '
+  .properties.template
+  | .scale = {minReplicas: 1, maxReplicas: 1}
+  | .volumes = ((.volumes // [] | map(select(.name != "data")))
+      + [{name: "data", storageType: "AzureFile", storageName: $storage}])
+  | .containers |= map(if .name == "app" then
+      .volumeMounts = ((.volumeMounts // [] | map(select(.mountPath != $mount)))
+        + [{volumeName: "data", mountPath: $mount}])
+    else . end)
+' <<<"$app")
+payload=$(jq -n --argjson template "$template" '{properties:{template:$template}}')
+subscription=$($az_bin account show --query id --output tsv)
+$az_bin rest --method patch \
+  --url "https://management.azure.com/subscriptions/$subscription/resourceGroups/$resource_group/providers/Microsoft.App/containerApps/$app_name?api-version=2024-03-01" \
+  --body "$payload" --output none
 
 expected_build_sha=$(git -C "$repo" rev-parse HEAD)
 

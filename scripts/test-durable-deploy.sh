@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Regression coverage for the verifier-15 production failure. The production
-# helper must receive the work-order /data contract on the build that creates
-# the revision; a later mount patch is vulnerable to being overwritten by a
-# generic 1–3 replica deployment.
+# Regression coverage for the verifier-15 production failure. The factory
+# helper creates the image revision, then this product wrapper attaches the
+# already-registered product Azure File share at the work-order's /data mount
+# and pins SQLite to one replica. A later generic 1–3 replica deployment must
+# be rejected by the final live topology gate.
 set -euo pipefail
 
 repo_root=$(cd "$(dirname "$0")/.." && pwd)
@@ -19,14 +20,6 @@ cat > "$test_dir/fleet-deploy" <<'MOCK'
 #!/usr/bin/env bash
 set -euo pipefail
 printf '%s\n' "$*" > "$MOCK_STATE_DIR/fleet-args"
-printf '%s\n' "${WO_DATA_DIR:-}" > "$MOCK_STATE_DIR/fleet-data-dir"
-[[ "${WO_DATA_DIR:-}" == /data ]] || {
-  echo 'factory helper did not receive the required /data deployment contract' >&2
-  exit 1
-}
-if [[ "${MOCK_APPLY_DURABLE:-1}" == 1 ]]; then
-  cp "$MOCK_STATE_DIR/durable-app.json" "$MOCK_STATE_DIR/app.json"
-fi
 MOCK
 
 cat > "$test_dir/live-checker" <<'MOCK'
@@ -54,6 +47,19 @@ case "$args" in
   'containerapp env storage show '*) cat "$MOCK_STATE_DIR/storage.json" ;;
   'containerapp revision list '*) cat "$MOCK_STATE_DIR/revisions.json" ;;
   'containerapp replica list '*) cat "$MOCK_STATE_DIR/replicas.json" ;;
+  'account show '*) printf 'subscription-test\n' ;;
+  'rest --method patch '*)
+    body=''
+    while (($#)); do
+      if [[ "$1" == --body ]]; then
+        body=$2
+        break
+      fi
+      shift
+    done
+    printf '%s' "$body" > "$MOCK_STATE_DIR/template-patch.json"
+    cp "$MOCK_STATE_DIR/durable-app.json" "$MOCK_STATE_DIR/app.json"
+    ;;
   *) echo "unexpected az command: $args" >&2; exit 1 ;;
 esac
 MOCK
@@ -68,7 +74,7 @@ chmod +x "$test_dir/fleet-deploy" "$test_dir/live-checker" \
   "$test_dir/bin/az" "$test_dir/bin/curl"
 
 test_sha=$(git -C "$repo_root" rev-parse HEAD)
-storage_name='sf-accessible-explanation-checkin-data'
+storage_name='aec-accessible-explanati-9c1a54'
 share_name='sf-accessible-explanation-checkin-data'
 
 cat > "$test_dir/state/stateless-app.json" <<JSON
@@ -105,7 +111,6 @@ run_deploy() {
 
 output=$(run_deploy)
 grep -Fxq "accessible-explanation-checkin $repo_root Dockerfile 8080" "$test_dir/state/fleet-args"
-grep -Fxq /data "$test_dir/state/fleet-data-dir"
 grep -Eq "^https://accessible-explanation-checkin.sociobot.in sf-accessible-explanation-9c1a54 sociobot [a-f0-9]{40} $storage_name $share_name$" "$test_dir/state/live-checker-args"
 [[ "$output" == *"PASS: deployed and verified sf-accessible-explanation-9c1a54 with durable /data"* ]]
 [[ "$output" == *'"result": "PASS"'* ]]
@@ -114,6 +119,11 @@ jq -e '
   and (.properties.template.volumes[] | select(.name == "data" and .storageType == "AzureFile"))
   and (.properties.template.containers[] | select(.name == "app") | .volumeMounts[] | select(.volumeName == "data" and .mountPath == "/data"))
 ' "$test_dir/state/app.json" >/dev/null
+jq -e --arg storage "$storage_name" '
+  .properties.template.scale == {minReplicas: 1, maxReplicas: 1}
+  and (.properties.template.volumes[] | select(.name == "data" and .storageType == "AzureFile" and .storageName == $storage))
+  and (.properties.template.containers[] | select(.name == "app") | .volumeMounts[] | select(.volumeName == "data" and .mountPath == "/data"))
+' "$test_dir/state/template-patch.json" >/dev/null
 
 # This is verifier 15's exact failure after the durability workflow creates a
 # new revision: maxReplicas regresses from one to three. The final live
@@ -127,11 +137,13 @@ fi
 grep -Fq 'expected minReplicas=maxReplicas=1; observed minReplicas=1 maxReplicas=3' \
   "$test_dir/regressed.out"
 
-# The wrapper must not regress to its old hand-managed Azure-storage patching
-# path; the fleet helper owns the work-order storage resource and template.
-if rg -q 'az storage|env storage set|az rest' "$script"; then
-  echo 'deployment wrapper still manages Azure storage instead of using the work-order helper' >&2
+# The wrapper may patch only the Container App template. It must not create or
+# access storage credentials: the factory owns the existing product share.
+if rg -q 'az storage|storage account keys|env storage set|storage share create' "$script"; then
+  echo 'deployment wrapper attempts to manage Azure storage credentials or shares' >&2
   exit 1
 fi
+rg -Fq 'data_dir=${DEPLOY_DATA_DIR:-/data}' "$script"
+rg -Fq 'minReplicas: 1, maxReplicas: 1' "$script"
 
-echo 'PASS @claim:durable-deployment-policy: /data reaches the factory helper and verifier-15 multi-replica state is rejected'
+echo 'PASS @claim:durable-deployment-policy: registered Azure Files mounts at /data, one replica is patched, and verifier-15 multi-replica state is rejected'
