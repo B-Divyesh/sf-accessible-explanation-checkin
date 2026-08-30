@@ -16,11 +16,11 @@ cleanup() {
 }
 trap cleanup EXIT
 chmod 0777 "$runtime_tmp"
-mkdir -p "$runtime_tmp/app" "$runtime_tmp/uploads" "$runtime_tmp/durable"
+mkdir -p "$runtime_tmp/app" "$runtime_tmp/uploads" "$runtime_tmp/runtime" "$runtime_tmp/durable"
 cp target/release/accessible-explanation-checkin "$runtime_tmp/app/server"
 cp -R dist "$runtime_tmp/app/dist"
 chmod 0755 "$runtime_tmp/app" "$runtime_tmp/app/server" "$runtime_tmp/app/dist"
-chmod 0777 "$runtime_tmp/uploads" "$runtime_tmp/durable"
+chmod 0777 "$runtime_tmp/uploads" "$runtime_tmp/runtime" "$runtime_tmp/durable"
 
 runtime_stage=$(sed -n '/^FROM debian:bookworm-slim AS runtime$/,$p' Dockerfile)
 grep -qx 'USER checkin' <<<"$runtime_stage"
@@ -32,6 +32,7 @@ fi
 setpriv --reuid=65534 --regid=65534 --clear-groups env \
   PORT=18193 \
   DATA_DIR="$runtime_tmp/durable" \
+  RUNTIME_DATA_DIR="$runtime_tmp/runtime" \
   DIST_DIR="$runtime_tmp/app/dist" \
   BUILD_SHA=claim-runtime \
   "$runtime_tmp/app/server" >"$runtime_tmp/server.log" 2>&1 &
@@ -51,9 +52,11 @@ curl --fail --silent \
   http://127.0.0.1:18193/api/checkins >"$runtime_tmp/create.json"
 grep -Fq 'student_token' "$runtime_tmp/create.json"
 test -s "$runtime_tmp/durable/checkins.db"
-# The server process runs through setpriv as UID 65534. A durable SQLite write
-# is stronger and less racy proof than inspecting setpriv's transient wrapper
-# process in /proc.
+test -s "$runtime_tmp/runtime/checkins.db"
+# The server process runs through setpriv as UID 65534. A durable database
+# snapshot and local SQLite working copy are stronger proof than inspecting
+# setpriv's transient wrapper process in /proc.
 test "$(stat -c '%u' "$runtime_tmp/durable/checkins.db")" = '65534'
+test "$(stat -c '%u' "$runtime_tmp/runtime/checkins.db")" = '65534'
 
-echo 'PASS @claim:runtime-container-policy: release server ran non-root and wrote its durable SQLite database'
+echo 'PASS @claim:runtime-container-policy: release server ran non-root and wrote a durable SQLite snapshot'

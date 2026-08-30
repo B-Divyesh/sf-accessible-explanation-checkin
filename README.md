@@ -35,7 +35,9 @@ This is a single-container Rust and Vite application. Build it with the root `Do
 The image declares port 8080 and the non-root `checkin` user. Its claim test executes the release server under an unprivileged UID.
 
 Run `npm run deploy` for Container Apps. It mounts the factory-registered,
-product-specific Azure File share at the work order's `/data` path.
+product-specific Azure File share at the work order's `/data` path. SQLite runs
+locally inside the one replica; each saved change copies its database snapshot
+and any voice upload to `/data`, which is restored on the next revision.
 
 The deployment uses one SQLite replica. The deployment gate checks private links, submission, and teacher review. It repeats those checks after replacing the production revision. Run `npm run verify:live-topology` to check the live mount, replica, and build identity.
 

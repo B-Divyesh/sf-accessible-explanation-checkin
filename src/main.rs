@@ -39,32 +39,32 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         )
         .init();
     let (data_dir, data_dir_supplied) = config_value("DATA_DIR", &default_data_dir());
-    let (database_url, database_supplied) = config_value(
-        "DATABASE_URL",
-        &format!("sqlite:{data_dir}/checkins.db?mode=rwc"),
-    );
+    let (runtime_dir, runtime_dir_supplied) =
+        config_value("RUNTIME_DATA_DIR", &default_runtime_dir());
+    let (database_url, database_supplied) =
+        config_value("DATABASE_URL", &database_url_for(Path::new(&runtime_dir)));
     let (uploads_dir, uploads_supplied) =
         config_value("UPLOADS_DIR", &format!("{data_dir}/uploads"));
     let (dist_dir, dist_supplied) = config_value("DIST_DIR", "dist");
     let (billing_base, billing_supplied) =
         config_value("BILLING_BASE_URL", "https://api.sociobot.in");
     let (build_sha, build_sha_supplied) = config_value("BUILD_SHA", "development");
-    let persistence_dir = std::env::var("PERSISTENCE_DIR")
-        .ok()
-        .filter(|value| !value.trim().is_empty())
-        .map(PathBuf::from);
+    // Azure Files is the durable store, but SQLite's byte-range locks are not
+    // reliable on an SMB mount. Run SQLite on the container's local disk and
+    // copy the committed database to /data after every mutation. With the
+    // deployment's one replica, this retains records across revisions without
+    // exposing the database to Azure Files locking semantics.
+    let (persistence_dir, persistence_supplied) = config_value("PERSISTENCE_DIR", &data_dir);
+    let persistence_dir = Some(PathBuf::from(persistence_dir));
     tracing::info!(
         database = config_source(database_supplied),
         data_dir = config_source(data_dir_supplied),
+        runtime = config_source(runtime_dir_supplied),
         uploads = config_source(uploads_supplied),
         dist = config_source(dist_supplied),
         billing = config_source(billing_supplied),
         build_sha = config_source(build_sha_supplied),
-        persistence = if persistence_dir.is_some() {
-            "supplied"
-        } else {
-            "generated_default"
-        },
+        persistence = config_source(persistence_supplied),
         "runtime configuration initialized"
     );
     let database_file = db::sqlite_path(&database_url);
@@ -196,6 +196,17 @@ fn default_data_dir() -> String {
     data_dir_for(Path::new("/data"))
 }
 
+fn default_runtime_dir() -> String {
+    "/tmp/accessible-explanation-checkin".into()
+}
+
+fn database_url_for(runtime_dir: &Path) -> String {
+    format!(
+        "sqlite:{}?mode=rwc",
+        runtime_dir.join("checkins.db").display()
+    )
+}
+
 fn data_dir_for(candidate: &Path) -> String {
     if candidate.is_dir() {
         candidate.display().to_string()
@@ -246,6 +257,14 @@ mod tests {
             mount.path().display().to_string()
         );
         assert_eq!(data_dir_for(Path::new("/does-not-exist")), "data");
+    }
+
+    #[test]
+    fn runtime_database_stays_off_the_azure_files_mount() {
+        assert_eq!(
+            database_url_for(Path::new("/tmp/checkin-runtime")),
+            "sqlite:/tmp/checkin-runtime/checkins.db?mode=rwc"
+        );
     }
 
     #[tokio::test]

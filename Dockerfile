@@ -22,8 +22,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 WORKDIR /app
 COPY --from=backend /app/target/release/accessible-explanation-checkin /app/server
 COPY --from=frontend /app/dist /app/dist
-# The factory mounts the durable Azure Files share at /data. The server chooses
-# /data itself when it exists, and otherwise falls back to ./data for local use.
+# The factory mounts durable snapshots and uploads at /data. SQLite works from
+# local container storage, then the single replica copies each committed state
+# to /data so Azure Files SMB locking cannot block writes.
 USER checkin
 ENV PORT=8080 BUILD_SHA=${BUILD_SHA}
 EXPOSE 8080

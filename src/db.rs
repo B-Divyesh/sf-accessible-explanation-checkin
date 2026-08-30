@@ -68,9 +68,9 @@ pub async fn connect(database_url: &str) -> Result<SqlitePool, sqlx::Error> {
             }
         }
     }
-    // Azure Files is a durable SMB volume. DELETE journaling and an explicit
-    // busy timeout avoid WAL side files and allow its file-lock propagation to
-    // settle before schema setup or a write gives up.
+    // The working database is local to the one running replica. DELETE
+    // journaling makes each committed snapshot a single database file, so it
+    // can be copied safely to the durable Azure Files mount after a mutation.
     let options = SqliteConnectOptions::from_str(database_url)?
         .create_if_missing(true)
         .journal_mode(SqliteJournalMode::Delete)
@@ -134,6 +134,34 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(fs::read(database_file).await.unwrap(), b"sqlite snapshot");
+    }
+
+    #[tokio::test]
+    async fn durable_snapshot_restores_sqlite_records_after_a_fresh_runtime() {
+        let temp = tempfile::tempdir().unwrap();
+        let durable_dir = temp.path().join("data");
+        let first_runtime = temp.path().join("runtime-one/checkins.db");
+        let second_runtime = temp.path().join("runtime-two/checkins.db");
+        let first_url = format!("sqlite:{}?mode=rwc", first_runtime.display());
+        let first_pool = connect(&first_url).await.unwrap();
+
+        sqlx::query("INSERT INTO checkins (id, student_token, review_token, title, prompt, created_at, voice_retention_days, max_submissions) VALUES ('saved', 'student-token', 'review-token', 'Durable check-in', 'Explain one choice.', '2026-08-30T00:00:00Z', 3, 35)")
+            .execute(&first_pool)
+            .await
+            .unwrap();
+        first_pool.close().await;
+        save_snapshot(&first_runtime, &durable_dir).await.unwrap();
+
+        restore_snapshot(&second_runtime, &durable_dir)
+            .await
+            .unwrap();
+        let second_url = format!("sqlite:{}?mode=rwc", second_runtime.display());
+        let second_pool = connect(&second_url).await.unwrap();
+        let title: String = sqlx::query_scalar("SELECT title FROM checkins WHERE id='saved'")
+            .fetch_one(&second_pool)
+            .await
+            .unwrap();
+        assert_eq!(title, "Durable check-in");
     }
 
     #[cfg(unix)]
