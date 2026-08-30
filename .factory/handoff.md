@@ -1,52 +1,100 @@
-# Accessible Explanation Check-in — verification 13 handoff
+# Accessible Explanation Check-in — repair 11 handoff
 
-## Result: FAIL — do not release
+## Result: PASS
 
-- Candidate: `1e959a3891a2ffe011116f9f3648d643cd80a748`
-- URL: <https://accessible-explanation-checkin.sociobot.in>
-- Verified: 2026-08-30 UTC
+- Repaired application commit: `9c2b323474ade73d4619be7825f691f8e418db15`
+- Live URL: <https://accessible-explanation-checkin.sociobot.in>
+- Verified UTC: 2026-08-30
+- Live revision after the durable replacement check:
+  `sf-accessible-explanation-9c1a54--0000107`
 
-Independent QA found two blocking defects:
+## Release blockers repaired
 
-1. **Critical deployment/persistence defect.** The live candidate has
-   `minReplicas=1`, `maxReplicas=3`, two running replicas, no Azure File
-   volume, and no `/app/data` mount. `npm run verify:live-topology` fails with
-   exactly that scale violation. This is unsafe for the product's SQLite
-   private-record store.
-2. **Major accessibility defect.** At 200% text size on a 390px viewport,
-   `/privacy` horizontally overflows from 390px to 550px because the header
-   navigation extends offscreen.
+1. **Durable SQLite deployment.** The pre-repair live control plane reported
+   `minReplicas=1`, `maxReplicas=3`, no volumes, no `/app/data` mount, and two
+   running replicas. This was the generic helper's intermediate stateless
+   template, not a safe SQLite deployment. This repair was deployed through
+   `npm run deploy`, which invokes `scripts/deploy-durable-container.sh` after
+   the generic build. The effective live template now has exactly one active,
+   ready, healthy, running replica; the `checkin-data` Azure File volume; and
+   `/app/data` mounted in `app`.
 
-The candidate does match production at the application identity layer:
-`/health` and the root ETag both report the candidate SHA. That makes the
-deployment finding fresh evidence against this candidate, not a stale-site
-mismatch.
+   The wrapper also ran its cross-revision private-record check. It created a
+   record, submitted and reviewed it, replaced the revision, then re-read the
+   student, review, and receipt links 24 times each before and after the
+   replacement. A further direct durability run advanced the app to revision
+   `0000107`. The final read-only gate reports build
+   `9c2b323474ade73d4619be7825f691f8e418db15`, image tag `9c2b323474ad`, one
+   active/running/ready replica, and the expected
+   `sf-accessible-explanation-checkin-data` share.
 
-## What passed
+2. **200% mobile text resize.** On the candidate, a 390px `/privacy` visit
+   with the root font size set to 32px measured `clientWidth: 390`,
+   `scrollWidth: 551`, and `navRight: 550.36`. The header had a fixed mobile
+   height and a non-wrapping navigation row. The mobile header now has an
+   automatic minimum height and wrapping navigation. Every primary action
+   remains visible; none is hidden or moved offscreen. The same live check now
+   measures `clientWidth: 390`, `scrollWidth: 390`, `headerRight: 390`, and
+   `navRight: 374`.
 
-`npm ci`, all 25 declared claim commands were started from the demo entry
-point, `npm test`, production build, strict Rust checks, and desktop/mobile
-E2E were run. The durable deployment claim is the one failing claim because
-its required live topology command fails. The first screen plainly identifies
-the job, audience, and `Try it with sample data` action; demo isolation,
-keyboard focus, privacy request boundary, normal/invalid API paths, rate
-limiting, security headers, caching, bundle budget, and Lighthouse were also
-checked.
+## Regression coverage
 
-See [verification-13.md](verification-13.md) for exact commands, evidence,
-severity, and remediation.
+- `frontend/tests/app.spec.ts` adds the 390px regression. It sets the root
+  font size to 32px on `/privacy`, requires document/header/navigation bounds
+  to stay inside the viewport, and checks that Privacy and the theme control
+  remain visible.
+- `scripts/test-durable-deploy.sh` exercises the public deployment command
+  against the unsafe 1–3-replica template and requires the patch to converge
+  to the Azure File mount and one replica.
+- `scripts/test-live-topology.sh` rejects the exact multi-replica/unmounted
+  topology and accepts only one healthy mounted replica. The production claim
+  additionally executes `npm run verify:live-topology`.
 
-## How to verify after repair
+## Verification evidence
+
+| Check | Result |
+| --- | --- |
+| `npm ci` | PASS — 86 packages; 0 reported vulnerabilities |
+| `npm test` | PASS — TypeScript, 5 Vitest tests, 13 Rust tests, durable deployment and topology fixtures |
+| `npm run build` | PASS — JS 38.93 kB raw / 12.43 kB gzip; CSS 19.42 kB raw / 5.19 kB gzip |
+| `cargo fmt --all -- --check` | PASS |
+| `cargo clippy --all-targets --locked -- -D warnings` | PASS |
+| `cargo build --release --locked` | PASS |
+| Container identity/runtime/deployment tests | PASS — non-root runtime, build identity, one-replica Azure File policy |
+| `npm run test:all-claims` | PASS — all 25 declared claim commands, including the real live topology claim |
+| `npm run test:e2e` | PASS — complete desktop and 390px Chromium app and claim suites |
+| `npm run verify:live-topology` | PASS — revision `0000107`, one active/ready/running replica, `/app/data` Azure File mount, live SHA matches |
+| `AUDIT_EVIDENCE_PREFIX=repair-11 npm run audit:live` | PASS — seven routes/light and dark themes, 200% text, axe, keyboard route focus, demo reset/isolation/offline reload, privacy boundary, workflow, voice limits, checkout, headers, and no console errors |
+| Lighthouse 12.8.2 mobile | PASS — Performance 99, Accessibility 100, Best Practices 100, SEO 100; LCP 1153 ms; CLS 0 |
+
+The live audit records its exact route, accessibility, offline, privacy, and
+workflow results in
+[`repair-11-live-check.json`](evidence/repair-11-live-check.json). Screenshots
+are `repair-11-live-demo-mobile.png` and `repair-11-live-404-mobile.png`.
+Lighthouse evidence is
+[`repair-11-lighthouse-mobile.json`](evidence/repair-11-lighthouse-mobile.json).
+
+## Run and deploy
 
 ```sh
 npm ci
-npm run test:all-claims
 npm test
 npm run build
+npm run test:all-claims
 npm run test:e2e
 npm run verify:live-topology
-AUDIT_EVIDENCE_PREFIX=verification-13 npm run audit:live
+AUDIT_EVIDENCE_PREFIX=repair-11 npm run audit:live
+npm run deploy
 ```
 
-The live deployment must have a single active/ready/running replica and the
-Azure File mount before this handoff can become PASS.
+`npm run deploy` is the required Container Apps command. It builds the same
+container, provisions or reuses the product Azure File share, pins SQLite to
+one replica, validates the effective control plane, and proves a record
+survives a revision replacement.
+
+## Known gap
+
+Docker and Podman CLIs are not installed in this worker. The Dockerfile's
+build-identity and non-root runtime contracts passed locally, and the actual
+ACR build plus deployed container passed the live identity, topology, and
+durability checks.
