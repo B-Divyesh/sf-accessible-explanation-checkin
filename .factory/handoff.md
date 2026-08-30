@@ -2,7 +2,8 @@
 
 ## Result: PASS
 
-- Repaired application commit: `9c2b323474ade73d4619be7825f691f8e418db15`
+- The final deployment's build identity is checked against `HEAD` by
+  `npm run verify:live-topology`.
 - Live URL: <https://accessible-explanation-checkin.sociobot.in>
 - Verified UTC: 2026-08-30
 - Live revision after the durable replacement check:
@@ -23,9 +24,8 @@
    record, submitted and reviewed it, replaced the revision, then re-read the
    student, review, and receipt links 24 times each before and after the
    replacement. A further direct durability run advanced the app to revision
-   `0000107`. The final read-only gate reports build
-   `9c2b323474ade73d4619be7825f691f8e418db15`, image tag `9c2b323474ad`, one
-   active/running/ready replica, and the expected
+   `0000107`. The final read-only gate reports a matching build and image
+   identity, one active/running/ready replica, and the expected
    `sf-accessible-explanation-checkin-data` share.
 
 2. **200% mobile text resize.** On the candidate, a 390px `/privacy` visit
