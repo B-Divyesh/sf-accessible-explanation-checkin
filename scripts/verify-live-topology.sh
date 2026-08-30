@@ -10,6 +10,7 @@ resource_group=${3:-sociobot}
 expected_build_sha=${4:-}
 expected_storage_name=${5:-}
 expected_share_name=${6:-}
+data_dir=${DEPLOY_DATA_DIR:-/data}
 environment=${AZURE_CONTAINERAPP_ENV:-factory-env}
 az_bin=${AZ_BIN:-az}
 curl_bin=${CURL_BIN:-curl}
@@ -43,18 +44,28 @@ max_replicas=$(jq -er '.properties.template.scale.maxReplicas' <<<"$topology")
 [[ "$min_replicas" == 1 && "$max_replicas" == 1 ]] || \
   fail "expected minReplicas=maxReplicas=1; observed minReplicas=$min_replicas maxReplicas=$max_replicas"
 
-if ! jq -e --arg storage "$expected_storage_name" '
-  any(.properties.template.volumes[]?;
-    .name == "checkin-data"
-    and .storageType == "AzureFile"
-    and ($storage == "" or .storageName == $storage))
-  and any(.properties.template.containers[]?;
-    .name == "app"
-    and any(.volumeMounts[]?;
-      .volumeName == "checkin-data" and .mountPath == "/app/data"))
+if ! jq -e --arg storage "$expected_storage_name" --arg mount "$data_dir" '
+  [(.properties.template.volumes // []) as $volumes
+   | .properties.template.containers[]?
+   | select(.name == "app")
+   | .volumeMounts[]?
+   | select(.mountPath == $mount)
+   | .volumeName as $volume
+   | $volumes[]?
+   | select(.name == $volume and .storageType == "AzureFile" and ($storage == "" or .storageName == $storage))
+  ] | length > 0
 ' >/dev/null <<<"$topology"; then
-  fail "expected the checkin-data Azure File volume mounted at /app/data"
+  fail "expected an Azure File volume mounted at $data_dir"
 fi
+
+volume_name=$(jq -er --arg mount "$data_dir" '
+  (.properties.template.volumes // []) as $volumes
+  | first(.properties.template.containers[]? | select(.name == "app")
+      | .volumeMounts[]? | select(.mountPath == $mount)
+      | .volumeName as $volume
+      | $volumes[]? | select(.name == $volume and .storageType == "AzureFile")
+      | .name)
+' <<<"$topology")
 
 image=$(jq -er '.properties.template.containers[] | select(.name == "app") | .image' \
   <<<"$topology")
@@ -123,6 +134,8 @@ jq -n \
   --arg build_sha "$health_sha" \
   --arg storage_name "$expected_storage_name" \
   --arg share_name "$expected_share_name" \
+  --arg data_dir "$data_dir" \
+  --arg volume_name "$volume_name" \
   --arg custom_domain "$custom_domain" \
   --arg revision_health "$revision_health" \
   --arg revision_state "$revision_state" \
@@ -144,8 +157,8 @@ jq -n \
       ready_replicas: 1,
       revision_health: $revision_health,
       revision_state: $revision_state,
-      volume: "checkin-data",
-      mount_path: "/app/data",
+      volume: $volume_name,
+      mount_path: $data_dir,
       storage_name: $storage_name,
       share_name: $share_name
     }

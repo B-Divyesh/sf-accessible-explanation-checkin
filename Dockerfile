@@ -18,14 +18,13 @@ FROM debian:bookworm-slim AS runtime
 ARG BUILD_SHA=development
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/* \
     && groupadd --system checkin && useradd --system --gid checkin --home-dir /app checkin \
-    && mkdir -p /app/data/uploads && chown -R checkin:checkin /app
+    && mkdir -p /data/uploads && chown -R checkin:checkin /app /data
 WORKDIR /app
 COPY --from=backend /app/target/release/accessible-explanation-checkin /app/server
 COPY --from=frontend /app/dist /app/dist
-# The durable volume is mounted by the platform, while SQLite itself stays in
-# /tmp. The deployment mount is configured as a writable share; this service
-# never needs root privileges to read or write its snapshot or voice files.
+# The factory mounts the durable Azure Files share at /data. The server chooses
+# /data itself when it exists, and otherwise falls back to ./data for local use.
 USER checkin
-ENV PORT=8080 DATABASE_URL=sqlite:/tmp/checkins.db?mode=rwc UPLOADS_DIR=/app/data/uploads PERSISTENCE_DIR=/app/data DIST_DIR=dist BUILD_SHA=${BUILD_SHA}
+ENV PORT=8080 BUILD_SHA=${BUILD_SHA}
 EXPOSE 8080
 CMD ["/app/server"]

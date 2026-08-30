@@ -14,7 +14,7 @@
     "test:deployment-policy": "bash scripts/test-durable-deploy.sh",
     "test:live-durability-checker": "bash scripts/test-live-durable-workflow.sh",
     "test:live-topology": "bash scripts/test-live-topology.sh",
-    "verify:live-topology": "bash scripts/verify-live-topology.sh https://accessible-explanation-checkin.sociobot.in sf-accessible-explanation-9c1a54 sociobot $(git rev-parse HEAD) aec-accessible-explanati-9c1a54 sf-accessible-explanation-checkin-data",
+    "verify:live-topology": "bash scripts/verify-live-topology.sh https://accessible-explanation-checkin.sociobot.in sf-accessible-explanation-9c1a54 sociobot $(git rev-parse HEAD) sf-accessible-explanation-checkin-data sf-accessible-explanation-checkin-data",
     "test:e2e": "npm run test:e2e:desktop && npm run test:e2e:mobile",
     "test:e2e:desktop": "npm run test:e2e:desktop:app && npm run test:e2e:desktop:claims-a && npm run test:e2e:desktop:claims-b",
     "test:e2e:mobile": "npm run test:e2e:mobile:app && npm run test:e2e:mobile:claims-a && npm run test:e2e:mobile:claims-b",

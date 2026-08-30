@@ -169,5 +169,10 @@ test('teacher creates, student explains, and teacher reviews', async ({ page }) 
   await expectAccessible(page);
   const download = page.waitForEvent('download');
   await page.getByRole('link', { name: 'Export CSV' }).click();
-  expect((await download).suggestedFilename()).toBe('explanation-checkin.csv');
+  const csv = await download;
+  expect(csv.suggestedFilename()).toBe('explanation-checkin.csv');
+  // Let Chromium finish the response before Playwright tears down this
+  // context. Otherwise the next route navigation can occasionally inherit an
+  // in-flight download instead of a document response.
+  await csv.path();
 });

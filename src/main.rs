@@ -11,7 +11,12 @@ use axum::{
     Router,
 };
 use routes::AppState;
-use std::{net::SocketAddr, path::PathBuf, sync::Arc, time::Duration};
+use std::{
+    net::SocketAddr,
+    path::{Path, PathBuf},
+    sync::Arc,
+    time::Duration,
+};
 use tokio::net::TcpListener;
 use tower_governor::{
     governor::GovernorConfigBuilder, key_extractor::SmartIpKeyExtractor, GovernorLayer,
@@ -33,9 +38,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .unwrap_or_else(|_| "info,tower_http=info".into()),
         )
         .init();
-    let (database_url, database_supplied) =
-        config_value("DATABASE_URL", "sqlite:data/checkins.db?mode=rwc");
-    let (uploads_dir, uploads_supplied) = config_value("UPLOADS_DIR", "data/uploads");
+    let (data_dir, data_dir_supplied) = config_value("DATA_DIR", &default_data_dir());
+    let (database_url, database_supplied) = config_value(
+        "DATABASE_URL",
+        &format!("sqlite:{data_dir}/checkins.db?mode=rwc"),
+    );
+    let (uploads_dir, uploads_supplied) =
+        config_value("UPLOADS_DIR", &format!("{data_dir}/uploads"));
     let (dist_dir, dist_supplied) = config_value("DIST_DIR", "dist");
     let (billing_base, billing_supplied) =
         config_value("BILLING_BASE_URL", "https://api.sociobot.in");
@@ -46,6 +55,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .map(PathBuf::from);
     tracing::info!(
         database = config_source(database_supplied),
+        data_dir = config_source(data_dir_supplied),
         uploads = config_source(uploads_supplied),
         dist = config_source(dist_supplied),
         billing = config_source(billing_supplied),
@@ -182,6 +192,18 @@ fn config_source(supplied: bool) -> &'static str {
     }
 }
 
+fn default_data_dir() -> String {
+    data_dir_for(Path::new("/data"))
+}
+
+fn data_dir_for(candidate: &Path) -> String {
+    if candidate.is_dir() {
+        candidate.display().to_string()
+    } else {
+        "data".into()
+    }
+}
+
 async fn response_policy(
     axum::extract::State(build_sha): axum::extract::State<String>,
     request: Request,
@@ -215,6 +237,16 @@ mod tests {
     use super::*;
     use axum::{body::Body, http::Request};
     use tower::ServiceExt;
+
+    #[test]
+    fn default_data_directory_uses_the_factory_mount_when_present() {
+        let mount = tempfile::tempdir().unwrap();
+        assert_eq!(
+            data_dir_for(mount.path()),
+            mount.path().display().to_string()
+        );
+        assert_eq!(data_dir_for(Path::new("/does-not-exist")), "data");
+    }
 
     #[tokio::test]
     async fn rate_limit_uses_forwarded_client_ip_and_returns_retry_after() {

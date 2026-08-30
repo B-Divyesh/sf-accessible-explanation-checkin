@@ -10,6 +10,7 @@ resource_group=${3:-sociobot}
 expected_build_sha=${4:-}
 expected_storage_name=${5:-}
 expected_share_name=${6:-}
+data_dir=${DEPLOY_DATA_DIR:-/data}
 read_attempts=${DURABILITY_READ_ATTEMPTS:-24}
 revision_attempts=${DURABILITY_REVISION_ATTEMPTS:-${DURABILITY_RESTART_ATTEMPTS:-36}}
 revision_interval=${DURABILITY_REVISION_INTERVAL_SECONDS:-${DURABILITY_RESTART_INTERVAL_SECONDS:-5}}
@@ -50,20 +51,21 @@ expect_status() {
 }
 
 topology=$($az_bin containerapp show --resource-group "$resource_group" --name "$app_name" --output json)
-if ! jq -e --arg storage "$expected_storage_name" '
+if ! jq -e --arg storage "$expected_storage_name" --arg mount "$data_dir" '
   .properties.latestRevisionName == .properties.latestReadyRevisionName
   and .properties.template.scale.minReplicas == 1
   and .properties.template.scale.maxReplicas == 1
-  and any(.properties.template.volumes[]?;
-    .name == "checkin-data"
-    and .storageType == "AzureFile"
-    and ($storage == "" or .storageName == $storage))
-  and any(.properties.template.containers[]?;
-    .name == "app"
-    and any(.volumeMounts[]?;
-      .volumeName == "checkin-data" and .mountPath == "/app/data"))
+  and ([ (.properties.template.volumes // []) as $volumes
+        | .properties.template.containers[]?
+        | select(.name == "app")
+        | .volumeMounts[]?
+        | select(.mountPath == $mount)
+        | .volumeName as $volume
+        | $volumes[]?
+        | select(.name == $volume and .storageType == "AzureFile" and ($storage == "" or .storageName == $storage))
+       ] | length > 0)
 ' >/dev/null <<<"$topology"; then
-  fail "Azure control plane does not show the ready one-replica Azure Files topology"
+  fail "Azure control plane does not show the ready one-replica Azure Files topology at $data_dir"
 fi
 original_revision=$(jq -r '.properties.latestRevisionName' <<<"$topology")
 if [[ -n "$expected_storage_name" && -n "$expected_share_name" ]]; then
@@ -169,20 +171,20 @@ for _ in $(seq 1 "$revision_attempts"); do
   running=$(jq '[.[] | select(.properties.runningState == "Running")] | length' <<<"$replicas")
   replacement_replica=$(jq -r '[.[] | select(.properties.runningState == "Running") | .name][0] // empty' <<<"$replicas")
   status=$(request GET "$base_url/health" || true)
-  topology_ready=$(jq -r --arg original "$original_revision" --arg storage "$expected_storage_name" '
+  topology_ready=$(jq -r --arg original "$original_revision" --arg storage "$expected_storage_name" --arg mount "$data_dir" '
     (.properties.latestRevisionName != $original)
     and (.properties.latestRevisionName == .properties.latestReadyRevisionName)
     and (.properties.template.scale.minReplicas == 1)
     and (.properties.template.scale.maxReplicas == 1)
-    and any(.properties.template.volumes[]?;
-      .name == "checkin-data"
-      and .storageType == "AzureFile"
-      and ($storage == "" or .storageName == $storage))
-    and any(.properties.template.containers[]?;
-      .name == "app"
-      and any(.volumeMounts[]?;
-        .volumeName == "checkin-data"
-        and .mountPath == "/app/data"))
+    and ([ (.properties.template.volumes // []) as $volumes
+          | .properties.template.containers[]?
+          | select(.name == "app")
+          | .volumeMounts[]?
+          | select(.mountPath == $mount)
+          | .volumeName as $volume
+          | $volumes[]?
+          | select(.name == $volume and .storageType == "AzureFile" and ($storage == "" or .storageName == $storage))
+         ] | length > 0)
   ' <<<"$topology")
   if [[ "$topology_ready" == true && "$active_ready" == true && "$running" == 1 && -n "$replacement_replica" && "$replacement_replica" != "$original_replica" && "$status" == 200 ]]; then
     health_sha=$(jq -r '.build_sha // empty' "$body_file")
@@ -238,6 +240,7 @@ jq -n \
   --arg build_sha "$expected_build_sha" \
   --arg storage_name "$expected_storage_name" \
   --arg share_name "$expected_share_name" \
+  --arg data_dir "$data_dir" \
   --arg marker "$marker" \
   --argjson reads "$read_attempts" \
   '{
@@ -248,7 +251,7 @@ jq -n \
     revision: $revision,
     build_sha: $build_sha,
     marker: $marker,
-    topology: {min_replicas: 1, max_replicas: 1, azure_files_mount: "/app/data", storage_name: $storage_name, share_name: $share_name, active_revisions: 1, running_replicas: 1},
+    topology: {min_replicas: 1, max_replicas: 1, azure_files_mount: $data_dir, storage_name: $storage_name, share_name: $share_name, active_revisions: 1, running_replicas: 1},
     before_new_revision: {student_reads_200: $reads, review_reads_200: $reads, receipt_reads_200: $reads, submission_status: 201, review_saved: true},
     after_new_revision: {student_reads_200: $reads, review_reads_200: $reads, receipt_reads_200: $reads, submission_and_review_persisted: true}
   }'

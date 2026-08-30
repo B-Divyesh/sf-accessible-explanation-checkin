@@ -19,7 +19,7 @@ if [[ "$args" == "containerapp show"* ]]; then
     revision='app--0000040'
   fi
   cat <<JSON
-{"properties":{"latestRevisionName":"$revision","latestReadyRevisionName":"$revision","template":{"scale":{"minReplicas":1,"maxReplicas":1},"volumes":[{"name":"checkin-data","storageType":"AzureFile","storageName":"durable"}],"containers":[{"name":"app","volumeMounts":[{"volumeName":"checkin-data","mountPath":"/app/data"}]}]}}}
+{"properties":{"latestRevisionName":"$revision","latestReadyRevisionName":"$revision","template":{"scale":{"minReplicas":1,"maxReplicas":1},"volumes":[{"name":"data","storageType":"AzureFile","storageName":"durable"}],"containers":[{"name":"app","volumeMounts":[{"volumeName":"data","mountPath":"/data"}]}]}}}
 JSON
 elif [[ "$args" == "containerapp env storage show"* ]]; then
   printf '%s\n' '{"properties":{"azureFile":{"accessMode":"ReadWrite","accountName":"storage","shareName":"durable-share"}}}'

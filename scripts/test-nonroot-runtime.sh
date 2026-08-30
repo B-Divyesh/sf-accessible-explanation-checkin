@@ -31,9 +31,7 @@ fi
 
 setpriv --reuid=65534 --regid=65534 --clear-groups env \
   PORT=18193 \
-  DATABASE_URL="sqlite:$runtime_tmp/runtime.db?mode=rwc" \
-  UPLOADS_DIR="$runtime_tmp/uploads" \
-  PERSISTENCE_DIR="$runtime_tmp/durable" \
+  DATA_DIR="$runtime_tmp/durable" \
   DIST_DIR="$runtime_tmp/app/dist" \
   BUILD_SHA=claim-runtime \
   "$runtime_tmp/app/server" >"$runtime_tmp/server.log" 2>&1 &
@@ -53,9 +51,9 @@ curl --fail --silent \
   http://127.0.0.1:18193/api/checkins >"$runtime_tmp/create.json"
 grep -Fq 'student_token' "$runtime_tmp/create.json"
 test -s "$runtime_tmp/durable/checkins.db"
-# The server process runs through setpriv as UID 65534. A snapshot written by
-# the live server is stronger and less racy proof than inspecting setpriv's
-# transient wrapper process in /proc.
+# The server process runs through setpriv as UID 65534. A durable SQLite write
+# is stronger and less racy proof than inspecting setpriv's transient wrapper
+# process in /proc.
 test "$(stat -c '%u' "$runtime_tmp/durable/checkins.db")" = '65534'
 
-echo 'PASS @claim:runtime-container-policy: release server ran non-root and wrote its durable snapshot'
+echo 'PASS @claim:runtime-container-policy: release server ran non-root and wrote its durable SQLite database'
