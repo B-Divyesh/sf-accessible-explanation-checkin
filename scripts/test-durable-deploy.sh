@@ -149,4 +149,15 @@ rg -Fq 'data_dir=${DEPLOY_DATA_DIR:-/data}' "$script"
 rg -Fq 'WO_DATA_DIR= "$fleet_deploy_helper"' "$script"
 rg -Fq 'minReplicas: 1, maxReplicas: 1' "$script"
 
+# The factory contract fixes this stateful product's durable path at /data.
+# An inherited deployment setting must fail before the generic helper can make
+# a stateless revision with a mismatched mount path.
+rm -f "$test_dir/state/fleet-args"
+if DEPLOY_DATA_DIR=/app/data run_deploy >"$test_dir/wrong-data-dir.out" 2>&1; then
+  echo 'deployment accepted a durable path other than the work-order /data mount' >&2
+  exit 1
+fi
+grep -Fq 'requires DEPLOY_DATA_DIR=/data; received /app/data' "$test_dir/wrong-data-dir.out"
+test ! -e "$test_dir/state/fleet-args"
+
 echo 'PASS @claim:durable-deployment-policy: registered Azure Files mounts at /data, one replica is patched, and verifier-15 multi-replica state is rejected'

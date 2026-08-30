@@ -16,6 +16,14 @@ data_dir=${DEPLOY_DATA_DIR:-/data}
 storage_name=${DEPLOY_STORAGE_NAME:-aec-accessible-explanati-9c1a54}
 az_bin=${AZ_BIN:-az}
 
+# This service keeps its durable Azure Files contract at /data. Do not allow a
+# generic worker setting to silently move the mount: the runtime restores its
+# SQLite snapshot and voice uploads from this exact path on every revision.
+if [[ "$data_dir" != /data ]]; then
+  echo "ERROR: accessible-explanation-checkin requires DEPLOY_DATA_DIR=/data; received $data_dir" >&2
+  exit 2
+fi
+
 app_name="sf-$slug"
 if [ ${#app_name} -gt 32 ]; then
   app_name="sf-${slug:0:22}-$(printf '%s' "$slug" | sha1sum | cut -c1-6)"
