@@ -87,6 +87,28 @@ test('mobile theme and legal controls meet the 44px touch-target contract', asyn
   }
 });
 
+test('mobile Privacy header stays usable at 200% text size', async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith('mobile'), 'This is a 390px mobile text-resize regression check.');
+  await page.goto('/privacy');
+  await page.locator('html').evaluate(element => { (element as HTMLElement).style.fontSize = '32px'; });
+
+  const geometry = await page.evaluate(() => {
+    const header = document.querySelector<HTMLElement>('.site-header')!.getBoundingClientRect();
+    const nav = document.querySelector<HTMLElement>('.site-header nav')!.getBoundingClientRect();
+    return {
+      clientWidth: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+      headerRight: header.right,
+      navRight: nav.right,
+    };
+  });
+  expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.clientWidth);
+  expect(geometry.headerRight).toBeLessThanOrEqual(geometry.clientWidth);
+  expect(geometry.navRight).toBeLessThanOrEqual(geometry.clientWidth);
+  await expect(page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Privacy' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Change color theme' })).toBeVisible();
+});
+
 test('shared footer identifies the builder and release version', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('contentinfo')).toContainText('Built by Param Factory · version 1.0.0');
