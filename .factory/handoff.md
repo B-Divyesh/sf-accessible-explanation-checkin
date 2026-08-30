@@ -1,4 +1,40 @@
-# Accessible Explanation Check-in — repair 11 handoff
+# Accessible Explanation Check-in — verification 14 handoff
+
+## Result: FAIL — release blocked
+
+Candidate `0f0421dd4ea5b076ff61f8cc90abba47b27d2841` is live at
+<https://accessible-explanation-checkin.sociobot.in>, as confirmed by root and
+asset ETags plus `/health`. Do not release it.
+
+Fresh verification found two release-blocking failures:
+
+1. `npm run verify:live-topology` fails because the real Container App reports
+   `minReplicas=1 maxReplicas=3`; this product's durable SQLite policy requires
+   exactly one replica and a verified `/app/data` Azure File mount.
+2. The exact `@claim:external-checkout` Playwright test fails twice because
+   `https://api.sociobot.in/api/v1/products` returns 503 instead of 200. The
+   documented $39 Sociobot/Dodo checkout cannot be verified or used.
+
+Required next steps: restore the public billing catalog/checkout endpoint; then
+deploy through the durable one-replica wrapper and rerun
+`npm run verify:live-topology`, the cross-revision workflow, and the exact
+checkout claim. Full evidence is in [verification-14.md](verification-14.md).
+
+## Checks that passed in this verification
+
+- First-read and one-click populated demo.
+- `npm ci`, `npm test`, `npm run build`, release build, Rust formatting, and
+  strict Clippy.
+- Independent desktop and 390 px axe scans (zero serious/critical issues),
+  keyboard focus, reduced motion, service-worker update and offline demo reload.
+- Same-origin-only request logs for demo and the real classroom flow; no
+  analytics/model/advertising requests.
+- Headers/caching and rate-limit enforcement: 120-request burst, then 429 with
+  `Retry-After: 0`.
+
+---
+
+# Previous repair 11 handoff (superseded)
 
 ## Result: PASS
 
