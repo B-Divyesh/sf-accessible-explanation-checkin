@@ -1,67 +1,41 @@
-# Accessible Explanation Check-in — polish 7 handoff
+# Accessible Explanation Check-in — verification 18 handoff
 
 ## Result
 
-**PASS.** The application repair source is
-`f886c6fc58113551d1efc52d438cc399bbfa8366` (`fix: complete deletion and
-release claims`). It was deployed through the durable work-order wrapper and
-then checked cold at
-`https://accessible-explanation-checkin.sociobot.in`.
+**FAIL — release blocked.** Candidate
+`f886c6fc58113551d1efc52d438cc399bbfa8366` is not the code deployed at
+<https://accessible-explanation-checkin.sociobot.in>. Live `/health`, HTML and
+asset ETags, and the product image identify
+`b6ea22ce6875778503e053da80d0b1279bdc02a9` instead.
 
-## What changed
+The required `durable-deployment-policy` claim therefore failed its live
+identity step:
 
-- Implemented authenticated teacher deletion for a whole check-in. After the
-  explicit confirmation, it deletes the check-in, submissions, receipt links,
-  and each associated voice file. The UI returns to setup with a clear result.
-- Added the observable `teacher-checkin-deletion` claim and its temporary
-  SQLite/file integration test. The live browser audit repeats the full flow
-  and confirms every private link is `404` afterward.
-- Rewrote the student and setup copy so it accurately describes a teacher
-  deleting a check-in rather than promising a student self-service record
-  removal.
-- Replaced the long README deployment sentence with the required three short,
-  plain sentences.
-- Updated the catalog sentence to: “Collect student reasoning with private
-  text or voice check-ins for teachers.”
-- Recorded the complete cumulative closure matrix in
-  [polish-7.md](polish-7.md).
-
-## How to run and verify
-
-```sh
-npm ci
-npm test
-npm run build
-npm run test:e2e
-npm run test:all-claims
-npm run test:container-identity
-npm run verify:live-topology
+```
+ERROR: live topology check failed: image
+sociobotregistry.azurecr.io/sf-accessible-explanation-9c1a54:b6ea22ce6875
+does not identify build f886c6fc5811
 ```
 
-The claim runner completed all 26 entries from a new clean clone. Local checks
-also passed `cargo fmt --all -- --check`,
-`cargo clippy --all-targets --locked -- -D warnings`, and
-`cargo build --release --locked`.
+## What was verified
 
-## Deployment and live evidence
+- Fresh candidate checkout: `npm ci`, all declared claim commands, `npm test`,
+  `npm run build`, release build, format, clippy, and desktop/390 px E2E.
+- Local candidate: all local checks passed; 24 claim commands passed.
+- Live old build: first-read/demo, normal and boundary workflows, keyboard,
+  responsive/mobile, Axe, offline demo, privacy request boundary, headers,
+  caching, voice limits/deletion, whole record deletion, checkout, and rate
+  limiting all passed.
+- Live rate-limit observation: a one-client 130-request burst returned 120
+  normal API responses and 10 `429` responses, each with `Retry-After: 0`.
+- Live mobile Lighthouse: Performance 96, Accessibility 100, Best Practices
+  100, SEO 100; LCP 2.397 s, TBT 0 ms, CLS 0.
 
-- Runtime: one active, ready replica; durable product-specific Azure File
-  share mounted at `/data`; no other product resource was read or changed.
-- Strict topology: the deployed image, `/health` build SHA, active revision,
-  replica count, and data mount matched the repair source when
-  `npm run verify:live-topology` ran. Evidence:
-  [polish-7-live-topology.json](evidence/polish-7-live-topology.json).
-- Cold live audit: public routes, 404, console, metadata, focus, links, demo
-  isolation/offline, privacy boundary, real workflow, whole-record deletion,
-  voice limits/deletion, checkout, and security headers passed. Evidence:
-  [polish-7-live-check.json](evidence/polish-7-live-check.json).
-- Accessibility: `verify-url.sh` passed; Axe reported zero serious or critical
-  issues across audited routes. Evidence:
-  [polish-7-verify-url](evidence/polish-7-verify-url).
-- Mobile Lighthouse: Performance 100, Accessibility 100, Best Practices 100,
-  SEO 100. Evidence:
-  [polish-7-lighthouse-mobile.json](evidence/polish-7-lighthouse-mobile.json).
+## Required next step
 
-## Known gaps
+Deploy the exact candidate commit, then rerun `npm run test:all-claims` and
+`npm run verify:live-topology`. Do not mark release complete until `/health`
+and the image identity report `f886c6fc58113551d1efc52d438cc399bbfa8366`.
 
-None. The application has no unresolved finding from reviews 1–7.
+Full evidence and reproduction commands are in
+[verification-18.md](verification-18.md).
