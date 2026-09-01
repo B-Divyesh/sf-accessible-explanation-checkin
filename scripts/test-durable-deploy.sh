@@ -16,6 +16,19 @@ test_dir=$(mktemp -d)
 trap 'rm -rf "$test_dir"' EXIT
 mkdir -p "$test_dir/bin" "$test_dir/state"
 
+assert_exact_file() {
+  local label=$1
+  local expected=$2
+  local file=$3
+  local actual
+  actual=$(<"$file")
+  if [[ "$actual" != "$expected" ]]; then
+    printf 'FAIL: %s mismatch\nexpected: %q\nactual:   %q\n' \
+      "$label" "$expected" "$actual" >&2
+    exit 1
+  fi
+}
+
 cat > "$test_dir/fleet-deploy" <<'MOCK'
 #!/usr/bin/env bash
 set -euo pipefail
@@ -99,6 +112,7 @@ JSON
 cp "$test_dir/state/stateless-app.json" "$test_dir/state/app.json"
 
 run_deploy() {
+  local deploy_repo=${1:-$repo_root}
   PATH="$test_dir/bin:$PATH" \
     MOCK_STATE_DIR="$test_dir/state" \
     MOCK_BUILD_SHA="$test_sha" \
@@ -107,12 +121,14 @@ run_deploy() {
     FLEET_DEPLOY_CONTAINER_HELPER="$test_dir/fleet-deploy" \
     LIVE_DURABILITY_CHECKER="$test_dir/live-checker" \
     LIVE_TOPOLOGY_CHECKER="$repo_root/scripts/verify-live-topology.sh" \
-    npm run deploy --silent
+    npm --prefix "$deploy_repo" run deploy --silent
 }
 
 output=$(run_deploy)
-grep -Fxq "accessible-explanation-checkin $repo_root Dockerfile 8080" "$test_dir/state/fleet-args"
-grep -Fxq '' "$test_dir/state/fleet-data-dir"
+assert_exact_file 'default deployment helper arguments' \
+  "accessible-explanation-checkin $repo_root Dockerfile 8080" \
+  "$test_dir/state/fleet-args"
+assert_exact_file 'generic helper durable-path override' '' "$test_dir/state/fleet-data-dir"
 grep -Eq "^https://accessible-explanation-checkin.sociobot.in sf-accessible-explanation-9c1a54 sociobot [a-f0-9]{40} $storage_name $share_name$" "$test_dir/state/live-checker-args"
 [[ "$output" == *"PASS: deployed and verified sf-accessible-explanation-9c1a54 with durable /data"* ]]
 [[ "$output" == *'"result": "PASS"'* ]]
@@ -126,6 +142,23 @@ jq -e --arg storage "$storage_name" '
   and (.properties.template.volumes[] | select(.name == "data" and .storageType == "AzureFile" and .storageName == $storage))
   and (.properties.template.containers[] | select(.name == "app") | .volumeMounts[] | select(.volumeName == "data" and .mountPath == "/data"))
 ' "$test_dir/state/template-patch.json" >/dev/null
+
+# npm's deploy command does not pass a repository argument. Reproduce the
+# verifier-16 clean-clone condition in an actual clone under a different path;
+# the wrapper must derive the path from its own scripts/ location.
+relocated_repo="$test_dir/clean-clone-outside-workspace"
+git clone --quiet --no-local "$repo_root" "$relocated_repo"
+# The fixture runs before this repair is committed, so place the script under
+# test into the otherwise clean clone. The package command still invokes it
+# without positional arguments, exactly as `npm run deploy` does in CI.
+cp "$script" "$relocated_repo/scripts/deploy-durable-container.sh"
+cp "$test_dir/state/stateless-app.json" "$test_dir/state/app.json"
+rm -f "$test_dir/state/durability-workflow-finished"
+relocated_output=$(run_deploy "$relocated_repo")
+assert_exact_file 'relocated clean-clone helper arguments' \
+  "accessible-explanation-checkin $relocated_repo Dockerfile 8080" \
+  "$test_dir/state/fleet-args"
+[[ "$relocated_output" == *"PASS: deployed and verified sf-accessible-explanation-9c1a54 with durable /data"* ]]
 
 # This is verifier 15's exact failure after the durability workflow creates a
 # new revision: maxReplicas regresses from one to three. The final live

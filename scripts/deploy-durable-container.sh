@@ -4,8 +4,13 @@
 # independent container filesystems.
 set -euo pipefail
 
+script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+default_repo=$(cd -- "$script_dir/.." && pwd -P)
 slug=${1:-accessible-explanation-checkin}
-repo=${2:-/work/repo}
+# `npm run deploy` passes no repository argument. Resolve that default from
+# this checked-out script, rather than from the factory worker's workspace,
+# so a clean clone can be built and deployed from any path.
+repo=${2:-$default_repo}
 dockerfile=${3:-Dockerfile}
 port=${4:-8080}
 fleet_deploy_helper=${FLEET_DEPLOY_CONTAINER_HELPER:-/opt/fleet/lib/deploy-container.sh}
