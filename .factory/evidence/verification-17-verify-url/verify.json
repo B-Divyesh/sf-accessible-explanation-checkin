@@ -1,0 +1,14 @@
+{
+  "url": "https://accessible-explanation-checkin.sociobot.in",
+  "loadMs": 591,
+  "errors": [],
+  "a11y": {
+    "title": "Accessible Explanation Check-in — Collect student reasoning",
+    "lang": "en",
+    "h1": 1,
+    "main": true,
+    "imgsMissingAlt": 0,
+    "buttonsUnlabeled": 0,
+    "textLength": 1162
+  }
+}
