@@ -7,7 +7,7 @@
     "dev": "concurrently -k \"vite --config frontend/vite.config.ts\" \"cargo run\"",
     "build": "vite build --config frontend/vite.config.ts",
     "deploy": "bash scripts/deploy-durable-container.sh",
-    "test": "tsc --noEmit -p frontend/tsconfig.json && vitest run --config frontend/vite.config.ts && cargo test && bash scripts/test-durable-deploy.sh && bash scripts/test-live-durable-workflow.sh && bash scripts/test-live-topology.sh",
+    "test": "tsc --noEmit -p frontend/tsconfig.json && vitest run --config frontend/vite.config.ts && cargo test && bash scripts/test-deploy-container-name.sh && bash scripts/test-durable-deploy.sh && bash scripts/test-live-durable-workflow.sh && bash scripts/test-live-topology.sh",
     "test:deploy-helper": "bash scripts/test-deploy-container-name.sh",
     "test:container-identity": "bash scripts/test-container-build-identity.sh",
     "test:runtime-policy": "bash scripts/test-nonroot-runtime.sh",
