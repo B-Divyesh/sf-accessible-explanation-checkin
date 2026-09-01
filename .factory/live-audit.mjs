@@ -183,6 +183,38 @@ assert.equal(await flow.getByLabel('Private teacher note').inputValue(), 'Live r
 assert.deepEqual([...new Set(workflowRequests.map(url => new URL(url).origin))], [base]);
 await flowContext.close();
 
+const deletionContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+const deletion = await deletionContext.newPage();
+await deletion.goto(`${base}/create`);
+await deletion.getByLabel('Assignment name').fill('Live deletion verification');
+await deletion.getByLabel('Explanation prompt').fill('Which choice changed your conclusion, and why?');
+await deletion.getByRole('button', { name: 'Create private links' }).click();
+const deletionStudentUrl = await deletion.locator('#student-link').inputValue();
+const deletionReviewUrl = await deletion.locator('#review-link').inputValue();
+await deletion.goto(deletionStudentUrl);
+await deletion.getByLabel('Your name').fill('Deletion verifier');
+await deletion.getByLabel('Write your explanation').fill('I checked the complete deletion path.');
+await deletion.getByLabel('Mostly').check();
+await deletion.getByRole('button', { name: 'Send my explanation' }).click();
+const deletionReceiptUrl = deletion.url();
+deletion.once('dialog', async dialog => {
+  assert.match(dialog.message(), /every student response/);
+  await dialog.accept();
+});
+await deletion.goto(deletionReviewUrl);
+await deletion.getByRole('button', { name: 'Delete check-in' }).click();
+await deletion.waitForURL(`${base}/create`);
+await deletion.getByText('Check-in deleted. Its responses, receipt links, and voice files are gone.').waitFor();
+for (const [path, url] of [
+  [`/api/checkins/${new URL(deletionStudentUrl).pathname.split('/').pop()}`, deletionStudentUrl],
+  [`/api/reviews/${new URL(deletionReviewUrl).pathname.split('/').pop()}`, deletionReviewUrl],
+  [`/api/receipts/${new URL(deletionReceiptUrl).pathname.split('/').pop()}`, deletionReceiptUrl],
+]) {
+  const response = await deletionContext.request.get(`${base}${path}`);
+  assert.equal(response.status(), 404, `deleted private resource ${url}`);
+}
+await deletionContext.close();
+
 const voiceContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
 await voiceContext.addInitScript(() => {
   let scheduled;
@@ -319,6 +351,7 @@ const report = {
   focus: { forward: 'h1', back: 'h1', forwardAnnouncement, backAnnouncement },
   demo: { entry: '/?demo=1', sampleResponses: 3, isolatedStorage: true, reset: true, exitDiscardsAllDemoKeys: true, apiRequests: 0, offlineReload: true },
   workflow: { created: true, submitted: true, reviewed: true, reloadedSavedReview: true, origins: [base] },
+  deletion: { teacherConfirmed: true, studentLink: 404, reviewLink: 404, receiptLink: 404 },
   voice: { autoStopMilliseconds: 120000, acceptedBytes: 4194304, rejectedBytes: 4194305, earlyDelete: true, textReceiptAndReviewRetained: true },
   checkout: { catalogPriceMinor: 3900, currency: 'USD', status: 303, destination: 'checkout.dodopayments.com' },
   securityHeaders: ['content-security-policy', 'strict-transport-security', 'permissions-policy', 'x-content-type-options', 'referrer-policy'],

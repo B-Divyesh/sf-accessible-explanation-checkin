@@ -1,209 +1,968 @@
-import './styles.css';
-import { escapeHtml as e, formatDate } from './utils';
-import { BILLING_BASE_URL as BILLING, PRODUCT_SLUG as PRODUCT } from './config';
+import "./styles.css";
+import { escapeHtml as e, formatDate } from "./utils";
+import { BILLING_BASE_URL as BILLING, PRODUCT_SLUG as PRODUCT } from "./config";
 
-const app = document.querySelector<HTMLDivElement>('#app')!;
+const app = document.querySelector<HTMLDivElement>("#app")!;
 const licenseKey = `sb_license:${PRODUCT}`;
 const licenseCacheKey = `${licenseKey}:verdict`;
 let currentRecording: Blob | null = null;
 let recorder: MediaRecorder | null = null;
 let recordingTimer: number | null = null;
 let focusOnRouteChange = false;
-const SITE_ORIGIN = 'https://accessible-explanation-checkin.sociobot.in';
-const demoStorageKey = 'demo:accessible-explanation-checkin:review';
+const SITE_ORIGIN = "https://accessible-explanation-checkin.sociobot.in";
+const demoStorageKey = "demo:accessible-explanation-checkin:review";
 
-type Checkin = { title:string; prompt:string; voice_retention_days:number; open:boolean; submissions:number; max_submissions:number };
-type Submission = { id:string; student_name:string; explanation_text:string|null; confidence:number; has_voice:boolean; voice_delete_at:string|null; created_at:string; teacher_tags:string[]; teacher_note:string; follow_up:boolean; receipt_token:string };
-type Review = { title:string; prompt:string; voice_retention_days:number; submissions:Submission[] };
+type Checkin = {
+  title: string;
+  prompt: string;
+  voice_retention_days: number;
+  open: boolean;
+  submissions: number;
+  max_submissions: number;
+};
+type Submission = {
+  id: string;
+  student_name: string;
+  explanation_text: string | null;
+  confidence: number;
+  has_voice: boolean;
+  voice_delete_at: string | null;
+  created_at: string;
+  teacher_tags: string[];
+  teacher_note: string;
+  follow_up: boolean;
+  receipt_token: string;
+};
+type Review = {
+  title: string;
+  prompt: string;
+  voice_retention_days: number;
+  submissions: Submission[];
+};
 
-function shell(content:string, active='') {
+function shell(content: string, active = "") {
   const demo = isDemo();
-  setMetadata(document.title, routeDescription(), demo ? '/demo' : location.pathname);
-  app.innerHTML = `<header class="site-header"><a class="brand" href="/" data-link aria-label="Explanation Check-in home"><span class="door-mark" aria-hidden="true"></span><span>Explanation<br><em>Check-in</em></span></a><nav aria-label="Primary"><a href="/demo" data-link ${demo?'aria-current="page"':''}>Demo</a><a href="/create" data-link ${active==='create'?'aria-current="page"':''}>Create</a><a href="/pricing" data-link ${active==='pricing'?'aria-current="page"':''}>Plans</a><a href="/privacy" data-link ${active==='privacy'?'aria-current="page"':''}>Privacy</a><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Change color theme"><span aria-hidden="true">◐</span><span class="theme-label">Theme</span></button></nav></header>${demo?`<aside class="demo-banner" aria-label="Demo controls"><strong>Demo — sample data, nothing is saved</strong><span>Try the teacher review with three sample explanations.</span><button class="text-button" id="reset-demo" type="button">Reset demo</button><a href="/create" class="text-button" data-link>Start for real</a></aside>`:''}<div class="network-banner" id="network" role="status" hidden><strong>Offline.</strong> You can keep writing; submission needs a connection.</div><main id="main" tabindex="-1">${content}</main><footer><div><span class="door-mark small" aria-hidden="true"></span><p><strong>Student explanation check-ins for teachers.</strong><br>No automated grading or identity checks.</p></div><nav aria-label="Legal"><a href="/privacy" data-link>Privacy</a><a href="/terms" data-link>Terms</a></nav><p class="art-credit">Original generated classroom art · Param Factory, 2026<br>Built by Param Factory · version 1.0.0</p></footer><div id="announcer" class="sr-only" aria-live="polite"></div>`;
-  wireLinks(); wireTheme(); setNetwork(navigator.onLine); wireDemoControls(); focusAndAnnounceRoute();
+  setMetadata(
+    document.title,
+    routeDescription(),
+    demo ? "/demo" : location.pathname,
+  );
+  app.innerHTML = `<header class="site-header"><a class="brand" href="/" data-link aria-label="Explanation Check-in home"><span class="door-mark" aria-hidden="true"></span><span>Explanation<br><em>Check-in</em></span></a><nav aria-label="Primary"><a href="/demo" data-link ${demo ? 'aria-current="page"' : ""}>Demo</a><a href="/create" data-link ${active === "create" ? 'aria-current="page"' : ""}>Create</a><a href="/pricing" data-link ${active === "pricing" ? 'aria-current="page"' : ""}>Plans</a><a href="/privacy" data-link ${active === "privacy" ? 'aria-current="page"' : ""}>Privacy</a><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Change color theme"><span aria-hidden="true">◐</span><span class="theme-label">Theme</span></button></nav></header>${demo ? `<aside class="demo-banner" aria-label="Demo controls"><strong>Demo — sample data, nothing is saved</strong><span>Try the teacher review with three sample explanations.</span><button class="text-button" id="reset-demo" type="button">Reset demo</button><a href="/create" class="text-button" data-link>Start for real</a></aside>` : ""}<div class="network-banner" id="network" role="status" hidden><strong>Offline.</strong> You can keep writing; submission needs a connection.</div><main id="main" tabindex="-1">${content}</main><footer><div><span class="door-mark small" aria-hidden="true"></span><p><strong>Student explanation check-ins for teachers.</strong><br>No automated grading or identity checks.</p></div><nav aria-label="Legal"><a href="/privacy" data-link>Privacy</a><a href="/terms" data-link>Terms</a></nav><p class="art-credit">Original generated classroom art · Param Factory, 2026<br>Built by Param Factory · version 1.0.0</p></footer><div id="announcer" class="sr-only" aria-live="polite"></div>`;
+  wireLinks();
+  wireTheme();
+  setNetwork(navigator.onLine);
+  wireDemoControls();
+  focusAndAnnounceRoute();
 }
 
 function routeDescription() {
-  const path=location.pathname;
-  if (isDemo()) return 'Try a populated teacher review with isolated sample student explanations.';
-  if (path==='/create') return 'Create a private text or voice explanation check-in for students.';
-  if (path==='/pricing') return 'Compare free and Classroom Plus limits for explanation check-ins.';
-  if (path==='/privacy') return 'Read what this check-in stores, who can see it, and how voice is deleted.';
-  if (path==='/terms') return 'Read classroom use and purchase terms for Accessible Explanation Check-in.';
-  if (path.startsWith('/review/')) return 'Review student explanations in a private teacher workspace.';
-  if (path.startsWith('/receipt/')) return 'View a private record of a submitted student explanation.';
-  if (path.startsWith('/c/')) return 'Submit a private student explanation by text or voice.';
-  if (path!=='/') return 'Find a working explanation check-in link or return to the home page.';
-  return 'Collect student reasoning with a low-stakes text or voice check-in for teachers.';
+  const path = location.pathname;
+  if (isDemo())
+    return "Try a populated teacher review with isolated sample student explanations.";
+  if (path === "/create")
+    return "Create a private text or voice explanation check-in for students.";
+  if (path === "/pricing")
+    return "Compare free and Classroom Plus limits for explanation check-ins.";
+  if (path === "/privacy")
+    return "Read what this check-in stores, who can see it, and how voice is deleted.";
+  if (path === "/terms")
+    return "Read classroom use and purchase terms for Accessible Explanation Check-in.";
+  if (path.startsWith("/review/"))
+    return "Review student explanations in a private teacher workspace.";
+  if (path.startsWith("/receipt/"))
+    return "View a private record of a submitted student explanation.";
+  if (path.startsWith("/c/"))
+    return "Submit a private student explanation by text or voice.";
+  if (path !== "/")
+    return "Find a working explanation check-in link or return to the home page.";
+  return "Collect student reasoning with a low-stakes text or voice check-in for teachers.";
 }
 
-function routeParts() { return location.pathname.split('/').filter(Boolean); }
-function isDemo() { return location.pathname === '/demo' || new URLSearchParams(location.search).get('demo') === '1'; }
-function setMetadata(title:string, description:string, path=location.pathname) {
-  document.title=title;
-  const canonical=`${SITE_ORIGIN}${path === '/' ? '/' : path}`;
-  setMeta('meta[name="description"]','content',description); setMeta('link[rel="canonical"]','href',canonical);
-  setMeta('meta[property="og:title"]','content',title); setMeta('meta[property="og:description"]','content',description); setMeta('meta[property="og:image"]','content',`${SITE_ORIGIN}/assets/social-classroom.jpg`);
-  setMeta('meta[name="twitter:title"]','content',title); setMeta('meta[name="twitter:description"]','content',description); setMeta('meta[name="twitter:image"]','content',`${SITE_ORIGIN}/assets/social-classroom.jpg`);
+function routeParts() {
+  return location.pathname.split("/").filter(Boolean);
 }
-function setMeta(selector:string, attribute:string, value:string) { document.querySelector(selector)?.setAttribute(attribute,value); }
-function focusAndAnnounceRoute() { if(!focusOnRouteChange)return; focusOnRouteChange=false; requestAnimationFrame(()=>{ const heading=document.querySelector<HTMLElement>('main h1'); if(heading){ heading.tabIndex=-1; heading.focus({preventScroll:true}); announce(`Opened ${heading.textContent?.trim()||document.title}.`); } }); }
+function isDemo() {
+  return (
+    location.pathname === "/demo" ||
+    new URLSearchParams(location.search).get("demo") === "1"
+  );
+}
+function setMetadata(
+  title: string,
+  description: string,
+  path = location.pathname,
+) {
+  document.title = title;
+  const canonical = `${SITE_ORIGIN}${path === "/" ? "/" : path}`;
+  setMeta('meta[name="description"]', "content", description);
+  setMeta('link[rel="canonical"]', "href", canonical);
+  setMeta('meta[property="og:title"]', "content", title);
+  setMeta('meta[property="og:description"]', "content", description);
+  setMeta(
+    'meta[property="og:image"]',
+    "content",
+    `${SITE_ORIGIN}/assets/social-classroom.jpg`,
+  );
+  setMeta('meta[name="twitter:title"]', "content", title);
+  setMeta('meta[name="twitter:description"]', "content", description);
+  setMeta(
+    'meta[name="twitter:image"]',
+    "content",
+    `${SITE_ORIGIN}/assets/social-classroom.jpg`,
+  );
+}
+function setMeta(selector: string, attribute: string, value: string) {
+  document.querySelector(selector)?.setAttribute(attribute, value);
+}
+function focusAndAnnounceRoute() {
+  if (!focusOnRouteChange) return;
+  focusOnRouteChange = false;
+  requestAnimationFrame(() => {
+    const heading = document.querySelector<HTMLElement>("main h1");
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+      announce(`Opened ${heading.textContent?.trim() || document.title}.`);
+    }
+  });
+}
 async function render() {
   if (!isDemo()) clearDemoState();
-  currentRecording=null; if (recorder?.state === 'recording') recorder.stop(); recorder=null;
-  if (recordingTimer !== null) window.clearTimeout(recordingTimer); recordingTimer=null;
+  currentRecording = null;
+  if (recorder?.state === "recording") recorder.stop();
+  recorder = null;
+  if (recordingTimer !== null) window.clearTimeout(recordingTimer);
+  recordingTimer = null;
   const [route, token] = routeParts();
-  window.scrollTo({top:0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto':'smooth'});
+  window.scrollTo({
+    top: 0,
+    behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+      ? "auto"
+      : "smooth",
+  });
   if (!route && isDemo()) return demoPage();
   if (!route) return home();
-  if (route==='demo') return demoPage();
-  if (route==='create') return createPage();
-  if (route==='c' && token) return studentPage(token);
-  if (route==='review' && token) return reviewPage(token);
-  if (route==='receipt' && token) return receiptPage(token);
-  if (route==='pricing') return pricingPage();
-  if (route==='privacy') return privacyPage();
-  if (route==='terms') return termsPage();
+  if (route === "demo") return demoPage();
+  if (route === "create") return createPage();
+  if (route === "c" && token) return studentPage(token);
+  if (route === "review" && token) return reviewPage(token);
+  if (route === "receipt" && token) return receiptPage(token);
+  if (route === "pricing") return pricingPage();
+  if (route === "privacy") return privacyPage();
+  if (route === "terms") return termsPage();
   notFound();
 }
 
 function home() {
-  setMetadata('Accessible Explanation Check-in — Collect student reasoning','Collect student reasoning with a low-stakes text or voice check-in for teachers.','/');
-  shell(`<section class="hero"><picture><source type="image/avif" srcset="/assets/hero-classroom-768.avif 768w, /assets/hero-classroom-1536.avif 1536w" sizes="100vw"><source type="image/webp" srcset="/assets/hero-classroom-768.webp 768w, /assets/hero-classroom-1536.webp 1536w" sizes="100vw"><img src="/assets/hero-classroom-768.jpg" width="768" height="512" alt="An empty accessible classroom at blue hour, with a clear aisle leading toward a warmly lit open doorway" fetchpriority="high" decoding="async"></picture><div class="hero-shade"></div><div class="hero-copy"><p class="eyebrow">Student explanation check-ins for teachers</p><h1>Collect student reasoning</h1><p>For teachers who need a low-stakes check-in, students explain one choice by text or voice.</p><div class="button-row"><a class="button primary" href="/demo" data-link>Try it with sample data</a><span class="hero-action-note">Open a populated teacher review; nothing is saved.</span><a class="button ghost" href="#how">Read the three steps</a></div><ul class="hero-facts"><li>No accounts</li><li>Voice deletes on your schedule</li><li>Free check-ins accept 35 responses</li></ul></div></section><section id="how" class="how section"><div><p class="eyebrow">What a teacher receives</p><h2>How the check-in works</h2><p class="lead">Review a student’s explanation, confidence, and optional voice note. Use them to plan a follow-up conversation.</p></div><ol class="trail"><li><span>01</span><div><h3>Create one check-in</h3><p>Ask one question about a choice or step.</p></div></li><li><span>02</span><div><h3>Students explain their reasoning</h3><p>Students can complete the form using only a keyboard.</p></div></li><li><span>03</span><div><h3>Review each explanation</h3><p>Save tags and notes for your next conversation.</p></div></li></ol></section><section class="principle-band"><div><h2>What this tool does not do</h2><p>It does not grade, detect AI use, proctor, or verify identity.</p></div><div><h2>Privacy limits</h2><p>Voice deletes on the selected schedule. Keep private review links secure.</p></div></section>`);
+  setMetadata(
+    "Accessible Explanation Check-in — Collect student reasoning",
+    "Collect student reasoning with a low-stakes text or voice check-in for teachers.",
+    "/",
+  );
+  shell(
+    `<section class="hero"><picture><source type="image/avif" srcset="/assets/hero-classroom-768.avif 768w, /assets/hero-classroom-1536.avif 1536w" sizes="100vw"><source type="image/webp" srcset="/assets/hero-classroom-768.webp 768w, /assets/hero-classroom-1536.webp 1536w" sizes="100vw"><img src="/assets/hero-classroom-768.jpg" width="768" height="512" alt="An empty accessible classroom at blue hour, with a clear aisle leading toward a warmly lit open doorway" fetchpriority="high" decoding="async"></picture><div class="hero-shade"></div><div class="hero-copy"><p class="eyebrow">Student explanation check-ins for teachers</p><h1>Collect student reasoning</h1><p>For teachers who need a low-stakes check-in, students explain one choice by text or voice.</p><div class="button-row"><a class="button primary" href="/demo" data-link>Try it with sample data</a><span class="hero-action-note">Open a populated teacher review; nothing is saved.</span><a class="button ghost" href="#how">Read the three steps</a></div><ul class="hero-facts"><li>No accounts</li><li>Voice deletes on your schedule</li><li>Free check-ins accept 35 responses</li></ul></div></section><section id="how" class="how section"><div><p class="eyebrow">What a teacher receives</p><h2>How the check-in works</h2><p class="lead">Review a student’s explanation, confidence, and optional voice note. Use them to plan a follow-up conversation.</p></div><ol class="trail"><li><span>01</span><div><h3>Create one check-in</h3><p>Ask one question about a choice or step.</p></div></li><li><span>02</span><div><h3>Students explain their reasoning</h3><p>Students can complete the form using only a keyboard.</p></div></li><li><span>03</span><div><h3>Review each explanation</h3><p>Save tags and notes for your next conversation.</p></div></li></ol></section><section class="principle-band"><div><h2>What this tool does not do</h2><p>It does not grade, detect AI use, proctor, or verify identity.</p></div><div><h2>Privacy limits</h2><p>Voice deletes on the selected schedule. Keep private review links secure.</p></div></section>`,
+  );
 }
 
-type DemoSubmission = { name:string; explanation:string; confidence:number; tags:string[]; note:string; followUp:boolean };
-const demoSeed:DemoSubmission[] = [
-  {name:'Maya Chen',explanation:'I changed my model after comparing how water moved across the paved and planted surfaces.',confidence:4,tags:['Clear reasoning'],note:'Ask Maya to connect the model to the class data.',followUp:true},
-  {name:'Jordan Ellis',explanation:'I chose the planted surface because roots slow the water and leave less runoff.',confidence:5,tags:['Uses evidence'],note:'',followUp:false},
-  {name:'Sam Rivera',explanation:'I first thought both paths were the same. The soil layer changed my answer.',confidence:3,tags:['Needs follow-up'],note:'Invite Sam to explain the soil layer in the next discussion.',followUp:true},
+type DemoSubmission = {
+  name: string;
+  explanation: string;
+  confidence: number;
+  tags: string[];
+  note: string;
+  followUp: boolean;
+};
+const demoSeed: DemoSubmission[] = [
+  {
+    name: "Maya Chen",
+    explanation:
+      "I changed my model after comparing how water moved across the paved and planted surfaces.",
+    confidence: 4,
+    tags: ["Clear reasoning"],
+    note: "Ask Maya to connect the model to the class data.",
+    followUp: true,
+  },
+  {
+    name: "Jordan Ellis",
+    explanation:
+      "I chose the planted surface because roots slow the water and leave less runoff.",
+    confidence: 5,
+    tags: ["Uses evidence"],
+    note: "",
+    followUp: false,
+  },
+  {
+    name: "Sam Rivera",
+    explanation:
+      "I first thought both paths were the same. The soil layer changed my answer.",
+    confidence: 3,
+    tags: ["Needs follow-up"],
+    note: "Invite Sam to explain the soil layer in the next discussion.",
+    followUp: true,
+  },
 ];
-function demoSubmissions():DemoSubmission[] { try { return JSON.parse(localStorage.getItem(demoStorageKey)||'null') || structuredClone(demoSeed); } catch { return structuredClone(demoSeed); } }
-function saveDemo(submissions:DemoSubmission[]) { localStorage.setItem(demoStorageKey,JSON.stringify(submissions)); }
-function clearDemoState() { for (let index=localStorage.length-1; index>=0; index-=1) { const key=localStorage.key(index); if(key?.startsWith('demo:')) localStorage.removeItem(key); } }
-function demoPage() {
-  setMetadata('Demo — Accessible Explanation Check-in','Try a populated teacher review with isolated sample student explanations.','/demo');
-  const submissions=demoSubmissions();
-  shell(`<div class="review-page demo-review"><header class="review-header"><div><p class="eyebrow">Sample teacher review</p><h1>Watershed reasoning</h1><p class="lead">Which step changed your conclusion about runoff, and why?</p></div><div class="review-actions"><button class="button secondary" id="demo-export" type="button">Download sample CSV</button></div></header><div class="review-summary" aria-label="Sample response summary" tabindex="0"><p><strong>${submissions.length}</strong><span>sample responses</span></p><p><strong>${submissions.filter(s=>s.followUp).length}</strong><span>marked for follow-up</span></p><p><strong>0</strong><span>voice notes</span></p></div><div class="submissions">${submissions.map((s,index)=>`<article class="submission"><header><div><p class="submission-number">Sample response ${index+1}</p><h2>${e(s.name)}</h2><p>Confidence ${s.confidence}/5</p></div>${s.followUp?'<span class="follow-badge">Follow up</span>':''}</header><div class="response-body"><h3>Student explanation</h3><p class="student-words">${e(s.explanation)}</p></div><form class="review-form demo-review-form" data-index="${index}"><fieldset><legend>Review tags</legend><div class="tag-list">${TAGS.map(tag=>`<label><input type="checkbox" name="tag" value="${e(tag)}" ${s.tags.includes(tag)?'checked':''}><span>${e(tag)}</span></label>`).join('')}</div></fieldset><label>Private teacher note<textarea name="teacher_note" maxlength="1000" rows="3">${e(s.note)}</textarea></label><label class="check-row"><input type="checkbox" name="follow_up" ${s.followUp?'checked':''}><span><strong>Mark for follow-up</strong><small>Stored only in this demo browser space.</small></span></label><button class="button secondary" type="submit">Save sample review</button><span class="save-status" role="status"></span></form></article>`).join('')}</div></div>`,'demo');
-  document.querySelectorAll<HTMLFormElement>('.demo-review-form').forEach(form=>form.addEventListener('submit',event=>{ event.preventDefault(); const data=new FormData(form); const items=demoSubmissions(); const item=items[Number(form.dataset.index)]; item.tags=data.getAll('tag').map(String); item.note=String(data.get('teacher_note')||''); item.followUp=data.get('follow_up')==='on'; saveDemo(items); const status=form.querySelector<HTMLElement>('.save-status')!; status.textContent='Saved in demo'; announce('Sample review saved in the isolated demo.'); }));
-  document.querySelector<HTMLButtonElement>('#demo-export')?.addEventListener('click',downloadDemoCsv);
+function demoSubmissions(): DemoSubmission[] {
+  try {
+    return (
+      JSON.parse(localStorage.getItem(demoStorageKey) || "null") ||
+      structuredClone(demoSeed)
+    );
+  } catch {
+    return structuredClone(demoSeed);
+  }
 }
-function wireDemoControls() { document.querySelector<HTMLButtonElement>('#reset-demo')?.addEventListener('click',()=>{ localStorage.removeItem(demoStorageKey); render(); announce('Demo reset to the original sample data.'); }); }
-function downloadDemoCsv() { const lines=['student_name,confidence,explanation']; for(const s of demoSubmissions()) lines.push([s.name,s.confidence,s.explanation].map(csvCell).join(',')); const url=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv'})); const link=document.createElement('a'); link.href=url; link.download='sample-explanation-checkin.csv'; link.click(); URL.revokeObjectURL(url); }
-function csvCell(value:string|number) { return `"${String(value).replaceAll('"','""')}"`; }
+function saveDemo(submissions: DemoSubmission[]) {
+  localStorage.setItem(demoStorageKey, JSON.stringify(submissions));
+}
+function clearDemoState() {
+  for (let index = localStorage.length - 1; index >= 0; index -= 1) {
+    const key = localStorage.key(index);
+    if (key?.startsWith("demo:")) localStorage.removeItem(key);
+  }
+}
+function demoPage() {
+  setMetadata(
+    "Demo — Accessible Explanation Check-in",
+    "Try a populated teacher review with isolated sample student explanations.",
+    "/demo",
+  );
+  const submissions = demoSubmissions();
+  shell(
+    `<div class="review-page demo-review"><header class="review-header"><div><p class="eyebrow">Sample teacher review</p><h1>Watershed reasoning</h1><p class="lead">Which step changed your conclusion about runoff, and why?</p></div><div class="review-actions"><button class="button secondary" id="demo-export" type="button">Download sample CSV</button></div></header><div class="review-summary" aria-label="Sample response summary" tabindex="0"><p><strong>${submissions.length}</strong><span>sample responses</span></p><p><strong>${submissions.filter((s) => s.followUp).length}</strong><span>marked for follow-up</span></p><p><strong>0</strong><span>voice notes</span></p></div><div class="submissions">${submissions.map((s, index) => `<article class="submission"><header><div><p class="submission-number">Sample response ${index + 1}</p><h2>${e(s.name)}</h2><p>Confidence ${s.confidence}/5</p></div>${s.followUp ? '<span class="follow-badge">Follow up</span>' : ""}</header><div class="response-body"><h3>Student explanation</h3><p class="student-words">${e(s.explanation)}</p></div><form class="review-form demo-review-form" data-index="${index}"><fieldset><legend>Review tags</legend><div class="tag-list">${TAGS.map((tag) => `<label><input type="checkbox" name="tag" value="${e(tag)}" ${s.tags.includes(tag) ? "checked" : ""}><span>${e(tag)}</span></label>`).join("")}</div></fieldset><label>Private teacher note<textarea name="teacher_note" maxlength="1000" rows="3">${e(s.note)}</textarea></label><label class="check-row"><input type="checkbox" name="follow_up" ${s.followUp ? "checked" : ""}><span><strong>Mark for follow-up</strong><small>Stored only in this demo browser space.</small></span></label><button class="button secondary" type="submit">Save sample review</button><span class="save-status" role="status"></span></form></article>`).join("")}</div></div>`,
+    "demo",
+  );
+  document
+    .querySelectorAll<HTMLFormElement>(".demo-review-form")
+    .forEach((form) =>
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const data = new FormData(form);
+        const items = demoSubmissions();
+        const item = items[Number(form.dataset.index)];
+        item.tags = data.getAll("tag").map(String);
+        item.note = String(data.get("teacher_note") || "");
+        item.followUp = data.get("follow_up") === "on";
+        saveDemo(items);
+        const status = form.querySelector<HTMLElement>(".save-status")!;
+        status.textContent = "Saved in demo";
+        announce("Sample review saved in the isolated demo.");
+      }),
+    );
+  document
+    .querySelector<HTMLButtonElement>("#demo-export")
+    ?.addEventListener("click", downloadDemoCsv);
+}
+function wireDemoControls() {
+  document
+    .querySelector<HTMLButtonElement>("#reset-demo")
+    ?.addEventListener("click", () => {
+      localStorage.removeItem(demoStorageKey);
+      render();
+      announce("Demo reset to the original sample data.");
+    });
+}
+function downloadDemoCsv() {
+  const lines = ["student_name,confidence,explanation"];
+  for (const s of demoSubmissions())
+    lines.push([s.name, s.confidence, s.explanation].map(csvCell).join(","));
+  const url = URL.createObjectURL(
+    new Blob([lines.join("\n")], { type: "text/csv" }),
+  );
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "sample-explanation-checkin.csv";
+  link.click();
+  URL.revokeObjectURL(url);
+}
+function csvCell(value: string | number) {
+  return `"${String(value).replaceAll('"', '""')}"`;
+}
 
 async function createPage() {
-  document.title='Create a check-in — Accessible Explanation Check-in';
-  const paid=await paidStatus(false);
-  shell(`<div class="work-page"><div class="page-heading"><p class="eyebrow">Teacher setup</p><h1>Create a student explanation check-in</h1><p class="lead">Ask about one decision, step, or change of mind. You’ll get separate student and teacher-review links.</p></div><div id="form-error" class="error-summary" role="alert" hidden tabindex="-1"></div><form id="create-form" class="paper-form"><label>Assignment name <span aria-hidden="true">*</span><input name="title" required maxlength="120" autocomplete="off" placeholder="Example: River systems reflection"></label><label>Explanation prompt <span aria-hidden="true">*</span><textarea name="prompt" required minlength="4" maxlength="1200" rows="5" placeholder="What choice or step mattered most in your work, and why?"></textarea><span class="field-note">Aim for one answerable question. 1,200 characters maximum.</span></label><fieldset><legend>Voice deletion schedule</legend><p class="field-note">Recordings delete automatically. Text remains until the teacher’s private record is removed from the server.</p><label class="select-label"><span>Delete voice after</span><select name="voice_retention_days">${retentionOptions(paid)}</select></label>${paid?'<p class="tier-note success">Classroom Plus is active. Check-ins accept up to 500 responses and offer extended voice retention.</p>':'<p class="tier-note">Free check-ins accept 35 responses and voice is kept for up to 7 days. <a href="/pricing" data-link>See Classroom Plus</a>.</p>'}</fieldset><div class="privacy-note"><span aria-hidden="true">◌</span><p><strong>Private by link.</strong> Links use random tokens. Store the review link somewhere your students cannot access.</p></div><button class="button primary" type="submit">Create private links</button><p class="submit-note">No account required. Creating a check-in stores these form fields, private-link tokens, limits, and timestamps.</p></form><aside class="recent" id="recent"><h2>Your recent review links</h2><p>Saved only in this browser.</p>${recentLinks()}</aside></div>`, 'create');
-  document.querySelector<HTMLFormElement>('#create-form')!.addEventListener('submit', ev=>createCheckin(ev,paid));
+  document.title = "Create a check-in — Accessible Explanation Check-in";
+  const paid = await paidStatus(false);
+  const deletedNotice = history.state?.deletedCheckin
+    ? '<p class="status success" role="status">Check-in deleted. Its responses, receipt links, and voice files are gone.</p>'
+    : "";
+  if (history.state?.deletedCheckin) history.replaceState({}, "", location.href);
+  shell(
+    `<div class="work-page">
+      <div class="page-heading">
+        <p class="eyebrow">Teacher setup</p>
+        <h1>Create a student explanation check-in</h1>
+        <p class="lead">Ask about one decision, step, or change of mind. You’ll get separate student and teacher-review links.</p>
+        ${deletedNotice}
+      </div>
+      <div id="form-error" class="error-summary" role="alert" hidden tabindex="-1"></div>
+      <form id="create-form" class="paper-form">
+        <label>Assignment name <span aria-hidden="true">*</span><input name="title" required maxlength="120" autocomplete="off" placeholder="Example: River systems reflection"></label>
+        <label>Explanation prompt <span aria-hidden="true">*</span><textarea name="prompt" required minlength="4" maxlength="1200" rows="5" placeholder="What choice or step mattered most in your work, and why?"></textarea><span class="field-note">Aim for one answerable question. 1,200 characters maximum.</span></label>
+        <fieldset>
+          <legend>Voice deletion schedule</legend>
+          <p class="field-note">Recordings delete automatically. Text does not follow the voice schedule.</p>
+          <label class="select-label"><span>Delete voice after</span><select name="voice_retention_days">${retentionOptions(paid)}</select></label>
+          ${paid ? '<p class="tier-note success">Classroom Plus is active. Check-ins accept up to 500 responses and offer extended voice retention.</p>' : '<p class="tier-note">Free check-ins accept 35 responses and voice is kept for up to 7 days. <a href="/pricing" data-link>See Classroom Plus</a>.</p>'}
+        </fieldset>
+        <div class="privacy-note"><span aria-hidden="true">◌</span><p><strong>Private by link.</strong> Links use random tokens. Store the review link somewhere your students cannot access.</p></div>
+        <button class="button primary" type="submit">Create private links</button>
+        <p class="submit-note">No account required. Creating a check-in stores these form fields, private-link tokens, limits, and timestamps.</p>
+      </form>
+      <aside class="recent" id="recent"><h2>Your recent review links</h2><p>Saved only in this browser.</p>${recentLinks()}</aside>
+    </div>`,
+    "create",
+  );
+  document
+    .querySelector<HTMLFormElement>("#create-form")!
+    .addEventListener("submit", (ev) => createCheckin(ev, paid));
 }
 
-function retentionOptions(paid:boolean) { const options=paid?[1,3,7,14,30,90,180,365]:[1,3,7]; return options.map(v=>`<option value="${v}" ${v===7?'selected':''}>${v} day${v===1?'':'s'}</option>`).join(''); }
+function retentionOptions(paid: boolean) {
+  const options = paid ? [1, 3, 7, 14, 30, 90, 180, 365] : [1, 3, 7];
+  return options
+    .map(
+      (v) =>
+        `<option value="${v}" ${v === 7 ? "selected" : ""}>${v} day${v === 1 ? "" : "s"}</option>`,
+    )
+    .join("");
+}
 
-async function createCheckin(event:SubmitEvent, paid:boolean) {
-  event.preventDefault(); const form=event.currentTarget as HTMLFormElement; const button=form.querySelector('button[type=submit]') as HTMLButtonElement; const data=new FormData(form);
-  button.disabled=true; button.textContent='Creating links…'; showError('');
-  const body={title:data.get('title'),prompt:data.get('prompt'),voice_retention_days:Number(data.get('voice_retention_days')),license:paid?localStorage.getItem(licenseKey):null};
+async function createCheckin(event: SubmitEvent, paid: boolean) {
+  event.preventDefault();
+  const form = event.currentTarget as HTMLFormElement;
+  const button = form.querySelector("button[type=submit]") as HTMLButtonElement;
+  const data = new FormData(form);
+  button.disabled = true;
+  button.textContent = "Creating links…";
+  showError("");
+  const body = {
+    title: data.get("title"),
+    prompt: data.get("prompt"),
+    voice_retention_days: Number(data.get("voice_retention_days")),
+    license: paid ? localStorage.getItem(licenseKey) : null,
+  };
   try {
-    const result=await api<{student_token:string;review_token:string;max_submissions:number;voice_retention_days:number}>('/api/checkins',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
-    const student=`${location.origin}/c/${result.student_token}`; const review=`${location.origin}/review/${result.review_token}`;
-    saveRecent(String(body.title),review);
-    form.outerHTML=`<section class="created" tabindex="-1"><p class="status success"><span aria-hidden="true">✓</span> Check-in ready</p><h2>Keep one link. Share the other.</h2><div class="link-block"><label for="student-link">Student link</label><p>Share this with your class.</p><div class="copy-line"><input id="student-link" readonly value="${e(student)}"><button class="button secondary copy" data-copy="student-link">Copy student link</button></div></div><div class="link-block private"><label for="review-link">Private review link</label><p>Anyone with this link can see responses. Keep it private.</p><div class="copy-line"><input id="review-link" readonly value="${e(review)}"><button class="button secondary copy" data-copy="review-link">Copy review link</button></div></div><div class="button-row"><a class="button primary" href="${e(review)}" data-link>Open review space</a><a class="button quiet" href="/create" data-link>Create another</a></div></section>`;
-    document.querySelector<HTMLElement>('.created')!.focus(); wireLinks(); wireCopy();
-  } catch(error) { showError(errorMessage(error)); button.disabled=false; button.textContent='Create private links'; }
+    const result = await api<{
+      student_token: string;
+      review_token: string;
+      max_submissions: number;
+      voice_retention_days: number;
+    }>("/api/checkins", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const student = `${location.origin}/c/${result.student_token}`;
+    const review = `${location.origin}/review/${result.review_token}`;
+    saveRecent(String(body.title), review);
+    form.outerHTML = `<section class="created" tabindex="-1"><p class="status success"><span aria-hidden="true">✓</span> Check-in ready</p><h2>Keep one link. Share the other.</h2><div class="link-block"><label for="student-link">Student link</label><p>Share this with your class.</p><div class="copy-line"><input id="student-link" readonly value="${e(student)}"><button class="button secondary copy" data-copy="student-link">Copy student link</button></div></div><div class="link-block private"><label for="review-link">Private review link</label><p>Anyone with this link can see responses. Keep it private.</p><div class="copy-line"><input id="review-link" readonly value="${e(review)}"><button class="button secondary copy" data-copy="review-link">Copy review link</button></div></div><div class="button-row"><a class="button primary" href="${e(review)}" data-link>Open review space</a><a class="button quiet" href="/create" data-link>Create another</a></div></section>`;
+    document.querySelector<HTMLElement>(".created")!.focus();
+    wireLinks();
+    wireCopy();
+  } catch (error) {
+    showError(errorMessage(error));
+    button.disabled = false;
+    button.textContent = "Create private links";
+  }
 }
 
-async function studentPage(token:string) {
-  document.title='Student check-in — Accessible Explanation Check-in';
-  shell(`<div class="loading" role="status"><span class="loader" aria-hidden="true"></span><p>Opening your check-in…</p></div>`);
-  try { const checkin=await api<Checkin>(`/api/checkins/${encodeURIComponent(token)}`); renderStudent(token,checkin); }
-  catch(error) { loadError('We could not open this check-in',errorMessage(error),`/c/${token}`); }
+async function studentPage(token: string) {
+  document.title = "Student check-in — Accessible Explanation Check-in";
+  shell(
+    `<div class="loading" role="status"><span class="loader" aria-hidden="true"></span><p>Opening your check-in…</p></div>`,
+  );
+  try {
+    const checkin = await api<Checkin>(
+      `/api/checkins/${encodeURIComponent(token)}`,
+    );
+    renderStudent(token, checkin);
+  } catch (error) {
+    loadError(
+      "We could not open this check-in",
+      errorMessage(error),
+      `/c/${token}`,
+    );
+  }
 }
 
-function renderStudent(token:string,c:Checkin) {
-  document.title=`${c.title} — Explanation Check-in`;
-  if(!c.open) { shell(`<div class="work-page narrow"><p class="eyebrow">Check-in closed</p><h1>${e(c.title)}</h1><div class="empty-state"><span aria-hidden="true">—</span><h2>This link has received all ${c.max_submissions} responses.</h2><p>Ask your teacher for a new check-in link. Nothing you type here will be saved.</p></div></div>`); return; }
-  const draftKey=`checkin-draft:${token}`; const draft=JSON.parse(localStorage.getItem(draftKey)||'{}');
-  shell(`<div class="student-page"><nav class="steps" aria-label="Check-in steps"><span aria-current="step">1 · Your words</span><span>2 · Confidence</span><span>3 · Review</span></nav><header class="prompt-header"><p class="eyebrow">${e(c.title)}</p><h1>${e(c.prompt)}</h1><p>This is not a test or AI detector. Explain one part of your thinking in the way that works for you.</p></header><div id="form-error" class="error-summary" role="alert" hidden tabindex="-1"></div><form id="student-form" class="paper-form" data-draft="${e(draftKey)}"><label>Your name <span aria-hidden="true">*</span><input name="student_name" required maxlength="80" autocomplete="name" value="${e(draft.student_name||'')}"><span class="field-note">Use the name your teacher will recognize. No email needed.</span></label><fieldset><legend>Your explanation <span class="optional">— text, voice, or both</span></legend><label for="explanation">Write your explanation</label><textarea id="explanation" name="explanation_text" maxlength="4000" rows="8" placeholder="I started by… The part I changed was…">${e(draft.explanation_text||'')}</textarea><div class="char-count" id="char-count">${String(draft.explanation_text||'').length} / 4,000</div><div class="or" aria-hidden="true"><span>or add voice</span></div><div class="recorder"><div><strong>Voice explanation</strong><p id="record-status">Nothing recorded. Maximum 2 minutes / 4 MB.</p></div><div class="button-row"><button class="button secondary" id="record" type="button"><span aria-hidden="true">●</span> Start recording</button><button class="button quiet" id="remove-recording" type="button" hidden>Remove recording</button></div><audio id="playback" controls hidden aria-label="Your recorded explanation"></audio></div><p class="retention"><span aria-hidden="true">◴</span> If you add voice, it will delete automatically ${c.voice_retention_days} day${c.voice_retention_days===1?'':'s'} after submission. Your teacher can delete it sooner.</p></fieldset><fieldset class="confidence"><legend>How confident do you feel about this work? <span aria-hidden="true">*</span></legend><div class="confidence-scale">${[1,2,3,4,5].map(n=>`<label><input type="radio" name="confidence" value="${n}" ${Number(draft.confidence)===n?'checked':''} required><span class="confidence-number">${n}</span><span>${['Not yet','A little','In between','Mostly','Very'][n-1]}</span></label>`).join('')}</div></fieldset><div class="review-note"><h2>Before you send</h2><ul><li>Your teacher sees your name, explanation and confidence.</li><li>You will receive a private receipt link.</li><li>You can ask your teacher to delete your record.</li></ul></div><button class="button primary" type="submit">Send my explanation</button><p class="submit-note">You’ll review a receipt immediately after sending.</p></form></div>`);
-  const form=document.querySelector<HTMLFormElement>('#student-form')!; form.addEventListener('submit',ev=>submitStudent(ev,token,draftKey)); form.addEventListener('input',()=>saveDraft(form,draftKey));
-  const area=form.elements.namedItem('explanation_text') as HTMLTextAreaElement; area.addEventListener('input',()=>document.querySelector('#char-count')!.textContent=`${area.value.length} / 4,000`);
+function renderStudent(token: string, c: Checkin) {
+  document.title = `${c.title} — Explanation Check-in`;
+  if (!c.open) {
+    shell(
+      `<div class="work-page narrow"><p class="eyebrow">Check-in closed</p><h1>${e(c.title)}</h1><div class="empty-state"><span aria-hidden="true">—</span><h2>This link has received all ${c.max_submissions} responses.</h2><p>Ask your teacher for a new check-in link. Nothing you type here will be saved.</p></div></div>`,
+    );
+    return;
+  }
+  const draftKey = `checkin-draft:${token}`;
+  const draft = JSON.parse(localStorage.getItem(draftKey) || "{}");
+  shell(
+    `<div class="student-page">
+      <nav class="steps" aria-label="Check-in steps"><span aria-current="step">1 · Your words</span><span>2 · Confidence</span><span>3 · Review</span></nav>
+      <header class="prompt-header"><p class="eyebrow">${e(c.title)}</p><h1>${e(c.prompt)}</h1><p>This is not a test or AI detector. Explain one part of your thinking in the way that works for you.</p></header>
+      <div id="form-error" class="error-summary" role="alert" hidden tabindex="-1"></div>
+      <form id="student-form" class="paper-form" data-draft="${e(draftKey)}">
+        <label>Your name <span aria-hidden="true">*</span><input name="student_name" required maxlength="80" autocomplete="name" value="${e(draft.student_name || "")}"><span class="field-note">Use the name your teacher will recognize. No email needed.</span></label>
+        <fieldset>
+          <legend>Your explanation <span class="optional">— text, voice, or both</span></legend>
+          <label for="explanation">Write your explanation</label>
+          <textarea id="explanation" name="explanation_text" maxlength="4000" rows="8" placeholder="I started by… The part I changed was…">${e(draft.explanation_text || "")}</textarea>
+          <div class="char-count" id="char-count">${String(draft.explanation_text || "").length} / 4,000</div>
+          <div class="or" aria-hidden="true"><span>or add voice</span></div>
+          <div class="recorder"><div><strong>Voice explanation</strong><p id="record-status">Nothing recorded. Maximum 2 minutes / 4 MB.</p></div><div class="button-row"><button class="button secondary" id="record" type="button"><span aria-hidden="true">●</span> Start recording</button><button class="button quiet" id="remove-recording" type="button" hidden>Remove recording</button></div><audio id="playback" controls hidden aria-label="Your recorded explanation"></audio></div>
+          <p class="retention"><span aria-hidden="true">◴</span> If you add voice, it will delete automatically ${c.voice_retention_days} day${c.voice_retention_days === 1 ? "" : "s"} after submission. Your teacher can delete it sooner.</p>
+        </fieldset>
+        <fieldset class="confidence"><legend>How confident do you feel about this work? <span aria-hidden="true">*</span></legend><div class="confidence-scale">${[1, 2, 3, 4, 5].map((n) => `<label><input type="radio" name="confidence" value="${n}" ${Number(draft.confidence) === n ? "checked" : ""} required><span class="confidence-number">${n}</span><span>${["Not yet", "A little", "In between", "Mostly", "Very"][n - 1]}</span></label>`).join("")}</div></fieldset>
+        <div class="review-note"><h2>Before you send</h2><ul><li>Your teacher sees your name, explanation and confidence.</li><li>You will receive a private receipt link.</li><li>Ask your teacher to delete the check-in if your school approves it.</li></ul></div>
+        <button class="button primary" type="submit">Send my explanation</button>
+        <p class="submit-note">You’ll review a receipt immediately after sending.</p>
+      </form>
+    </div>`,
+  );
+  const form = document.querySelector<HTMLFormElement>("#student-form")!;
+  form.addEventListener("submit", (ev) => submitStudent(ev, token, draftKey));
+  form.addEventListener("input", () => saveDraft(form, draftKey));
+  const area = form.elements.namedItem(
+    "explanation_text",
+  ) as HTMLTextAreaElement;
+  area.addEventListener(
+    "input",
+    () =>
+      (document.querySelector("#char-count")!.textContent =
+        `${area.value.length} / 4,000`),
+  );
   setupRecorder();
 }
 
 function setupRecorder() {
-  const start=document.querySelector<HTMLButtonElement>('#record')!; const remove=document.querySelector<HTMLButtonElement>('#remove-recording')!; const status=document.querySelector('#record-status')!; const audio=document.querySelector<HTMLAudioElement>('#playback')!;
-  if(!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) { start.disabled=true; status.textContent='Voice recording is not supported in this browser. You can use the text box above.'; return; }
-  start.addEventListener('click',async()=>{
-    if(recorder?.state==='recording') { recorder.stop(); return; }
-    try { const stream=await navigator.mediaDevices.getUserMedia({audio:true}); const chunks:BlobPart[]=[]; recorder=new MediaRecorder(stream); recorder.ondataavailable=ev=>chunks.push(ev.data); recorder.onstop=()=>{ if(recordingTimer!==null)window.clearTimeout(recordingTimer); recordingTimer=null; currentRecording=new Blob(chunks,{type:recorder?.mimeType||'audio/webm'}); stream.getTracks().forEach(t=>t.stop()); audio.src=URL.createObjectURL(currentRecording); audio.hidden=false; remove.hidden=false; start.innerHTML='<span aria-hidden="true">●</span> Record again'; status.textContent=`Recording ready (${Math.ceil(currentRecording.size/1024)} KB). Play it back before sending.`; announce('Recording ready to review.'); }; recorder.start(); start.innerHTML='<span aria-hidden="true">■</span> Stop recording'; status.textContent='Recording now… Select Stop recording when finished.'; announce('Recording started.'); recordingTimer=window.setTimeout(()=>{if(recorder?.state==='recording')recorder.stop()},120000); }
-    catch { status.textContent='Microphone access was not available. Allow microphone access or use the text box.'; announce(status.textContent); }
+  const start = document.querySelector<HTMLButtonElement>("#record")!;
+  const remove =
+    document.querySelector<HTMLButtonElement>("#remove-recording")!;
+  const status = document.querySelector("#record-status")!;
+  const audio = document.querySelector<HTMLAudioElement>("#playback")!;
+  if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+    start.disabled = true;
+    status.textContent =
+      "Voice recording is not supported in this browser. You can use the text box above.";
+    return;
+  }
+  start.addEventListener("click", async () => {
+    if (recorder?.state === "recording") {
+      recorder.stop();
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const chunks: BlobPart[] = [];
+      recorder = new MediaRecorder(stream);
+      recorder.ondataavailable = (ev) => chunks.push(ev.data);
+      recorder.onstop = () => {
+        if (recordingTimer !== null) window.clearTimeout(recordingTimer);
+        recordingTimer = null;
+        currentRecording = new Blob(chunks, {
+          type: recorder?.mimeType || "audio/webm",
+        });
+        stream.getTracks().forEach((t) => t.stop());
+        audio.src = URL.createObjectURL(currentRecording);
+        audio.hidden = false;
+        remove.hidden = false;
+        start.innerHTML = '<span aria-hidden="true">●</span> Record again';
+        status.textContent = `Recording ready (${Math.ceil(currentRecording.size / 1024)} KB). Play it back before sending.`;
+        announce("Recording ready to review.");
+      };
+      recorder.start();
+      start.innerHTML = '<span aria-hidden="true">■</span> Stop recording';
+      status.textContent =
+        "Recording now… Select Stop recording when finished.";
+      announce("Recording started.");
+      recordingTimer = window.setTimeout(() => {
+        if (recorder?.state === "recording") recorder.stop();
+      }, 120000);
+    } catch {
+      status.textContent =
+        "Microphone access was not available. Allow microphone access or use the text box.";
+      announce(status.textContent);
+    }
   });
-  remove.addEventListener('click',()=>{ currentRecording=null; audio.removeAttribute('src'); audio.hidden=true; remove.hidden=true; status.textContent='Nothing recorded. Maximum 2 minutes / 4 MB.'; announce('Recording removed.'); });
+  remove.addEventListener("click", () => {
+    currentRecording = null;
+    audio.removeAttribute("src");
+    audio.hidden = true;
+    remove.hidden = true;
+    status.textContent = "Nothing recorded. Maximum 2 minutes / 4 MB.";
+    announce("Recording removed.");
+  });
 }
 
-async function submitStudent(event:SubmitEvent,token:string,draftKey:string) {
-  event.preventDefault(); const form=event.currentTarget as HTMLFormElement; const button=form.querySelector('button[type=submit]') as HTMLButtonElement; const data=new FormData(form); showError('');
-  if(!String(data.get('explanation_text')||'').trim() && !currentRecording) { showError('Add a text explanation, a voice explanation, or both.'); return; }
-  if(currentRecording && currentRecording.size > 4*1024*1024) { showError('The voice recording is over 4 MB. Record a shorter explanation or use text.'); return; }
-  if(!navigator.onLine){ showError('You are offline. Your writing is saved on this device; reconnect and send again.'); return; }
-  button.disabled=true; button.textContent='Sending securely…';
-  try { const voice_data=currentRecording?await blobBase64(currentRecording):null; const result=await api<{receipt_token:string}>(`/api/checkins/${encodeURIComponent(token)}/submissions`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({student_name:data.get('student_name'),explanation_text:data.get('explanation_text'),confidence:Number(data.get('confidence')),voice_data,voice_mime:currentRecording?.type})}); localStorage.removeItem(draftKey); history.pushState({},'',`/receipt/${result.receipt_token}`); focusOnRouteChange=true; render(); }
-  catch(error){showError(errorMessage(error));button.disabled=false;button.textContent='Send my explanation';}
+async function submitStudent(
+  event: SubmitEvent,
+  token: string,
+  draftKey: string,
+) {
+  event.preventDefault();
+  const form = event.currentTarget as HTMLFormElement;
+  const button = form.querySelector("button[type=submit]") as HTMLButtonElement;
+  const data = new FormData(form);
+  showError("");
+  if (!String(data.get("explanation_text") || "").trim() && !currentRecording) {
+    showError("Add a text explanation, a voice explanation, or both.");
+    return;
+  }
+  if (currentRecording && currentRecording.size > 4 * 1024 * 1024) {
+    showError(
+      "The voice recording is over 4 MB. Record a shorter explanation or use text.",
+    );
+    return;
+  }
+  if (!navigator.onLine) {
+    showError(
+      "You are offline. Your writing is saved on this device; reconnect and send again.",
+    );
+    return;
+  }
+  button.disabled = true;
+  button.textContent = "Sending securely…";
+  try {
+    const voice_data = currentRecording
+      ? await blobBase64(currentRecording)
+      : null;
+    const result = await api<{ receipt_token: string }>(
+      `/api/checkins/${encodeURIComponent(token)}/submissions`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          student_name: data.get("student_name"),
+          explanation_text: data.get("explanation_text"),
+          confidence: Number(data.get("confidence")),
+          voice_data,
+          voice_mime: currentRecording?.type,
+        }),
+      },
+    );
+    localStorage.removeItem(draftKey);
+    history.pushState({}, "", `/receipt/${result.receipt_token}`);
+    focusOnRouteChange = true;
+    render();
+  } catch (error) {
+    showError(errorMessage(error));
+    button.disabled = false;
+    button.textContent = "Send my explanation";
+  }
 }
 
-async function reviewPage(token:string) {
-  document.title='Teacher review — Accessible Explanation Check-in'; shell(`<div class="loading" role="status"><span class="loader" aria-hidden="true"></span><p>Gathering responses…</p></div>`);
-  try { renderReview(token,await api<Review>(`/api/reviews/${encodeURIComponent(token)}`)); } catch(error){loadError('We could not open this review space',errorMessage(error),`/review/${token}`);}
+async function reviewPage(token: string) {
+  document.title = "Teacher review — Accessible Explanation Check-in";
+  shell(
+    `<div class="loading" role="status"><span class="loader" aria-hidden="true"></span><p>Gathering responses…</p></div>`,
+  );
+  try {
+    renderReview(
+      token,
+      await api<Review>(`/api/reviews/${encodeURIComponent(token)}`),
+    );
+  } catch (error) {
+    loadError(
+      "We could not open this review space",
+      errorMessage(error),
+      `/review/${token}`,
+    );
+  }
 }
 
-function renderReview(token:string,r:Review) {
-  document.title=`Review ${r.title} — Explanation Check-in`; shell(`<div class="review-page"><header class="review-header"><div><p class="eyebrow">Private teacher review</p><h1>${e(r.title)}</h1><p class="lead">${e(r.prompt)}</p></div><div class="review-actions"><a class="button secondary" href="/api/reviews/${encodeURIComponent(token)}/export.csv" download>Export CSV</a><button class="button quiet" id="copy-review" type="button">Copy review link</button></div></header><div class="review-summary" aria-label="Scrollable response summary" tabindex="0"><p><strong>${r.submissions.length}</strong><span>response${r.submissions.length===1?'':'s'}</span></p><p><strong>${r.submissions.filter(s=>s.follow_up).length}</strong><span>marked for follow-up</span></p><p><strong>${r.submissions.filter(s=>s.has_voice).length}</strong><span>voice note${r.submissions.filter(s=>s.has_voice).length===1?'':'s'} available</span></p></div>${r.submissions.length?`<div class="submissions">${r.submissions.map((s,i)=>submissionCard(token,s,i)).join('')}</div>`:`<div class="empty-state"><span aria-hidden="true">○</span><h2>No explanations yet</h2><p>Share the student link you saved when creating this check-in. Refresh when students have submitted.</p><button class="button secondary" id="refresh" type="button">Refresh responses</button></div>`}</div>`);
-  document.querySelector('#copy-review')?.addEventListener('click',()=>copyText(location.href,'Review link copied.'));
-  document.querySelector('#refresh')?.addEventListener('click',render); document.querySelectorAll<HTMLFormElement>('.review-form').forEach(form=>form.addEventListener('submit',ev=>saveReview(ev,token)));
-  document.querySelectorAll<HTMLButtonElement>('.delete-voice').forEach(button=>button.addEventListener('click',()=>removeVoice(token,button.dataset.id!,button)));
+function renderReview(token: string, r: Review) {
+  document.title = `Review ${r.title} — Explanation Check-in`;
+  shell(
+    `<div class="review-page"><header class="review-header"><div><p class="eyebrow">Private teacher review</p><h1>${e(r.title)}</h1><p class="lead">${e(r.prompt)}</p></div><div class="review-actions"><a class="button secondary" href="/api/reviews/${encodeURIComponent(token)}/export.csv" download>Export CSV</a><button class="button quiet" id="copy-review" type="button">Copy review link</button></div></header><div class="review-summary" aria-label="Scrollable response summary" tabindex="0"><p><strong>${r.submissions.length}</strong><span>response${r.submissions.length === 1 ? "" : "s"}</span></p><p><strong>${r.submissions.filter((s) => s.follow_up).length}</strong><span>marked for follow-up</span></p><p><strong>${r.submissions.filter((s) => s.has_voice).length}</strong><span>voice note${r.submissions.filter((s) => s.has_voice).length === 1 ? "" : "s"} available</span></p></div>${r.submissions.length ? `<div class="submissions">${r.submissions.map((s, i) => submissionCard(token, s, i)).join("")}</div>` : `<div class="empty-state"><span aria-hidden="true">○</span><h2>No explanations yet</h2><p>Share the student link you saved when creating this check-in. Refresh when students have submitted.</p><button class="button secondary" id="refresh" type="button">Refresh responses</button></div>`}</div>`,
+  );
+  const deleteButton = document.createElement("button");
+  deleteButton.id = "delete-checkin";
+  deleteButton.className = "button secondary danger";
+  deleteButton.type = "button";
+  deleteButton.textContent = "Delete check-in";
+  document.querySelector(".review-actions")?.append(deleteButton);
+  document
+    .querySelector("#copy-review")
+    ?.addEventListener("click", () =>
+      copyText(location.href, "Review link copied."),
+    );
+  document.querySelector("#refresh")?.addEventListener("click", render);
+  document
+    .querySelectorAll<HTMLFormElement>(".review-form")
+    .forEach((form) =>
+      form.addEventListener("submit", (ev) => saveReview(ev, token)),
+    );
+  document
+    .querySelectorAll<HTMLButtonElement>(".delete-voice")
+    .forEach((button) =>
+      button.addEventListener("click", () =>
+        removeVoice(token, button.dataset.id!, button),
+      ),
+    );
+  deleteButton.addEventListener("click", () => removeCheckin(token, deleteButton));
 }
 
-const TAGS=['Clear reasoning','Uses evidence','Needs follow-up','New strategy','AI use discussed','Misconception'];
-function submissionCard(token:string,s:Submission,index:number) { return `<article class="submission" id="submission-${e(s.id)}"><header><div><p class="submission-number">Response ${index+1}</p><h2>${e(s.student_name)}</h2><p><time datetime="${e(s.created_at)}">${e(formatDate(s.created_at))}</time> · Confidence ${s.confidence}/5</p></div>${s.follow_up?'<span class="follow-badge">Follow up</span>':''}</header><div class="response-body"><h3>Student explanation</h3>${s.explanation_text?`<p class="student-words">${e(s.explanation_text)}</p>`:'<p class="muted">Voice explanation only.</p>'}${s.has_voice?`<div class="voice-review"><audio controls preload="none" src="/api/reviews/${encodeURIComponent(token)}/submissions/${e(s.id)}/voice" aria-label="Voice explanation from ${e(s.student_name)}"></audio><p>${s.voice_delete_at?`Deletes automatically ${e(formatDate(s.voice_delete_at))}.`:''}</p><button class="text-button danger delete-voice" type="button" data-id="${e(s.id)}">Delete voice now</button></div>`:'<p class="voice-deleted">No voice file available.</p>'}</div><form class="review-form" data-id="${e(s.id)}"><fieldset><legend>Review tags</legend><div class="tag-list">${TAGS.map(tag=>`<label><input type="checkbox" name="tag" value="${e(tag)}" ${s.teacher_tags.includes(tag)?'checked':''}><span>${e(tag)}</span></label>`).join('')}</div></fieldset><label>Private teacher note<textarea name="teacher_note" maxlength="1000" rows="3">${e(s.teacher_note)}</textarea></label><label class="check-row"><input type="checkbox" name="follow_up" ${s.follow_up?'checked':''}><span><strong>Mark for follow-up</strong><small>Visible only in this review space and CSV.</small></span></label><button class="button secondary" type="submit">Save review</button><span class="save-status" role="status"></span></form><a class="receipt-link" href="/receipt/${e(s.receipt_token)}" data-link>Open student receipt</a></article>`; }
+const TAGS = [
+  "Clear reasoning",
+  "Uses evidence",
+  "Needs follow-up",
+  "New strategy",
+  "AI use discussed",
+  "Misconception",
+];
+function submissionCard(token: string, s: Submission, index: number) {
+  return `<article class="submission" id="submission-${e(s.id)}"><header><div><p class="submission-number">Response ${index + 1}</p><h2>${e(s.student_name)}</h2><p><time datetime="${e(s.created_at)}">${e(formatDate(s.created_at))}</time> · Confidence ${s.confidence}/5</p></div>${s.follow_up ? '<span class="follow-badge">Follow up</span>' : ""}</header><div class="response-body"><h3>Student explanation</h3>${s.explanation_text ? `<p class="student-words">${e(s.explanation_text)}</p>` : '<p class="muted">Voice explanation only.</p>'}${s.has_voice ? `<div class="voice-review"><audio controls preload="none" src="/api/reviews/${encodeURIComponent(token)}/submissions/${e(s.id)}/voice" aria-label="Voice explanation from ${e(s.student_name)}"></audio><p>${s.voice_delete_at ? `Deletes automatically ${e(formatDate(s.voice_delete_at))}.` : ""}</p><button class="text-button danger delete-voice" type="button" data-id="${e(s.id)}">Delete voice now</button></div>` : '<p class="voice-deleted">No voice file available.</p>'}</div><form class="review-form" data-id="${e(s.id)}"><fieldset><legend>Review tags</legend><div class="tag-list">${TAGS.map((tag) => `<label><input type="checkbox" name="tag" value="${e(tag)}" ${s.teacher_tags.includes(tag) ? "checked" : ""}><span>${e(tag)}</span></label>`).join("")}</div></fieldset><label>Private teacher note<textarea name="teacher_note" maxlength="1000" rows="3">${e(s.teacher_note)}</textarea></label><label class="check-row"><input type="checkbox" name="follow_up" ${s.follow_up ? "checked" : ""}><span><strong>Mark for follow-up</strong><small>Visible only in this review space and CSV.</small></span></label><button class="button secondary" type="submit">Save review</button><span class="save-status" role="status"></span></form><a class="receipt-link" href="/receipt/${e(s.receipt_token)}" data-link>Open student receipt</a></article>`;
+}
 
-async function saveReview(event:SubmitEvent,token:string) { event.preventDefault(); const form=event.currentTarget as HTMLFormElement; const button=form.querySelector('button')!; const status=form.querySelector('.save-status')!; const data=new FormData(form); button.disabled=true; status.textContent='Saving…'; try{await api(`/api/reviews/${encodeURIComponent(token)}/submissions/${encodeURIComponent(form.dataset.id!)}`,{method:'PATCH',headers:{'content-type':'application/json'},body:JSON.stringify({teacher_tags:data.getAll('tag'),teacher_note:data.get('teacher_note'),follow_up:data.get('follow_up')==='on'})});status.textContent='Saved';announce('Review saved.');}catch(error){status.textContent=errorMessage(error);}finally{button.disabled=false;}}
-async function removeVoice(token:string,id:string,button:HTMLButtonElement){if(!confirm('Delete this voice recording now? This cannot be undone. The text explanation and receipt remain.'))return;button.disabled=true;try{await api(`/api/reviews/${encodeURIComponent(token)}/submissions/${encodeURIComponent(id)}/voice`,{method:'DELETE'});button.closest('.voice-review')!.outerHTML='<p class="voice-deleted">Voice deleted by teacher. Text and review notes remain.</p>';announce('Voice recording deleted.');}catch(error){announce(errorMessage(error));button.disabled=false;}}
+async function saveReview(event: SubmitEvent, token: string) {
+  event.preventDefault();
+  const form = event.currentTarget as HTMLFormElement;
+  const button = form.querySelector("button")!;
+  const status = form.querySelector(".save-status")!;
+  const data = new FormData(form);
+  button.disabled = true;
+  status.textContent = "Saving…";
+  try {
+    await api(
+      `/api/reviews/${encodeURIComponent(token)}/submissions/${encodeURIComponent(form.dataset.id!)}`,
+      {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          teacher_tags: data.getAll("tag"),
+          teacher_note: data.get("teacher_note"),
+          follow_up: data.get("follow_up") === "on",
+        }),
+      },
+    );
+    status.textContent = "Saved";
+    announce("Review saved.");
+  } catch (error) {
+    status.textContent = errorMessage(error);
+  } finally {
+    button.disabled = false;
+  }
+}
+async function removeVoice(
+  token: string,
+  id: string,
+  button: HTMLButtonElement,
+) {
+  if (
+    !confirm(
+      "Delete this voice recording now? This cannot be undone. The text explanation and receipt remain.",
+    )
+  )
+    return;
+  button.disabled = true;
+  try {
+    await api(
+      `/api/reviews/${encodeURIComponent(token)}/submissions/${encodeURIComponent(id)}/voice`,
+      { method: "DELETE" },
+    );
+    button.closest(".voice-review")!.outerHTML =
+      '<p class="voice-deleted">Voice deleted by teacher. Text and review notes remain.</p>';
+    announce("Voice recording deleted.");
+  } catch (error) {
+    announce(errorMessage(error));
+    button.disabled = false;
+  }
+}
 
-async function receiptPage(token:string) { document.title='Submission receipt — Accessible Explanation Check-in'; shell(`<div class="loading" role="status"><span class="loader" aria-hidden="true"></span><p>Opening your receipt…</p></div>`); try{const r=await api<Record<string,unknown>>(`/api/receipts/${encodeURIComponent(token)}`);renderReceipt(r);}catch(error){loadError('We could not open this receipt',errorMessage(error),`/receipt/${token}`);}}
-function renderReceipt(r:Record<string,unknown>) { document.title=`Receipt for ${r.title} — Explanation Check-in`; shell(`<div class="receipt-page"><p class="status success"><span aria-hidden="true">✓</span> Explanation received</p><h1>Your check-in receipt</h1><p class="lead">Keep this private link if you want a record of what you sent.</p><dl class="receipt-meta"><div><dt>Assignment</dt><dd>${e(r.title)}</dd></div><div><dt>Name</dt><dd>${e(r.student_name)}</dd></div><div><dt>Submitted</dt><dd>${e(formatDate(String(r.created_at)))}</dd></div><div><dt>Confidence</dt><dd>${e(r.confidence)} out of 5</dd></div></dl><section class="receipt-content"><h2>Prompt</h2><p>${e(r.prompt)}</p><h2>Your explanation</h2>${r.explanation_text?`<p class="student-words">${e(r.explanation_text)}</p>`:'<p>Voice explanation only.</p>'}${r.has_voice?`<p class="retention">A voice file was included${r.voice_delete_at?` and is scheduled to delete ${e(formatDate(String(r.voice_delete_at)))}`:''}. The receipt does not expose the audio file.</p>`:'<p class="muted">No voice file is stored.</p>'}</section><div class="button-row no-print"><button class="button primary" id="print" type="button">Print or save PDF</button><button class="button secondary" id="copy-receipt" type="button">Copy receipt link</button></div><p class="receipt-foot">This receipt records a student explanation. It does not verify identity, authorship, or misconduct.</p></div>`);document.querySelector('#print')!.addEventListener('click',()=>window.print());document.querySelector('#copy-receipt')!.addEventListener('click',()=>copyText(location.href,'Receipt link copied.'));}
+async function removeCheckin(token: string, button: HTMLButtonElement) {
+  if (
+    !confirm(
+      "Delete this check-in and every student response now? This permanently removes receipt links and voice files.",
+    )
+  )
+    return;
+  button.disabled = true;
+  try {
+    await api(`/api/reviews/${encodeURIComponent(token)}`, { method: "DELETE" });
+    removeRecent(token);
+    history.replaceState({ deletedCheckin: true }, "", "/create");
+    focusOnRouteChange = true;
+    render();
+  } catch (error) {
+    button.disabled = false;
+    announce(errorMessage(error));
+  }
+}
 
-function pricingPage(){document.title='Plans — Accessible Explanation Check-in';const token=localStorage.getItem(licenseKey);shell(`<div class="work-page"><div class="page-heading"><p class="eyebrow">Simple classroom access</p><h1>Plans and prices</h1><p class="lead">Receipts, review tags, CSV exports, and print controls remain available on the free plan.</p></div><div class="plans"><section><p class="eyebrow">Free</p><h2>$0</h2><ul><li>Up to 35 responses per check-in</li><li>Text and optional voice</li><li>1–7 day voice deletion</li><li>Review tags and exports</li></ul><a class="button secondary" href="/create" data-link>Create free check-in</a></section><section class="paid-plan"><p class="eyebrow">Classroom Plus</p><h2>$39 <small>one time</small></h2><ul><li>Up to 500 responses per check-in</li><li>Custom 1–365 day voice retention</li><li>One license verified through Sociobot</li><li>Free tools remain available if the license ends</li></ul><a class="button primary" href="${BILLING}/api/v1/products/${PRODUCT}/checkout">Buy Classroom Plus through Sociobot (opens external site)</a><p>Sociobot/Dodo is the merchant of record. Refunds are requested there; a refunded license becomes inactive here.</p></section></div><section class="restore"><h2>Restore a purchase</h2><p>Paste the license token from your receipt. Verification never blocks the free experience.</p><form id="license-form"><label>License token<input name="license" autocomplete="off" value="${e(token||'')}"></label><button class="button secondary" type="submit">Verify license</button><span id="license-status" role="status"></span></form></section></div>`,'pricing');document.querySelector<HTMLFormElement>('#license-form')!.addEventListener('submit',verifyPastedLicense);}
-async function verifyPastedLicense(ev:SubmitEvent){ev.preventDefault();const form=ev.currentTarget as HTMLFormElement;const input=(form.elements.namedItem('license') as HTMLInputElement).value.trim();const status=document.querySelector('#license-status')!;if(!input){status.textContent='Paste a license token first.';return;}localStorage.setItem(licenseKey,input);status.textContent='Verifying…';const valid=await paidStatus(true);status.textContent=valid?'Classroom Plus is active on this device.':'This license is not active. Check the token or buy Classroom Plus.';}
+async function receiptPage(token: string) {
+  document.title = "Submission receipt — Accessible Explanation Check-in";
+  shell(
+    `<div class="loading" role="status"><span class="loader" aria-hidden="true"></span><p>Opening your receipt…</p></div>`,
+  );
+  try {
+    const r = await api<Record<string, unknown>>(
+      `/api/receipts/${encodeURIComponent(token)}`,
+    );
+    renderReceipt(r);
+  } catch (error) {
+    loadError(
+      "We could not open this receipt",
+      errorMessage(error),
+      `/receipt/${token}`,
+    );
+  }
+}
+function renderReceipt(r: Record<string, unknown>) {
+  document.title = `Receipt for ${r.title} — Explanation Check-in`;
+  shell(
+    `<div class="receipt-page"><p class="status success"><span aria-hidden="true">✓</span> Explanation received</p><h1>Your check-in receipt</h1><p class="lead">Keep this private link if you want a record of what you sent.</p><dl class="receipt-meta"><div><dt>Assignment</dt><dd>${e(r.title)}</dd></div><div><dt>Name</dt><dd>${e(r.student_name)}</dd></div><div><dt>Submitted</dt><dd>${e(formatDate(String(r.created_at)))}</dd></div><div><dt>Confidence</dt><dd>${e(r.confidence)} out of 5</dd></div></dl><section class="receipt-content"><h2>Prompt</h2><p>${e(r.prompt)}</p><h2>Your explanation</h2>${r.explanation_text ? `<p class="student-words">${e(r.explanation_text)}</p>` : "<p>Voice explanation only.</p>"}${r.has_voice ? `<p class="retention">A voice file was included${r.voice_delete_at ? ` and is scheduled to delete ${e(formatDate(String(r.voice_delete_at)))}` : ""}. The receipt does not expose the audio file.</p>` : '<p class="muted">No voice file is stored.</p>'}</section><div class="button-row no-print"><button class="button primary" id="print" type="button">Print or save PDF</button><button class="button secondary" id="copy-receipt" type="button">Copy receipt link</button></div><p class="receipt-foot">This receipt records a student explanation. It does not verify identity, authorship, or misconduct.</p></div>`,
+  );
+  document
+    .querySelector("#print")!
+    .addEventListener("click", () => window.print());
+  document
+    .querySelector("#copy-receipt")!
+    .addEventListener("click", () =>
+      copyText(location.href, "Receipt link copied."),
+    );
+}
 
-function privacyPage(){document.title='Privacy — Accessible Explanation Check-in';shell(`<article class="legal"><p class="eyebrow">Plain-language policy · effective 29 August 2026</p><h1>Privacy</h1><p class="lead">The service stores the fields described below. It does not send classroom text or voice to model, analytics, or advertising providers.</p><h2>What is stored</h2><p>The service stores check-in and response fields, private-link tokens, response and retention limits, and timestamps.</p><p>Optional voice adds an audio file, file type, and deletion time.</p><h2>Who can see it</h2><p>Anyone holding the teacher review link can see all responses. Anyone holding a receipt link can see that receipt.</p><p>Teachers must keep review links private.</p><h2>Retention and deletion</h2><p>Voice deletes automatically on the schedule shown before submission. Free schedules are one, three, or seven days.</p><p>Classroom Plus adds schedules up to 365 days. Teachers can delete voice sooner.</p><p>Text does not follow the voice deletion schedule. Ask your teacher to coordinate access, correction, or deletion.</p><h2>Purchases and licenses</h2><p>Checkout opens on Sociobot/Dodo. Refunds are requested there; a refunded license becomes inactive here.</p><p>Paste a license token on the Plans page to verify it with Sociobot.</p><h2>Your choices</h2><p>Voice is optional. The student receipt shows what was submitted.</p><p>Ask your teacher or email the address below about access, correction, or deletion.</p><p>Schools remain responsible for their own FERPA and GDPR notices and lawful use.</p><h2>Contact</h2><p>Email <a href="mailto:privacy@sociobot.in">privacy@sociobot.in</a> with the assignment title and teacher. Do not email voice recordings or student explanations.</p></article>`);}
-function termsPage(){document.title='Terms — Accessible Explanation Check-in';shell(`<article class="legal"><p class="eyebrow">Fair-use terms · effective 29 August 2026</p><h1>Terms</h1><p class="lead">Use this tool to invite and review student reasoning. Do not use it to claim certainty about identity, authorship, cheating, or ability.</p><h2>Classroom responsibility</h2><p>Teachers and schools must have authority to collect the information they request. They must offer a reasonable non-voice alternative.</p><p>Protect private links, explain retention, and respond to access or deletion requests.</p><p>Do not collect sensitive health, immigration, disciplinary, or authentication information in prompts.</p><h2>No automated judgement</h2><p>The service does not grade, proctor, verify identity, or detect AI use. Confidence is a student self-report.</p><p>Review tags are teacher notes, not factual findings. Human follow-up is required for consequential decisions.</p><h2>Availability and acceptable use</h2><p>The service is provided “as is.” Do not probe private links, upload unlawful content, disrupt the service, or use it for surveillance.</p><h2>Classroom Plus</h2><p>Classroom Plus costs $39 once. It applies the limits shown on the Plans page while its product license is active.</p><p>Sociobot/Dodo is the merchant of record. Refunds are requested there; a refunded license becomes inactive here.</p><p>An invalid, expired, revoked, or wrong-product license relocks paid controls. Free check-ins remain available.</p><h2>Contact</h2><p>Questions: <a href="mailto:support@sociobot.in">support@sociobot.in</a>.</p></article>`);}
-function notFound(){document.title='Page not found — Explanation Check-in';shell(`<div class="work-page narrow"><p class="eyebrow">404 · The trail ends here</p><h1>That page is not available</h1><p>The link may be incomplete. Check the whole private link, or return home to create a check-in.</p><a class="button primary" href="/" data-link>Return home</a></div>`);}
-function loadError(title:string,message:string,retry:string){shell(`<div class="work-page narrow"><p class="eyebrow">Could not load</p><h1>${e(title)}</h1><div class="empty-state error"><span aria-hidden="true">!</span><p>${e(message)}</p><a class="button secondary" href="${e(retry)}" data-link>Try again</a></div></div>`);}
+function pricingPage() {
+  document.title = "Plans — Accessible Explanation Check-in";
+  const token = localStorage.getItem(licenseKey);
+  shell(
+    `<div class="work-page"><div class="page-heading"><p class="eyebrow">Simple classroom access</p><h1>Plans and prices</h1><p class="lead">Receipts, review tags, CSV exports, and print controls remain available on the free plan.</p></div><div class="plans"><section><p class="eyebrow">Free</p><h2>$0</h2><ul><li>Up to 35 responses per check-in</li><li>Text and optional voice</li><li>1–7 day voice deletion</li><li>Review tags and exports</li></ul><a class="button secondary" href="/create" data-link>Create free check-in</a></section><section class="paid-plan"><p class="eyebrow">Classroom Plus</p><h2>$39 <small>one time</small></h2><ul><li>Up to 500 responses per check-in</li><li>Custom 1–365 day voice retention</li><li>One license verified through Sociobot</li><li>Free tools remain available if the license ends</li></ul><a class="button primary" href="${BILLING}/api/v1/products/${PRODUCT}/checkout">Buy Classroom Plus through Sociobot (opens external site)</a><p>Sociobot/Dodo is the merchant of record. Refunds are requested there; a refunded license becomes inactive here.</p></section></div><section class="restore"><h2>Restore a purchase</h2><p>Paste the license token from your receipt. Verification never blocks the free experience.</p><form id="license-form"><label>License token<input name="license" autocomplete="off" value="${e(token || "")}"></label><button class="button secondary" type="submit">Verify license</button><span id="license-status" role="status"></span></form></section></div>`,
+    "pricing",
+  );
+  document
+    .querySelector<HTMLFormElement>("#license-form")!
+    .addEventListener("submit", verifyPastedLicense);
+}
+async function verifyPastedLicense(ev: SubmitEvent) {
+  ev.preventDefault();
+  const form = ev.currentTarget as HTMLFormElement;
+  const input = (
+    form.elements.namedItem("license") as HTMLInputElement
+  ).value.trim();
+  const status = document.querySelector("#license-status")!;
+  if (!input) {
+    status.textContent = "Paste a license token first.";
+    return;
+  }
+  localStorage.setItem(licenseKey, input);
+  status.textContent = "Verifying…";
+  const valid = await paidStatus(true);
+  status.textContent = valid
+    ? "Classroom Plus is active on this device."
+    : "This license is not active. Check the token or buy Classroom Plus.";
+}
 
-async function api<T=unknown>(url:string,init?:RequestInit):Promise<T>{let response:Response;try{response=await fetch(url,init);}catch{throw new Error(navigator.onLine?'The service could not be reached. Try again in a moment.':'You are offline. Reconnect and try again.');}let data:any={};try{data=await response.json();}catch{}if(!response.ok)throw new Error(data.error||`The request failed (${response.status}).`);return data as T;}
-function errorMessage(error:unknown){return error instanceof Error?error.message:'Something unexpected happened. Try again.';}
-function showError(message:string){const box=document.querySelector<HTMLElement>('#form-error');if(!box)return;if(!message){box.hidden=true;box.textContent='';return;}box.hidden=false;box.innerHTML=`<strong>Please check your response.</strong><p>${e(message)}</p>`;box.focus();}
-function announce(message:string){const live=document.querySelector('#announcer');if(live)live.textContent=message;}
-function setNetwork(online:boolean){const banner=document.querySelector<HTMLElement>('#network');if(banner)banner.hidden=online;}
-function wireLinks(){document.querySelectorAll<HTMLAnchorElement>('a[data-link]').forEach(link=>link.addEventListener('click',ev=>{if(ev.metaKey||ev.ctrlKey||ev.shiftKey||link.target)return;ev.preventDefault();history.pushState({},'',link.href);focusOnRouteChange=true;render();}));}
-function wireCopy(){document.querySelectorAll<HTMLButtonElement>('.copy').forEach(button=>button.addEventListener('click',()=>{const input=document.querySelector<HTMLInputElement>(`#${button.dataset.copy}`)!;copyText(input.value,'Link copied.');button.textContent='Copied';}));}
-async function copyText(text:string,message:string){try{await navigator.clipboard.writeText(text);announce(message);}catch{prompt('Copy this link:',text);}}
-function saveDraft(form:HTMLFormElement,key:string){const data=new FormData(form);localStorage.setItem(key,JSON.stringify({student_name:data.get('student_name'),explanation_text:data.get('explanation_text'),confidence:data.get('confidence')}));announce('Draft saved on this device.');}
-function saveRecent(title:string,review:string){const recent=JSON.parse(localStorage.getItem('recent-checkins')||'[]');recent.unshift({title,review,created:new Date().toISOString()});localStorage.setItem('recent-checkins',JSON.stringify(recent.slice(0,8)));}
-function recentLinks(){const recent=JSON.parse(localStorage.getItem('recent-checkins')||'[]');if(!recent.length)return '<div class="mini-empty">Your private review links will appear here after you create a check-in.</div>';return `<ul>${recent.map((r:any)=>`<li><a href="${e(r.review)}" data-link>${e(r.title)}</a><time>${e(formatDate(r.created))}</time></li>`).join('')}</ul>`;}
-function blobBase64(blob:Blob):Promise<string>{return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=()=>reject(new Error('The recording could not be read.'));reader.readAsDataURL(blob);});}
-function captureLicense(){const params=new URLSearchParams(location.search);const license=params.get('license');if(license){localStorage.setItem(licenseKey,license);params.delete('license');history.replaceState({},'',`${location.pathname}${params.size?`?${params}`:''}${location.hash}`);paidStatus(true);}}
-async function paidStatus(force:boolean):Promise<boolean>{const token=localStorage.getItem(licenseKey);if(!token)return false;const cached=JSON.parse(localStorage.getItem(licenseCacheKey)||'null');if(!force&&cached?.valid&&Date.now()-cached.checked<86400000)return true;try{const response=await fetch(`${BILLING}/api/v1/products/${PRODUCT}/verify?license=${encodeURIComponent(token)}`);const data=await response.json();const valid=Boolean(data.valid);localStorage.setItem(licenseCacheKey,JSON.stringify({valid,checked:Date.now()}));if(!valid)announce('Classroom Plus license is no longer active; free features remain available.');return valid;}catch{return Boolean(cached?.valid);}}
-function wireTheme(){const button=document.querySelector<HTMLButtonElement>('#theme-toggle');const stored=localStorage.getItem('theme');if(stored)document.documentElement.dataset.theme=stored;button?.addEventListener('click',()=>{const current=document.documentElement.dataset.theme|| (matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');const next=current==='dark'?'light':'dark';document.documentElement.dataset.theme=next;localStorage.setItem('theme',next);announce(`${next} theme active.`);});}
+function privacyPage() {
+  document.title = "Privacy — Accessible Explanation Check-in";
+  shell(
+    `<article class="legal"><p class="eyebrow">Plain-language policy · effective 29 August 2026</p><h1>Privacy</h1><p class="lead">The service stores the fields described below. It does not send classroom text or voice to model, analytics, or advertising providers.</p><h2>What is stored</h2><p>The service stores check-in and response fields, private-link tokens, response and retention limits, and timestamps.</p><p>Optional voice adds an audio file, file type, and deletion time.</p><h2>Who can see it</h2><p>Anyone holding the teacher review link can see all responses. Anyone holding a receipt link can see that receipt.</p><p>Teachers must keep review links private.</p><h2>Retention and deletion</h2><p>Voice deletes automatically on the schedule shown before submission. Free schedules are one, three, or seven days.</p><p>Classroom Plus adds schedules up to 365 days. Teachers can delete voice sooner.</p><p>Text does not follow the voice deletion schedule. Ask your teacher to coordinate access, correction, or deletion.</p><h2>Purchases and licenses</h2><p>Checkout opens on Sociobot/Dodo. Refunds are requested there; a refunded license becomes inactive here.</p><p>Paste a license token on the Plans page to verify it with Sociobot.</p><h2>Your choices</h2><p>Voice is optional. The student receipt shows what was submitted.</p><p>Ask your teacher or email the address below about access, correction, or deletion.</p><p>Schools remain responsible for their own FERPA and GDPR notices and lawful use.</p><h2>Contact</h2><p>Email <a href="mailto:privacy@sociobot.in">privacy@sociobot.in</a> with the assignment title and teacher. Do not email voice recordings or student explanations.</p></article>`,
+  );
+}
+function termsPage() {
+  document.title = "Terms — Accessible Explanation Check-in";
+  shell(
+    `<article class="legal"><p class="eyebrow">Fair-use terms · effective 29 August 2026</p><h1>Terms</h1><p class="lead">Use this tool to invite and review student reasoning. Do not use it to claim certainty about identity, authorship, cheating, or ability.</p><h2>Classroom responsibility</h2><p>Teachers and schools must have authority to collect the information they request. They must offer a reasonable non-voice alternative.</p><p>Protect private links, explain retention, and respond to access or deletion requests.</p><p>Do not collect sensitive health, immigration, disciplinary, or authentication information in prompts.</p><h2>No automated judgement</h2><p>The service does not grade, proctor, verify identity, or detect AI use. Confidence is a student self-report.</p><p>Review tags are teacher notes, not factual findings. Human follow-up is required for consequential decisions.</p><h2>Availability and acceptable use</h2><p>The service is provided “as is.” Do not probe private links, upload unlawful content, disrupt the service, or use it for surveillance.</p><h2>Classroom Plus</h2><p>Classroom Plus costs $39 once. It applies the limits shown on the Plans page while its product license is active.</p><p>Sociobot/Dodo is the merchant of record. Refunds are requested there; a refunded license becomes inactive here.</p><p>An invalid, expired, revoked, or wrong-product license relocks paid controls. Free check-ins remain available.</p><h2>Contact</h2><p>Questions: <a href="mailto:support@sociobot.in">support@sociobot.in</a>.</p></article>`,
+  );
+}
+function notFound() {
+  document.title = "Page not found — Explanation Check-in";
+  shell(
+    `<div class="work-page narrow"><p class="eyebrow">404 · The trail ends here</p><h1>That page is not available</h1><p>The link may be incomplete. Check the whole private link, or return home to create a check-in.</p><a class="button primary" href="/" data-link>Return home</a></div>`,
+  );
+}
+function loadError(title: string, message: string, retry: string) {
+  shell(
+    `<div class="work-page narrow"><p class="eyebrow">Could not load</p><h1>${e(title)}</h1><div class="empty-state error"><span aria-hidden="true">!</span><p>${e(message)}</p><a class="button secondary" href="${e(retry)}" data-link>Try again</a></div></div>`,
+  );
+}
+
+async function api<T = unknown>(url: string, init?: RequestInit): Promise<T> {
+  let response: Response;
+  try {
+    response = await fetch(url, init);
+  } catch {
+    throw new Error(
+      navigator.onLine
+        ? "The service could not be reached. Try again in a moment."
+        : "You are offline. Reconnect and try again.",
+    );
+  }
+  let data: any = {};
+  try {
+    data = await response.json();
+  } catch {}
+  if (!response.ok)
+    throw new Error(data.error || `The request failed (${response.status}).`);
+  return data as T;
+}
+function errorMessage(error: unknown) {
+  return error instanceof Error
+    ? error.message
+    : "Something unexpected happened. Try again.";
+}
+function showError(message: string) {
+  const box = document.querySelector<HTMLElement>("#form-error");
+  if (!box) return;
+  if (!message) {
+    box.hidden = true;
+    box.textContent = "";
+    return;
+  }
+  box.hidden = false;
+  box.innerHTML = `<strong>Please check your response.</strong><p>${e(message)}</p>`;
+  box.focus();
+}
+function announce(message: string) {
+  const live = document.querySelector("#announcer");
+  if (live) live.textContent = message;
+}
+function setNetwork(online: boolean) {
+  const banner = document.querySelector<HTMLElement>("#network");
+  if (banner) banner.hidden = online;
+}
+function wireLinks() {
+  document.querySelectorAll<HTMLAnchorElement>("a[data-link]").forEach((link) =>
+    link.addEventListener("click", (ev) => {
+      if (ev.metaKey || ev.ctrlKey || ev.shiftKey || link.target) return;
+      ev.preventDefault();
+      history.pushState({}, "", link.href);
+      focusOnRouteChange = true;
+      render();
+    }),
+  );
+}
+function wireCopy() {
+  document.querySelectorAll<HTMLButtonElement>(".copy").forEach((button) =>
+    button.addEventListener("click", () => {
+      const input = document.querySelector<HTMLInputElement>(
+        `#${button.dataset.copy}`,
+      )!;
+      copyText(input.value, "Link copied.");
+      button.textContent = "Copied";
+    }),
+  );
+}
+async function copyText(text: string, message: string) {
+  try {
+    await navigator.clipboard.writeText(text);
+    announce(message);
+  } catch {
+    prompt("Copy this link:", text);
+  }
+}
+function saveDraft(form: HTMLFormElement, key: string) {
+  const data = new FormData(form);
+  localStorage.setItem(
+    key,
+    JSON.stringify({
+      student_name: data.get("student_name"),
+      explanation_text: data.get("explanation_text"),
+      confidence: data.get("confidence"),
+    }),
+  );
+  announce("Draft saved on this device.");
+}
+function saveRecent(title: string, review: string) {
+  const recent = JSON.parse(localStorage.getItem("recent-checkins") || "[]");
+  recent.unshift({ title, review, created: new Date().toISOString() });
+  localStorage.setItem("recent-checkins", JSON.stringify(recent.slice(0, 8)));
+}
+function removeRecent(reviewToken: string) {
+  const reviewPath = `/review/${reviewToken}`;
+  const recent = JSON.parse(localStorage.getItem("recent-checkins") || "[]");
+  localStorage.setItem(
+    "recent-checkins",
+    JSON.stringify(
+      recent.filter((entry: { review?: string }) => {
+        try {
+          return new URL(entry.review || "", location.origin).pathname !== reviewPath;
+        } catch {
+          return true;
+        }
+      }),
+    ),
+  );
+}
+function recentLinks() {
+  const recent = JSON.parse(localStorage.getItem("recent-checkins") || "[]");
+  if (!recent.length)
+    return '<div class="mini-empty">Your private review links will appear here after you create a check-in.</div>';
+  return `<ul>${recent.map((r: any) => `<li><a href="${e(r.review)}" data-link>${e(r.title)}</a><time>${e(formatDate(r.created))}</time></li>`).join("")}</ul>`;
+}
+function blobBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(",")[1]);
+    reader.onerror = () =>
+      reject(new Error("The recording could not be read."));
+    reader.readAsDataURL(blob);
+  });
+}
+function captureLicense() {
+  const params = new URLSearchParams(location.search);
+  const license = params.get("license");
+  if (license) {
+    localStorage.setItem(licenseKey, license);
+    params.delete("license");
+    history.replaceState(
+      {},
+      "",
+      `${location.pathname}${params.size ? `?${params}` : ""}${location.hash}`,
+    );
+    paidStatus(true);
+  }
+}
+async function paidStatus(force: boolean): Promise<boolean> {
+  const token = localStorage.getItem(licenseKey);
+  if (!token) return false;
+  const cached = JSON.parse(localStorage.getItem(licenseCacheKey) || "null");
+  if (!force && cached?.valid && Date.now() - cached.checked < 86400000)
+    return true;
+  try {
+    const response = await fetch(
+      `${BILLING}/api/v1/products/${PRODUCT}/verify?license=${encodeURIComponent(token)}`,
+    );
+    const data = await response.json();
+    const valid = Boolean(data.valid);
+    localStorage.setItem(
+      licenseCacheKey,
+      JSON.stringify({ valid, checked: Date.now() }),
+    );
+    if (!valid)
+      announce(
+        "Classroom Plus license is no longer active; free features remain available.",
+      );
+    return valid;
+  } catch {
+    return Boolean(cached?.valid);
+  }
+}
+function wireTheme() {
+  const button = document.querySelector<HTMLButtonElement>("#theme-toggle");
+  const stored = localStorage.getItem("theme");
+  if (stored) document.documentElement.dataset.theme = stored;
+  button?.addEventListener("click", () => {
+    const current =
+      document.documentElement.dataset.theme ||
+      (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const next = current === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem("theme", next);
+    announce(`${next} theme active.`);
+  });
+}
 
 captureLicense();
 render();
-document.querySelector<HTMLAnchorElement>('.skip-link')?.addEventListener('click', event => {
-  event.preventDefault();
-  document.querySelector<HTMLElement>('#main')?.focus();
+document
+  .querySelector<HTMLAnchorElement>(".skip-link")
+  ?.addEventListener("click", (event) => {
+    event.preventDefault();
+    document.querySelector<HTMLElement>("#main")?.focus();
+  });
+window.addEventListener("popstate", () => {
+  focusOnRouteChange = true;
+  render();
 });
-window.addEventListener('popstate', () => { focusOnRouteChange=true; render(); });
-window.addEventListener('online', () => setNetwork(true));
-window.addEventListener('offline', () => setNetwork(false));
-if ('serviceWorker' in navigator && import.meta.env.PROD) navigator.serviceWorker.register('/sw.js').catch(() => undefined);
+window.addEventListener("online", () => setNetwork(true));
+window.addEventListener("offline", () => setNetwork(false));
+if ("serviceWorker" in navigator && import.meta.env.PROD)
+  navigator.serviceWorker.register("/sw.js").catch(() => undefined);

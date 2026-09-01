@@ -45,7 +45,7 @@ No landing sentence exceeds 22 words or contains a banned word. Every factual pr
 | The deployment gate checks private links, submission, and teacher review. | 10 | concise operator instruction |
 | It repeats those checks after replacing the production revision. | 9 | concise operator instruction |
 
-The inaccurate storage-only sentence and unproved infrastructure, completed-deletion, moderation, and legal-change promises were removed. No revised sentence exceeds 22 words or contains a banned word.
+The inaccurate storage-only and unproved infrastructure, moderation, and legal-change promises were removed. No revised sentence exceeds 22 words or contains a banned word.
 
 ## Terminology
 
@@ -82,3 +82,22 @@ behavior statements map to `demo-exit-disposal`, `voice-recording-limits`, and
 
 No student-flow sentence exceeds 22 words or contains a banned word. All four
 statements map to `student-draft-local` in `.factory/claims.json`.
+
+## Polish 7 revised copy
+
+| Text | Words | Result |
+| --- | ---: | --- |
+| Recordings delete automatically. | 3 | tested retention rule |
+| Text does not follow the voice schedule. | 7 | tested retention boundary |
+| Ask your teacher to delete the check-in if your school approves it. | 12 | links a request to the real teacher action |
+| Delete this check-in and every student response now? | 8 | specific destructive confirmation |
+| This permanently removes receipt links and voice files. | 8 | tested deletion outcome |
+| Check-in deleted. | 2 | action feedback |
+| Its responses, receipt links, and voice files are gone. | 9 | tested deletion result |
+| One app copy uses a local SQLite database. | 8 | plain deployment sentence |
+| Each save copies the database and voice upload to `/data`. | 9 | plain deployment sentence |
+| The next app version restores those files. | 7 | plain deployment sentence |
+| Collect student reasoning with private text or voice check-ins for teachers. | 11 | verb-first catalog description |
+
+All copy above is at or below 22 words. The deletion outcome maps to
+`teacher-checkin-deletion` in `.factory/claims.json`.

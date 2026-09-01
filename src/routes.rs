@@ -52,7 +52,10 @@ pub fn router(state: Arc<AppState>) -> Router {
         .route("/api/checkins", post(create_checkin))
         .route("/api/checkins/:token", get(get_checkin))
         .route("/api/checkins/:token/submissions", post(create_submission))
-        .route("/api/reviews/:token", get(get_review))
+        .route(
+            "/api/reviews/:token",
+            get(get_review).delete(delete_checkin),
+        )
         .route(
             "/api/reviews/:token/submissions/:id",
             patch(update_submission),
@@ -359,6 +362,44 @@ async fn get_review(
     }))
 }
 
+async fn delete_checkin(
+    State(state): State<Arc<AppState>>,
+    Path(review_token): Path<String>,
+) -> Result<Json<Value>, ApiError> {
+    // The review token is the teacher's private bearer credential. Read the
+    // affected voice filenames before the cascading database delete, then
+    // remove every private artifact and persist the resulting empty state.
+    let checkin = sqlx::query("SELECT id FROM checkins WHERE review_token=?")
+        .bind(&review_token)
+        .fetch_optional(&state.pool)
+        .await?
+        .ok_or_else(not_found)?;
+    let checkin_id: String = checkin.get("id");
+    let voice_rows = sqlx::query("SELECT voice_file FROM submissions WHERE checkin_id=?")
+        .bind(&checkin_id)
+        .fetch_all(&state.pool)
+        .await?;
+    for row in voice_rows {
+        if let Some(filename) = row.get::<Option<String>, _>("voice_file") {
+            match fs::remove_file(state.uploads_dir.join(filename)).await {
+                Ok(()) => {}
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+                Err(error) => return Err(delete_io_error(error)),
+            }
+        }
+    }
+    let result = sqlx::query("DELETE FROM checkins WHERE id=? AND review_token=?")
+        .bind(checkin_id)
+        .bind(review_token)
+        .execute(&state.pool)
+        .await?;
+    if result.rows_affected() != 1 {
+        return Err(not_found());
+    }
+    persist_database(&state).await?;
+    Ok(Json(json!({"deleted": true})))
+}
+
 fn row_to_submission(row: sqlx::sqlite::SqliteRow) -> Submission {
     let tags: String = row.get("teacher_tags");
     Submission {
@@ -588,6 +629,13 @@ fn io_error(error: std::io::Error) -> ApiError {
         StatusCode::INTERNAL_SERVER_ERROR,
         "The voice recording could not be stored. Your text has not been submitted; try again."
             .into(),
+    )
+}
+fn delete_io_error(error: std::io::Error) -> ApiError {
+    tracing::error!(%error, "record deletion failed");
+    ApiError(
+        StatusCode::INTERNAL_SERVER_ERROR,
+        "The check-in could not be deleted. Try again.".into(),
     )
 }
 fn csv_cell(value: &str) -> String {
@@ -1034,6 +1082,92 @@ mod tests {
             receipt_json["explanation_text"],
             "I compared both diagrams before choosing."
         );
+    }
+
+    #[tokio::test]
+    // @claim:teacher-checkin-deletion
+    async fn claim_teacher_checkin_deletion() {
+        let (state, _temp) = test_state("http://127.0.0.1:1".into()).await;
+        let app = router(state.clone());
+        let create = app
+            .clone()
+            .oneshot(
+                Request::post("/api/checkins")
+                    .header("content-type", "application/json")
+                    .body(Body::from(r#"{"title":"Deletion proof","prompt":"Explain the choice you made.","voice_retention_days":7}"#))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(create.status(), StatusCode::CREATED);
+        let created = json_response(create).await;
+        let student = created["student_token"].as_str().unwrap().to_owned();
+        let review = created["review_token"].as_str().unwrap().to_owned();
+
+        let submit = app
+            .clone()
+            .oneshot(
+                Request::post(format!("/api/checkins/{student}/submissions"))
+                    .header("content-type", "application/json")
+                    .body(Body::from(r#"{"student_name":"Avery","explanation_text":"I compared both diagrams before choosing.","confidence":4,"voice_data":"Y2hlY2tpbiBkZWxldGlvbiBmaXh0dXJl","voice_mime":"audio/webm"}"#))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(submit.status(), StatusCode::CREATED);
+        let receipt = json_response(submit).await["receipt_token"]
+            .as_str()
+            .unwrap()
+            .to_owned();
+
+        let stored = sqlx::query("SELECT id, voice_file FROM submissions")
+            .fetch_one(&state.pool)
+            .await
+            .unwrap();
+        let submission_id: String = stored.get("id");
+        let voice_file: String = stored.get::<Option<String>, _>("voice_file").unwrap();
+        assert!(state.uploads_dir.join(&voice_file).exists());
+
+        let deleted = app
+            .clone()
+            .oneshot(
+                Request::delete(format!("/api/reviews/{review}"))
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(deleted.status(), StatusCode::OK);
+        assert_eq!(json_response(deleted).await, json!({"deleted": true}));
+        assert!(!state.uploads_dir.join(voice_file).exists());
+        assert_eq!(
+            sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM checkins")
+                .fetch_one(&state.pool)
+                .await
+                .unwrap(),
+            0
+        );
+        assert_eq!(
+            sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM submissions")
+                .fetch_one(&state.pool)
+                .await
+                .unwrap(),
+            0
+        );
+
+        for path in [
+            format!("/api/checkins/{student}"),
+            format!("/api/reviews/{review}"),
+            format!("/api/reviews/{review}/submissions/{submission_id}/voice"),
+            format!("/api/receipts/{receipt}"),
+        ] {
+            let response = app
+                .clone()
+                .oneshot(Request::get(path).body(Body::empty()).unwrap())
+                .await
+                .unwrap();
+            assert_eq!(response.status(), StatusCode::NOT_FOUND);
+        }
     }
 
     #[tokio::test]
