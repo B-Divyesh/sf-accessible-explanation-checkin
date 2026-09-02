@@ -85,7 +85,7 @@
       "file_type": "code",
       "norm_label": "recordedmedia",
       "source_file": "frontend/tests/claims.spec.ts",
-      "source_location": "L270"
+      "source_location": "L305"
     },
     {
       "id": "frontend_tests_claims_spec_recordingwindow",
@@ -97,7 +97,7 @@
       "file_type": "code",
       "norm_label": "recordingwindow",
       "source_file": "frontend/tests/claims.spec.ts",
-      "source_location": "L243"
+      "source_location": "L278"
     },
     {
       "id": "frontend_src_main_announce",
@@ -720,7 +720,7 @@
       "label": "expectAccessible()",
       "_callable": true,
       "_origin": "ast",
-      "community": 19,
+      "community": 16,
       "file_type": "code",
       "norm_label": "expectaccessible()",
       "source_file": "frontend/tests/app.spec.ts",
@@ -779,7 +779,7 @@
       "file_type": "code",
       "norm_label": ".start()",
       "source_file": "frontend/tests/claims.spec.ts",
-      "source_location": "L275"
+      "source_location": "L310"
     },
     {
       "id": "frontend_tests_claims_spec_recordedmedia_stop",
@@ -790,7 +790,7 @@
       "file_type": "code",
       "norm_label": ".stop()",
       "source_file": "frontend/tests/claims.spec.ts",
-      "source_location": "L278"
+      "source_location": "L313"
     },
     {
       "id": "frontend_tests_claims_spec_tabto",
@@ -1728,10 +1728,30 @@
       "source_location": "L1"
     },
     {
+      "id": "test",
+      "label": "@playwright/test",
+      "_origin": "ast",
+      "community": 16,
+      "confidence": "EXTRACTED",
+      "file_type": "code",
+      "norm_label": "@playwright/test",
+      "source_file": "@playwright/test"
+    },
+    {
+      "id": "frontend_tests_app_spec",
+      "label": "app.spec.ts",
+      "_origin": "ast",
+      "community": 16,
+      "file_type": "code",
+      "norm_label": "app.spec.ts",
+      "source_file": "frontend/tests/app.spec.ts",
+      "source_location": "L1"
+    },
+    {
       "id": "scripts_test_nonroot_runtime",
       "label": "test-nonroot-runtime.sh",
       "_origin": "ast",
-      "community": 16,
+      "community": 17,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1745,7 +1765,7 @@
       "id": "scripts_test_nonroot_runtime_cleanup",
       "label": "cleanup()",
       "_origin": "ast",
-      "community": 16,
+      "community": 17,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1759,7 +1779,7 @@
       "id": "scripts_test_nonroot_runtime_sh__entry",
       "label": "test-nonroot-runtime.sh script",
       "_origin": "ast",
-      "community": 16,
+      "community": 17,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1773,7 +1793,7 @@
       "id": "scripts_verify_live_topology",
       "label": "verify-live-topology.sh",
       "_origin": "ast",
-      "community": 17,
+      "community": 18,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1787,7 +1807,7 @@
       "id": "scripts_verify_live_topology_fail",
       "label": "fail()",
       "_origin": "ast",
-      "community": 17,
+      "community": 18,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1801,7 +1821,7 @@
       "id": "scripts_verify_live_topology_sh__entry",
       "label": "verify-live-topology.sh script",
       "_origin": "ast",
-      "community": 17,
+      "community": 18,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1815,7 +1835,7 @@
       "id": "frontend_public_sw",
       "label": "sw.js",
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "file_type": "code",
       "norm_label": "sw.js",
       "source_file": "frontend/public/sw.js",
@@ -1825,21 +1845,11 @@
       "id": "frontend_public_sw_shell",
       "label": "SHELL",
       "_origin": "ast",
-      "community": 18,
+      "community": 19,
       "file_type": "code",
       "norm_label": "shell",
       "source_file": "frontend/public/sw.js",
       "source_location": "L2"
-    },
-    {
-      "id": "frontend_tests_app_spec",
-      "label": "app.spec.ts",
-      "_origin": "ast",
-      "community": 19,
-      "file_type": "code",
-      "norm_label": "app.spec.ts",
-      "source_file": "frontend/tests/app.spec.ts",
-      "source_location": "L1"
     },
     {
       "id": "package_scripts",
@@ -2130,10 +2140,38 @@
       "source_location": "L1"
     },
     {
+      "id": "scripts_resolve_product_candidate",
+      "label": "resolve-product-candidate.sh",
+      "_origin": "ast",
+      "community": 21,
+      "file_type": "code",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "norm_label": "resolve-product-candidate.sh",
+      "source_file": "scripts/resolve-product-candidate.sh",
+      "source_location": "L1"
+    },
+    {
+      "id": "scripts_resolve_product_candidate_sh__entry",
+      "label": "resolve-product-candidate.sh script",
+      "_origin": "ast",
+      "community": 21,
+      "file_type": "code",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "norm_label": "resolve-product-candidate.sh script",
+      "source_file": "scripts/resolve-product-candidate.sh",
+      "source_location": "L1"
+    },
+    {
       "id": "scripts_test_container_build_identity",
       "label": "test-container-build-identity.sh",
       "_origin": "ast",
-      "community": 21,
+      "community": 22,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -2147,7 +2185,7 @@
       "id": "scripts_test_container_build_identity_sh__entry",
       "label": "test-container-build-identity.sh script",
       "_origin": "ast",
-      "community": 21,
+      "community": 22,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -2161,7 +2199,7 @@
       "id": "scripts_test_deploy_container_name",
       "label": "test-deploy-container-name.sh",
       "_origin": "ast",
-      "community": 22,
+      "community": 23,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -2175,7 +2213,7 @@
       "id": "scripts_test_deploy_container_name_sh__entry",
       "label": "test-deploy-container-name.sh script",
       "_origin": "ast",
-      "community": 22,
+      "community": 23,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -2189,7 +2227,7 @@
       "id": "scripts_test_live_durable_workflow",
       "label": "test-live-durable-workflow.sh",
       "_origin": "ast",
-      "community": 23,
+      "community": 24,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -2203,7 +2241,7 @@
       "id": "scripts_test_live_durable_workflow_sh__entry",
       "label": "test-live-durable-workflow.sh script",
       "_origin": "ast",
-      "community": 23,
+      "community": 24,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -2217,7 +2255,7 @@
       "id": "scripts_test_live_topology",
       "label": "test-live-topology.sh",
       "_origin": "ast",
-      "community": 24,
+      "community": 25,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -2231,7 +2269,7 @@
       "id": "scripts_test_live_topology_sh__entry",
       "label": "test-live-topology.sh script",
       "_origin": "ast",
-      "community": 24,
+      "community": 25,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -2242,10 +2280,38 @@
       "source_location": "L1"
     },
     {
+      "id": "scripts_test_product_candidate",
+      "label": "test-product-candidate.sh",
+      "_origin": "ast",
+      "community": 26,
+      "file_type": "code",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "norm_label": "test-product-candidate.sh",
+      "source_file": "scripts/test-product-candidate.sh",
+      "source_location": "L1"
+    },
+    {
+      "id": "scripts_test_product_candidate_sh__entry",
+      "label": "test-product-candidate.sh script",
+      "_origin": "ast",
+      "community": 26,
+      "file_type": "code",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "norm_label": "test-product-candidate.sh script",
+      "source_file": "scripts/test-product-candidate.sh",
+      "source_location": "L1"
+    },
+    {
       "id": "frontend_vite_config",
       "label": "vite.config.ts",
       "_origin": "ast",
-      "community": 25,
+      "community": 27,
       "file_type": "code",
       "norm_label": "vite.config.ts",
       "source_file": "frontend/vite.config.ts",
@@ -2255,7 +2321,7 @@
       "id": "pkg_accessible_explanation_checkin",
       "label": "accessible-explanation-checkin",
       "_origin": "ast",
-      "community": 26,
+      "community": 28,
       "ecosystem": "cargo",
       "file_type": "code",
       "norm_label": "accessible-explanation-checkin",
@@ -2268,29 +2334,9 @@
       "id": "src_db_rs_sqlitepool",
       "label": "SqlitePool",
       "_origin": "ast",
-      "community": 27,
-      "file_type": "code",
-      "norm_label": "sqlitepool",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "src_main_rs_response",
-      "label": "Response",
-      "_origin": "ast",
-      "community": 28,
-      "file_type": "code",
-      "norm_label": "response",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "src_main_rs_state",
-      "label": "State",
-      "_origin": "ast",
       "community": 29,
       "file_type": "code",
-      "norm_label": "state",
+      "norm_label": "sqlitepool",
       "source_file": "",
       "source_location": ""
     },
@@ -2535,10 +2581,30 @@
       "source_location": "L249"
     },
     {
+      "id": "src_main_rs_response",
+      "label": "Response",
+      "_origin": "ast",
+      "community": 30,
+      "file_type": "code",
+      "norm_label": "response",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "src_main_rs_state",
+      "label": "State",
+      "_origin": "ast",
+      "community": 31,
+      "file_type": "code",
+      "norm_label": "state",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
       "id": "src_main_rs_string",
       "label": "String",
       "_origin": "ast",
-      "community": 30,
+      "community": 32,
       "file_type": "code",
       "norm_label": "string",
       "source_file": "",
@@ -2548,7 +2614,7 @@
       "id": "src_routes_rs_error",
       "label": "Error",
       "_origin": "ast",
-      "community": 31,
+      "community": 33,
       "file_type": "code",
       "norm_label": "error",
       "source_file": "",
@@ -2558,7 +2624,7 @@
       "id": "src_routes_rs_option",
       "label": "Option",
       "_origin": "ast",
-      "community": 32,
+      "community": 34,
       "file_type": "code",
       "norm_label": "option",
       "source_file": "",
@@ -2568,7 +2634,7 @@
       "id": "src_routes_rs_path",
       "label": "Path",
       "_origin": "ast",
-      "community": 33,
+      "community": 35,
       "file_type": "code",
       "norm_label": "path",
       "source_file": "",
@@ -2578,7 +2644,7 @@
       "id": "src_routes_rs_pathbuf",
       "label": "PathBuf",
       "_origin": "ast",
-      "community": 34,
+      "community": 36,
       "file_type": "code",
       "norm_label": "pathbuf",
       "source_file": "",
@@ -2588,7 +2654,7 @@
       "id": "src_routes_rs_response",
       "label": "Response",
       "_origin": "ast",
-      "community": 35,
+      "community": 37,
       "file_type": "code",
       "norm_label": "response",
       "source_file": "",
@@ -2598,7 +2664,7 @@
       "id": "src_routes_rs_result",
       "label": "Result",
       "_origin": "ast",
-      "community": 36,
+      "community": 38,
       "file_type": "code",
       "norm_label": "result",
       "source_file": "",
@@ -2608,29 +2674,9 @@
       "id": "src_routes_rs_sqlitepool",
       "label": "SqlitePool",
       "_origin": "ast",
-      "community": 37,
-      "file_type": "code",
-      "norm_label": "sqlitepool",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "src_routes_rs_state",
-      "label": "State",
-      "_origin": "ast",
-      "community": 38,
-      "file_type": "code",
-      "norm_label": "state",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "src_routes_rs_string",
-      "label": "String",
-      "_origin": "ast",
       "community": 39,
       "file_type": "code",
-      "norm_label": "string",
+      "norm_label": "sqlitepool",
       "source_file": "",
       "source_location": ""
     },
@@ -2863,6 +2909,26 @@
       "norm_label": "vitest/globals",
       "source_file": "frontend/tsconfig.json",
       "source_location": "L14"
+    },
+    {
+      "id": "src_routes_rs_state",
+      "label": "State",
+      "_origin": "ast",
+      "community": 40,
+      "file_type": "code",
+      "norm_label": "state",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "src_routes_rs_string",
+      "label": "String",
+      "_origin": "ast",
+      "community": 41,
+      "file_type": "code",
+      "norm_label": "string",
+      "source_file": "",
+      "source_location": ""
     },
     {
       "id": "package",
@@ -9236,18 +9302,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/tests/claims.spec.ts",
-      "source_location": "L243",
-      "weight": 1.0
-    },
-    {
-      "source": "frontend_tests_claims_spec",
-      "target": "frontend_tests_claims_spec_recordedmedia",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "frontend/tests/claims.spec.ts",
-      "source_location": "L270",
+      "source_location": "L278",
       "weight": 1.0
     },
     {
@@ -9259,6 +9314,17 @@
       "confidence_score": 1.0,
       "source_file": "frontend/tests/claims.spec.ts",
       "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "frontend_tests_claims_spec",
+      "target": "frontend_tests_claims_spec_recordedmedia",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "frontend/tests/claims.spec.ts",
+      "source_location": "L305",
       "weight": 1.0
     },
     {
@@ -9845,6 +9911,17 @@
       "weight": 1.0
     },
     {
+      "source": "scripts_resolve_product_candidate",
+      "target": "scripts_resolve_product_candidate_sh__entry",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/resolve-product-candidate.sh",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
       "source": "scripts_test_all_claims",
       "target": "scripts_test_all_claims_root",
       "relation": "contains",
@@ -9940,6 +10017,17 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "scripts/test-nonroot-runtime.sh",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "scripts_test_product_candidate",
+      "target": "scripts_test_product_candidate_sh__entry",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/test-product-candidate.sh",
       "source_location": "L1",
       "weight": 1.0
     },
@@ -10868,6 +10956,15 @@
       "weight": 1.0
     },
     {
+      "source": "frontend_tests_app_spec",
+      "target": "test",
+      "relation": "dynamic_import",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "frontend/tests/app.spec.ts"
+    },
+    {
       "source": "src_routes_apierror",
       "target": "intoresponse",
       "relation": "implements",
@@ -10919,7 +11016,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/tests/claims.spec.ts",
-      "source_location": "L275",
+      "source_location": "L310",
       "weight": 1.0
     },
     {
@@ -10930,7 +11027,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/tests/claims.spec.ts",
-      "source_location": "L278",
+      "source_location": "L313",
       "weight": 1.0
     },
     {
@@ -11005,5 +11102,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "c2f15604546d9d01d459a0b2df423fd97cea14e6"
+  "built_at_commit": "63757a06cf7e8c8770a72f0adbcd2e8bc16f0f13"
 }

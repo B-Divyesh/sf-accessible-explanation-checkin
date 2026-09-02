@@ -330,86 +330,95 @@
       "scripts_test_durable_deploy_sh__entry"
     ],
     "16": [
+      "frontend_tests_app_spec",
+      "frontend_tests_app_spec_expectaccessible",
+      "test"
+    ],
+    "17": [
       "scripts_test_nonroot_runtime",
       "scripts_test_nonroot_runtime_cleanup",
       "scripts_test_nonroot_runtime_sh__entry"
     ],
-    "17": [
+    "18": [
       "scripts_verify_live_topology",
       "scripts_verify_live_topology_fail",
       "scripts_verify_live_topology_sh__entry"
     ],
-    "18": [
+    "19": [
       "frontend_public_sw",
       "frontend_public_sw_shell"
-    ],
-    "19": [
-      "frontend_tests_app_spec",
-      "frontend_tests_app_spec_expectaccessible"
     ],
     "20": [
       "scripts_deploy_durable_container",
       "scripts_deploy_durable_container_sh__entry"
     ],
     "21": [
+      "scripts_resolve_product_candidate",
+      "scripts_resolve_product_candidate_sh__entry"
+    ],
+    "22": [
       "scripts_test_container_build_identity",
       "scripts_test_container_build_identity_sh__entry"
     ],
-    "22": [
+    "23": [
       "scripts_test_deploy_container_name",
       "scripts_test_deploy_container_name_sh__entry"
     ],
-    "23": [
+    "24": [
       "scripts_test_live_durable_workflow",
       "scripts_test_live_durable_workflow_sh__entry"
     ],
-    "24": [
+    "25": [
       "scripts_test_live_topology",
       "scripts_test_live_topology_sh__entry"
     ],
-    "25": [
-      "frontend_vite_config"
-    ],
     "26": [
-      "pkg_accessible_explanation_checkin"
+      "scripts_test_product_candidate",
+      "scripts_test_product_candidate_sh__entry"
     ],
     "27": [
-      "src_db_rs_sqlitepool"
+      "frontend_vite_config"
     ],
     "28": [
-      "src_main_rs_response"
+      "pkg_accessible_explanation_checkin"
     ],
     "29": [
-      "src_main_rs_state"
+      "src_db_rs_sqlitepool"
     ],
     "30": [
-      "src_main_rs_string"
+      "src_main_rs_response"
     ],
     "31": [
-      "src_routes_rs_error"
+      "src_main_rs_state"
     ],
     "32": [
-      "src_routes_rs_option"
+      "src_main_rs_string"
     ],
     "33": [
-      "src_routes_rs_path"
+      "src_routes_rs_error"
     ],
     "34": [
-      "src_routes_rs_pathbuf"
+      "src_routes_rs_option"
     ],
     "35": [
-      "src_routes_rs_response"
+      "src_routes_rs_path"
     ],
     "36": [
-      "src_routes_rs_result"
+      "src_routes_rs_pathbuf"
     ],
     "37": [
-      "src_routes_rs_sqlitepool"
+      "src_routes_rs_response"
     ],
     "38": [
-      "src_routes_rs_state"
+      "src_routes_rs_result"
     ],
     "39": [
+      "src_routes_rs_sqlitepool"
+    ],
+    "40": [
+      "src_routes_rs_state"
+    ],
+    "41": [
       "src_routes_rs_string"
     ]
   },
@@ -431,7 +440,7 @@
     "14": 0.5,
     "15": 0.8333333333333334,
     "16": 0.6666666666666666,
-    "17": 1.0,
+    "17": 0.6666666666666666,
     "18": 1.0,
     "19": 1.0,
     "20": 1.0,
@@ -453,7 +462,9 @@
     "36": 1.0,
     "37": 1.0,
     "38": 1.0,
-    "39": 1.0
+    "39": 1.0,
+    "40": 1.0,
+    "41": 1.0
   },
   "gods": [
     {
@@ -462,13 +473,13 @@
       "degree": 26
     },
     {
-      "id": "frontend_src_main_shell",
-      "label": "shell()",
+      "id": "src_routes_apierror",
+      "label": "ApiError",
       "degree": 23
     },
     {
-      "id": "src_routes_apierror",
-      "label": "ApiError",
+      "id": "frontend_src_main_shell",
+      "label": "shell()",
       "degree": 23
     },
     {
