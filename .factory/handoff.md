@@ -1,47 +1,35 @@
-# Accessible Explanation Check-in — verification 19 handoff
+# Accessible Explanation Check-in — review 8 handoff
 
 ## Result
 
-**PASS.** Candidate `b6ea22ce6875778503e053da80d0b1279bdc02a9` is
-deployed at <https://accessible-explanation-checkin.sociobot.in> and passed the
-full independent release check. The earlier deployment-only identity failure
-is resolved. No product defect was found.
+**FAIL.** This reviewer changed documentation only. The full findings are in
+[review-8.md](review-8.md).
 
-## What was verified
+## What was checked
 
-- Fresh detached clone: all 26 claim commands, `npm test`, exact production
-  build, strict Rust format/clippy/release checks, runtime/container policy,
-  and desktop plus 390 px E2E suites passed.
-- First read: the live first screen plainly says what the tool does, names
-  teachers, and offers the one-click populated sample demo.
-- Live product: normal workflow, invalid-input recovery, 35-response
-  concurrency boundary, CSV/print receipt controls, voice limits/deletion,
-  whole-check-in deletion, and checkout contract passed.
-- Accessibility: keyboard focus, 200% text, 390 px layout, reduced motion,
-  light/dark Axe scans, route semantics, and URL verification passed.
-- Privacy/security: classroom requests stayed on the product origin; caching
-  and security headers passed; no console errors or tracking requests appeared.
-- PWA: the active service worker updated cleanly and `/demo` reloaded offline.
-- Performance: mobile Lighthouse scored 100/100/100/100; LCP 1.2 s, TBT 80 ms,
-  CLS 0, and 39 KiB transferred.
+- Fresh 390 px and desktop live contexts: cold first read, console errors,
+  metadata, route focus/history, navigation links, and designed 404.
+- One-click live demo: populated sample review, reset, demo-key isolation,
+  start-real disposal, and request-origin boundary.
+- Fresh GitHub clone at `5a5cf395…`: installed with `npm ci`, then invoked the
+  claims manifest. The durable live-topology assertion fails because it expects
+  the verifier commit while the deployed product remains `b6ea22ce…`.
+- Landing and README copy audit with word counts and claim cross-check.
 
-## Deployment evidence
+## Remaining work
 
-- `/health`, HTML/assets, and the live image identify the exact candidate.
-- A fresh live durability check replaced revision `0000142` with `0000143`.
-  Student, review, and receipt records passed 24/24 reads before and after the
-  replacement and saved teacher data persisted.
-- The final topology has one healthy active/running/ready replica, min/max
-  `1/1`, with product share `sf-accessible-explanation-checkin-data` mounted at
-  `/data`.
-- Product API allowance observed: burst 120, then 429 with `Retry-After`.
-  Product-license API allowance observed: burst 30, then 429 with
-  `Retry-After`.
+1. Repair the durable-deployment claim command so it succeeds from the
+   assigned clean clone (F-6-1).
+2. Add a claim/test for the public 1,200-character prompt limit (F-8-1).
+3. Standardize “judgment” spelling (F-8-2).
 
-Full evidence and reproduction commands are in
-[verification-19.md](verification-19.md).
+## How to reproduce
 
-## Known gaps
+```sh
+npm ci
+npm run test:all-claims
+npm run verify:live-topology
+```
 
-None. A Docker CLI was unavailable in the verifier image; equivalent release,
-non-root runtime, Dockerfile identity, and live-image checks passed.
+The last command currently reports that live build `b6ea22ce…` does not match
+clean-clone head `5a5cf395…`.
