@@ -1,0 +1,9 @@
+{
+  "base": "https://accessible-explanation-checkin.sociobot.in",
+  "exactCharacters": 1200,
+  "exactStatus": 201,
+  "oversizedCharacters": 1201,
+  "oversizedStatus": 400,
+  "oversizedError": "Prompt must be between 4 and 1200 characters.",
+  "cleanupStatus": 200
+}

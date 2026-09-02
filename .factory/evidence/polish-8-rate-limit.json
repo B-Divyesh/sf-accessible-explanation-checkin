@@ -1,0 +1,13 @@
+{
+  "url": "https://accessible-explanation-checkin.sociobot.in/api/checkins/00000000000000000000000000000000",
+  "requests": 150,
+  "statuses": {
+    "404": 120,
+    "429": 30
+  },
+  "responses429": 30,
+  "retryAfterOnEvery429": true,
+  "retryAfterValues": [
+    "0"
+  ]
+}

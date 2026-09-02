@@ -1,0 +1,19 @@
+{
+  "result": "PASS",
+  "base_url": "https://accessible-explanation-checkin.sociobot.in",
+  "build_sha": "2182c924b7b2a2e1a9ed84f629538989a38aeacd",
+  "replacement_revision": "sf-accessible-explanation-9c1a54--0000146",
+  "before_revision_replacement": {
+    "student_reads": "24/24",
+    "review_reads": "24/24",
+    "receipt_reads": "24/24",
+    "submission_status": 201,
+    "review_saved": true
+  },
+  "after_revision_replacement": {
+    "student_reads": "24/24",
+    "review_reads": "24/24",
+    "receipt_reads": "24/24",
+    "review_persisted": true
+  }
+}
