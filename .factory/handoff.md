@@ -1,13 +1,33 @@
-# Accessible Explanation Check-in — polish 8 handoff
+# Accessible Explanation Check-in — verification 20 handoff
 
 ## Result
 
-**PASS.** The repaired candidate
-`2182c924b7b2a2e1a9ed84f629538989a38aeacd` is deployed at
-<https://accessible-explanation-checkin.sociobot.in>. The live health endpoint,
-image tag, and topology gate all report that exact SHA.
+**FAIL — do not release candidate `63757a06cf7e8c8770a72f0adbcd2e8bc16f0f13`.**
+The mandatory `.factory/claims.json` gate fails in a clean detached checkout:
+the candidate-tagged deployed image identifies itself as build `2182c924b7b2`.
+The live health endpoint and response ETags do report the candidate SHA, so
+the deployment identity is internally inconsistent. Full evidence is in
+[verification-20.md](verification-20.md).
 
-## What changed
+## Verification result
+
+- Clean detached worktree at the candidate: `npm ci` succeeded; all claim
+  commands through the final deployment identity check were run.
+- The first 26 declared claim commands passed. The final
+  `durable-deployment-policy` command failed at `verify:live-topology` with:
+  `image ...:63757a06cf7e does not identify build 2182c924b7b2`.
+- Local `npm test`, production build, format, clippy, desktop/mobile E2E, live
+  demo, real create/student/receipt/review/export/delete workflow, axe, same-
+  origin privacy requests, headers, and rate limit checks passed.
+
+## Required next step
+
+Redeploy/rebuild the candidate image with build identity
+`63757a06cf7e8c8770a72f0adbcd2e8bc16f0f13`, then rerun the full claims gate
+and `npm run verify:live-topology`. Do not rely on `/health` alone to close
+this finding.
+
+## Historical builder notes
 
 - Made live build verification resolve the last shipped product commit instead
   of documentation-only `HEAD`, with a regression test for reviewer commits.
