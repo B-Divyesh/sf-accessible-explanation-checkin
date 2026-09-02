@@ -28,6 +28,12 @@ test("landing and legal screens are semantic and console-clean", async ({
   await page.goto("/privacy");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Privacy");
   await expectAccessible(page);
+  await page.goto("/terms");
+  await expect(
+    page.getByRole("heading", { level: 2, name: "No automated judgment" }),
+  ).toBeVisible();
+  await expect(page.getByText("No automated judgement")).toHaveCount(0);
+  await expectAccessible(page);
   await page.emulateMedia({ colorScheme: "dark", reducedMotion: "reduce" });
   await page.goto("/create");
   await expectAccessible(page);

@@ -209,6 +209,41 @@ test("@claim:recent-links-local keeps recent review links in one browser only", 
   }
 });
 
+test("@claim:prompt-character-limit accepts 1,200 characters and explains rejection at 1,201", async ({
+  page,
+}, testInfo) => {
+  desktopOnly(testInfo);
+  await page.goto("/demo");
+  await page.goto("/create");
+  await expect(page.getByText("1,200 characters maximum.")).toBeVisible();
+  await expect(page.getByLabel("Explanation prompt")).toHaveAttribute(
+    "maxlength",
+    "1200",
+  );
+
+  await page.getByLabel("Assignment name").fill("Exact prompt limit");
+  await page.getByLabel("Explanation prompt").fill("a".repeat(1_200));
+  await page.getByRole("button", { name: "Create private links" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Keep one link. Share the other." }),
+  ).toBeVisible();
+
+  await page.goto("/create");
+  await page.getByLabel("Assignment name").fill("Over prompt limit");
+  const prompt = page.getByLabel("Explanation prompt");
+  await prompt.evaluate((element) => element.removeAttribute("maxlength"));
+  await prompt.fill("b".repeat(1_201));
+  await page.getByRole("button", { name: "Create private links" }).click();
+  const error = page.locator("#form-error");
+  await expect(error).toBeFocused();
+  await expect(error).toContainText(
+    "Prompt must be between 4 and 1200 characters.",
+  );
+  await expect(
+    page.getByRole("heading", { name: "Keep one link. Share the other." }),
+  ).toHaveCount(0);
+});
+
 test("@claim:voice-retention-control applies the selected free voice schedule", async ({
   page,
 }, testInfo) => {

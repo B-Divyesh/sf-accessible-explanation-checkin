@@ -101,3 +101,15 @@ statements map to `student-draft-local` in `.factory/claims.json`.
 
 All copy above is at or below 22 words. The deletion outcome maps to
 `teacher-checkin-deletion` in `.factory/claims.json`.
+
+## Polish 8 revised copy
+
+| Text | Words | Result |
+| --- | ---: | --- |
+| Aim for one answerable question. | 5 | plain prompt guidance |
+| 1,200 characters maximum. | 3 | tested `prompt-character-limit` boundary |
+| No automated judgment | 3 | consistent product term |
+| Collect student reasoning through private text or voice check-ins for teachers. | 11 | verb-first catalog description |
+
+All round 8 copy is at or below 22 words and contains no banned term. The
+numeric prompt limit maps to `prompt-character-limit` in `.factory/claims.json`.

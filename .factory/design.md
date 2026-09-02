@@ -63,7 +63,7 @@ stack. Interactive targets are at least 44px with 8px separation.
 - Warm amber marks the next action; chalk green marks a saved record. A dotted
   “trail” motif joins steps, echoing a line of reasoning.
 - Student identity is a teacher-issued private link plus a student-entered
-  display name. There are no accounts, biometrics, AI judgements or scores.
+  display name. There are no accounts, biometrics, AI judgments or scores.
 - Voice and text are peers. Voice is never required, can be replayed/removed,
   and its retention date is stated next to the recorder.
 - Errors appear beside the field and in an assertive summary. Save, offline and
