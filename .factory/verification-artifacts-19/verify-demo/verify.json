@@ -1,0 +1,14 @@
+{
+  "url": "https://accessible-explanation-checkin.sociobot.in/demo",
+  "loadMs": 553,
+  "errors": [],
+  "a11y": {
+    "title": "Demo — Accessible Explanation Check-in",
+    "lang": "en",
+    "h1": 1,
+    "main": true,
+    "imgsMissingAlt": 0,
+    "buttonsUnlabeled": 0,
+    "textLength": 1625
+  }
+}
