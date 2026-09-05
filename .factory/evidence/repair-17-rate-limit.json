@@ -1,0 +1,10 @@
+{
+  "checked_at": "2026-09-05T23:04:41.778Z",
+  "requests": 150,
+  "statuses": {
+    "404": 120,
+    "429": 30
+  },
+  "responses_429_with_retry_after": 30,
+  "every_429_had_retry_after": true
+}

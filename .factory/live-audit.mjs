@@ -64,6 +64,13 @@ for (const [route, wanted] of expected) {
   if (route === '/no-such-page') {
     await page.screenshot({ path: new URL(`./evidence/${evidencePrefix}-live-404-mobile.png`, import.meta.url).pathname, fullPage: true });
   }
+  if (route === '/') {
+    assert.equal((await page.locator('h1').innerText()).trim(), 'Collect student reasoning', 'home job');
+    await page.getByText('For teachers who need a low-stakes check-in, students explain one choice by text or voice.').waitFor();
+    await page.getByRole('link', { name: 'Try it with sample data' }).waitFor();
+    await page.getByText('Open a populated teacher review; nothing is saved.').waitFor();
+    await page.screenshot({ path: new URL(`./evidence/${evidencePrefix}-live-home-mobile.png`, import.meta.url).pathname, fullPage: true });
+  }
   await page.evaluate(() => { document.documentElement.style.fontSize = '32px'; });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth), false, `${route} 200% text overflow`);
 
@@ -156,6 +163,11 @@ const flowContext = await browser.newContext({ viewport: { width: 1280, height: 
 const flow = await flowContext.newPage();
 const workflowRequests = [];
 flow.on('request', request => workflowRequests.push(request.url()));
+await flow.goto(base, { waitUntil: 'networkidle' });
+assert.equal((await flow.locator('h1').innerText()).trim(), 'Collect student reasoning', 'desktop home job');
+await flow.getByText('For teachers who need a low-stakes check-in, students explain one choice by text or voice.').waitFor();
+await flow.getByRole('link', { name: 'Try it with sample data' }).waitFor();
+await flow.screenshot({ path: new URL(`./evidence/${evidencePrefix}-live-home-desktop.png`, import.meta.url).pathname, fullPage: true });
 await flow.goto(`${base}/create`);
 await flow.getByLabel('Assignment name').fill('Live release verification');
 await flow.getByLabel('Explanation prompt').fill('Which example changed your conclusion, and why?');
@@ -181,6 +193,10 @@ await flow.reload();
 assert.equal(await flow.getByLabel('Uses evidence').isChecked(), true);
 assert.equal(await flow.getByLabel('Private teacher note').inputValue(), 'Live review save verified.');
 assert.deepEqual([...new Set(workflowRequests.map(url => new URL(url).origin))], [base]);
+const workflowCleanup = await flowContext.request.delete(`${base}/api/reviews/${new URL(reviewUrl).pathname.split('/').pop()}`);
+assert.equal(workflowCleanup.status(), 200, 'workflow cleanup');
+assert.equal((await flowContext.request.get(`${base}/api/checkins/${new URL(studentUrl).pathname.split('/').pop()}`)).status(), 404, 'workflow cleanup student resource');
+assert.equal((await flowContext.request.get(`${base}/api/reviews/${new URL(reviewUrl).pathname.split('/').pop()}`)).status(), 404, 'workflow cleanup review resource');
 await flowContext.close();
 
 const deletionContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
@@ -319,6 +335,11 @@ assert.equal(retainedReceiptResponse.status(), 200);
 const retainedReceipt = await retainedReceiptResponse.json();
 assert.equal(retainedReceipt.has_voice, false);
 assert.equal(retainedReceipt.explanation_text, 'The exact-size recording is supported.');
+const voiceCleanup = await voiceContext.request.delete(`${base}/api/reviews/${voiceCheckin.review_token}`);
+assert.equal(voiceCleanup.status(), 200, 'voice workflow cleanup');
+assert.equal((await voiceContext.request.get(`${base}/api/checkins/${voiceCheckin.student_token}`)).status(), 404, 'voice cleanup student link');
+assert.equal((await voiceContext.request.get(`${base}/api/reviews/${voiceCheckin.review_token}`)).status(), 404, 'voice cleanup review link');
+assert.equal((await voiceContext.request.get(`${base}/api/receipts/${acceptedSubmission.receipt_token}`)).status(), 404, 'voice cleanup receipt link');
 await voiceContext.close();
 
 const checkoutUrl = 'https://api.sociobot.in/api/v1/products/accessible-explanation-checkin/checkout';
@@ -350,9 +371,10 @@ const report = {
   crawledLinks: crawledLinks.size,
   focus: { forward: 'h1', back: 'h1', forwardAnnouncement, backAnnouncement },
   demo: { entry: '/?demo=1', sampleResponses: 3, isolatedStorage: true, reset: true, exitDiscardsAllDemoKeys: true, apiRequests: 0, offlineReload: true },
-  workflow: { created: true, submitted: true, reviewed: true, reloadedSavedReview: true, origins: [base] },
+  firstScreen: { job: 'Collect student reasoning', audience: 'teachers', firstAction: 'Try it with sample data', phone: true, desktop: true },
+  workflow: { created: true, submitted: true, reviewed: true, reloadedSavedReview: true, cleanedUp: true, origins: [base] },
   deletion: { teacherConfirmed: true, studentLink: 404, reviewLink: 404, receiptLink: 404 },
-  voice: { autoStopMilliseconds: 120000, acceptedBytes: 4194304, rejectedBytes: 4194305, earlyDelete: true, textReceiptAndReviewRetained: true },
+  voice: { autoStopMilliseconds: 120000, acceptedBytes: 4194304, rejectedBytes: 4194305, earlyDelete: true, textReceiptAndReviewRetained: true, cleanedUp: true },
   checkout: { catalogPriceMinor: 3900, currency: 'USD', status: 303, destination: 'checkout.dodopayments.com' },
   securityHeaders: ['content-security-policy', 'strict-transport-security', 'permissions-policy', 'x-content-type-options', 'referrer-policy'],
   consoleErrors: unexpectedConsoleErrors,
