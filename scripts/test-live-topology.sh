@@ -16,6 +16,7 @@ case "$args" in
   'containerapp env storage show '*) cat "$MOCK_STATE_DIR/storage.json" ;;
   'containerapp revision list '*) cat "$MOCK_STATE_DIR/revisions.json" ;;
   'containerapp replica list '*) cat "$MOCK_STATE_DIR/replicas.json" ;;
+  'acr repository show '*) printf '%s\n' "${MOCK_CANDIDATE_DIGEST:?}" ;;
   *) echo "unexpected az command: $args" >&2; exit 1 ;;
 esac
 MOCK
@@ -108,7 +109,23 @@ fi
 grep -Fq 'Container App app does not own custom domain example.test' "$test_dir/domain.out"
 cp "$test_dir/state/valid-topology.json" "$test_dir/state/topology.json"
 
-output=$(MOCK_STATE_DIR="$test_dir/state" AZ_BIN="$test_dir/bin/az" CURL_BIN="$test_dir/bin/curl" \
+candidate_digest='sha256:1111111111111111111111111111111111111111111111111111111111111111'
+jq --arg image "sociobotregistry.azurecr.io/app@$candidate_digest" \
+  '.properties.template.containers[] |= if .name == "app" then .image = $image else . end' \
+  "$test_dir/state/topology.json" > "$test_dir/state/digest-topology.json"
+mv "$test_dir/state/digest-topology.json" "$test_dir/state/topology.json"
+
+if MOCK_STATE_DIR="$test_dir/state" MOCK_CANDIDATE_DIGEST='sha256:2222222222222222222222222222222222222222222222222222222222222222' \
+  AZ_BIN="$test_dir/bin/az" CURL_BIN="$test_dir/bin/curl" \
+  "$checker" https://example.test app group repair-sha durable durable-share \
+  >"$test_dir/digest-mismatch.out" 2>&1; then
+  echo 'live topology gate accepted an immutable image outside the candidate tag' >&2
+  exit 1
+fi
+grep -Fq 'does not match candidate tag repair-sha' "$test_dir/digest-mismatch.out"
+
+output=$(MOCK_STATE_DIR="$test_dir/state" MOCK_CANDIDATE_DIGEST="$candidate_digest" \
+  AZ_BIN="$test_dir/bin/az" CURL_BIN="$test_dir/bin/curl" \
   "$checker" https://example.test app group repair-sha durable durable-share)
 jq -e '
   .result == "PASS"

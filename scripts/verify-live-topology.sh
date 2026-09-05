@@ -69,7 +69,21 @@ volume_name=$(jq -er --arg mount "$data_dir" '
 
 image=$(jq -er '.properties.template.containers[] | select(.name == "app") | .image' \
   <<<"$topology")
-if [[ -n "$expected_build_sha" && "$image" != *":${expected_build_sha:0:12}" ]]; then
+if [[ -n "$expected_build_sha" && "$image" == *@sha256:* ]]; then
+  registry_host=${image%%/*}
+  registry_name=${registry_host%.azurecr.io}
+  repository_with_digest=${image#*/}
+  repository=${repository_with_digest%@*}
+  deployed_digest=${image##*@}
+  if [[ "$registry_host" != *.azurecr.io || -z "$registry_name" || -z "$repository" || \
+        ! "$deployed_digest" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+    fail "image $image is not a valid immutable Azure Container Registry reference"
+  fi
+  candidate_digest=$($az_bin acr repository show --name "$registry_name" \
+    --image "$repository:${expected_build_sha:0:12}" --query digest --output tsv)
+  [[ "$candidate_digest" == "$deployed_digest" ]] || \
+    fail "image $image does not match candidate tag ${expected_build_sha:0:12}"
+elif [[ -n "$expected_build_sha" && "$image" != *":${expected_build_sha:0:12}" ]]; then
   fail "image $image does not identify build ${expected_build_sha:0:12}"
 fi
 
