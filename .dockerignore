@@ -1,9 +1,9 @@
 .git
 .factory
+graphify-out
 assets/src
 node_modules
 target
 data
 dist
 npm-debug.log
-

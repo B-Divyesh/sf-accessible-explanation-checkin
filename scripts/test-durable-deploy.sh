@@ -34,6 +34,8 @@ cat > "$test_dir/fleet-deploy" <<'MOCK'
 set -euo pipefail
 printf '%s\n' "$*" > "$MOCK_STATE_DIR/fleet-args"
 printf '%s\n' "${WO_DATA_DIR-unset}" > "$MOCK_STATE_DIR/fleet-data-dir"
+git -C "$2" rev-parse HEAD > "$MOCK_STATE_DIR/fleet-source-sha"
+git -C "$2" status --porcelain --untracked-files=no > "$MOCK_STATE_DIR/fleet-source-status"
 MOCK
 
 cat > "$test_dir/live-checker" <<'MOCK'
@@ -87,7 +89,7 @@ MOCK
 chmod +x "$test_dir/fleet-deploy" "$test_dir/live-checker" \
   "$test_dir/bin/az" "$test_dir/bin/curl"
 
-test_sha=$(git -C "$repo_root" rev-parse HEAD)
+test_sha=$(bash "$repo_root/scripts/resolve-product-candidate.sh" "$repo_root")
 storage_name='aec-accessible-explanati-9c1a54'
 share_name='sf-accessible-explanation-checkin-data'
 
@@ -125,9 +127,14 @@ run_deploy() {
 }
 
 output=$(run_deploy)
-assert_exact_file 'default deployment helper arguments' \
-  "accessible-explanation-checkin $repo_root Dockerfile 8080" \
-  "$test_dir/state/fleet-args"
+fleet_source=$(awk '{print $2}' "$test_dir/state/fleet-args")
+[[ "$fleet_source" != "$repo_root" ]] || {
+  echo 'deployment helper received the report-bearing source checkout' >&2
+  exit 1
+}
+[[ "$(<"$test_dir/state/fleet-args")" == "accessible-explanation-checkin $fleet_source Dockerfile 8080" ]]
+assert_exact_file 'default deployment source SHA' "$test_sha" "$test_dir/state/fleet-source-sha"
+assert_exact_file 'default deployment source status' '' "$test_dir/state/fleet-source-status"
 assert_exact_file 'generic helper durable-path override' '' "$test_dir/state/fleet-data-dir"
 grep -Eq "^https://accessible-explanation-checkin.sociobot.in sf-accessible-explanation-9c1a54 sociobot [a-f0-9]{40} $storage_name $share_name$" "$test_dir/state/live-checker-args"
 [[ "$output" == *"PASS: deployed and verified sf-accessible-explanation-9c1a54 with durable /data"* ]]
@@ -152,12 +159,21 @@ git clone --quiet --no-local "$repo_root" "$relocated_repo"
 # test into the otherwise clean clone. The package command still invokes it
 # without positional arguments, exactly as `npm run deploy` does in CI.
 cp "$script" "$relocated_repo/scripts/deploy-durable-container.sh"
+git -C "$relocated_repo" config user.name 'Deployment fixture'
+git -C "$relocated_repo" config user.email 'deployment-fixture@example.invalid'
+printf '%s\n' '' 'Report-only fixture.' >> "$relocated_repo/.factory/handoff.md"
+git -C "$relocated_repo" add .factory/handoff.md
+git -C "$relocated_repo" commit --quiet -m 'docs: report only'
+relocated_head=$(git -C "$relocated_repo" rev-parse HEAD)
+[[ "$relocated_head" != "$test_sha" ]]
 cp "$test_dir/state/stateless-app.json" "$test_dir/state/app.json"
 rm -f "$test_dir/state/durability-workflow-finished"
 relocated_output=$(run_deploy "$relocated_repo")
-assert_exact_file 'relocated clean-clone helper arguments' \
-  "accessible-explanation-checkin $relocated_repo Dockerfile 8080" \
-  "$test_dir/state/fleet-args"
+relocated_source=$(awk '{print $2}' "$test_dir/state/fleet-args")
+[[ "$relocated_source" != "$relocated_repo" ]]
+[[ "$(<"$test_dir/state/fleet-args")" == "accessible-explanation-checkin $relocated_source Dockerfile 8080" ]]
+assert_exact_file 'report-only deployment source SHA' "$test_sha" "$test_dir/state/fleet-source-sha"
+assert_exact_file 'report-only deployment source status' '' "$test_dir/state/fleet-source-status"
 [[ "$relocated_output" == *"PASS: deployed and verified sf-accessible-explanation-9c1a54 with durable /data"* ]]
 
 # This is verifier 15's exact failure after the durability workflow creates a

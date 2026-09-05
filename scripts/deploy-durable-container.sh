@@ -16,6 +16,7 @@ port=${4:-8080}
 fleet_deploy_helper=${FLEET_DEPLOY_CONTAINER_HELPER:-/opt/fleet/lib/deploy-container.sh}
 live_durability_checker=${LIVE_DURABILITY_CHECKER:-$repo/scripts/verify-live-durable-workflow.sh}
 live_topology_checker=${LIVE_TOPOLOGY_CHECKER:-$repo/scripts/verify-live-topology.sh}
+candidate_resolver=${PRODUCT_CANDIDATE_RESOLVER:-$repo/scripts/resolve-product-candidate.sh}
 resource_group=${AZURE_RESOURCE_GROUP:-sociobot}
 data_dir=${DEPLOY_DATA_DIR:-/data}
 storage_name=${DEPLOY_STORAGE_NAME:-aec-accessible-explanati-9c1a54}
@@ -36,6 +37,32 @@ if [ ${#app_name} -gt 32 ]; then
 fi
 share_name="sf-${slug}-data"
 
+# Build the last shipped product commit, not a newer report or Graphify commit.
+# The factory helper derives both the image tag and Docker BUILD_SHA from the
+# checkout HEAD, so give it a clean detached checkout at that exact candidate.
+expected_build_sha=$("$candidate_resolver" "$repo")
+if [[ ! "$expected_build_sha" =~ ^[0-9a-f]{40}$ ]]; then
+  echo "ERROR: product candidate resolver returned an invalid SHA: $expected_build_sha" >&2
+  exit 2
+fi
+build_root=$(mktemp -d)
+cleanup() {
+  if [[ -n "${build_root:-}" && -d "$build_root" ]]; then
+    rm -rf -- "$build_root"
+  fi
+}
+trap cleanup EXIT
+build_repo="$build_root/source"
+git clone --quiet --no-local --no-checkout "$repo" "$build_repo"
+git -C "$build_repo" checkout --quiet --detach "$expected_build_sha"
+actual_build_sha=$(git -C "$build_repo" rev-parse HEAD)
+if [[ "$actual_build_sha" != "$expected_build_sha" ]] || \
+  [[ -n "$(git -C "$build_repo" status --porcelain --untracked-files=no)" ]]; then
+  echo "ERROR: could not prepare a clean product candidate checkout at $expected_build_sha" >&2
+  exit 2
+fi
+echo "== product candidate $expected_build_sha"
+
 # The factory helper builds the image and keeps the app's ingress, identity and
 # secrets. Its automatic Azure-storage resource name exceeds this product's
 # environment-storage limit, so reuse the product share already registered by
@@ -44,7 +71,7 @@ share_name="sf-${slug}-data"
 # The factory environment also exports WO_DATA_DIR. Do not let the generic
 # helper attempt to register its overlong derived storage name before this
 # wrapper attaches the existing, valid environment-storage resource below.
-WO_DATA_DIR= "$fleet_deploy_helper" "$slug" "$repo" "$dockerfile" "$port"
+WO_DATA_DIR= "$fleet_deploy_helper" "$slug" "$build_repo" "$dockerfile" "$port"
 
 app=$($az_bin containerapp show --resource-group "$resource_group" --name "$app_name" --output json)
 template=$(jq --arg storage "$storage_name" --arg mount "$data_dir" '
@@ -62,8 +89,6 @@ subscription=$($az_bin account show --query id --output tsv)
 $az_bin rest --method patch \
   --url "https://management.azure.com/subscriptions/$subscription/resourceGroups/$resource_group/providers/Microsoft.App/containerApps/$app_name?api-version=2024-03-01" \
   --body "$payload" --output none
-
-expected_build_sha=$(git -C "$repo" rev-parse HEAD)
 
 # The helper waits for ARM provisioning, but a newly created revision can take
 # a little longer to become the sole healthy replica. Do not create a private

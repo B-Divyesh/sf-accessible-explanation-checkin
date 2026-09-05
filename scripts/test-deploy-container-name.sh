@@ -12,6 +12,12 @@ slug=accessible-explanation-checkin
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 mkdir -p "$work/bin" "$work/source"
+git init --quiet "$work/source"
+git -C "$work/source" config user.name 'Deployment fixture'
+git -C "$work/source" config user.email 'deployment-fixture@example.invalid'
+printf '%s\n' 'deployment fixture' > "$work/source/README.md"
+git -C "$work/source" add README.md
+git -C "$work/source" commit --quiet -m 'deployment fixture'
 
 printf '%s\n' '#!/usr/bin/env bash' \
   'set -euo pipefail' \
@@ -31,8 +37,9 @@ printf '%s\n' '#!/usr/bin/env bash' \
 printf '%s\n' '#!/usr/bin/env bash' 'printf "%s" "200"' > "$work/bin/curl"
 printf '%s\n' '#!/usr/bin/env bash' 'exit 0' > "$work/bin/sleep"
 chmod +x "$work/bin/az" "$work/bin/curl" "$work/bin/sleep"
+prebuilt='sociobotregistry.azurecr.io/deployment-fixture@sha256:0000000000000000000000000000000000000000000000000000000000000000'
 
-output=$(PATH="$work/bin:$PATH" "$helper" "$slug" "$work/source" Dockerfile 8080 'example.invalid/prebuilt:latest')
+output=$(PATH="$work/bin:$PATH" "$helper" "$slug" "$work/source" Dockerfile 8080 "$prebuilt")
 actual=$(sed -n 's/^== container app name: \([^ ]*\) (slug .*/\1/p' <<<"$output")
 expected="sf-${slug:0:22}-$(printf '%s' "$slug" | sha1sum | cut -c1-6)"
 expected=${expected//--/-}
@@ -47,18 +54,23 @@ expected=${expected//--/-}
 # deterministic shortened storage alias when deploy.data_dir is /data.
 legacy_helper="$work/legacy-deploy-container.sh"
 cp "$helper" "$legacy_helper"
+cp "$(dirname "$helper")/resolve-image.sh" "$work/resolve-image.sh"
 sed -i '/^DEFAULT_STORAGE="sf-\$SLUG-data"$/,/^fi$/c\DEFAULT_STORAGE="sf-$SLUG-data"' "$legacy_helper"
 chmod +x "$legacy_helper"
 
 legacy_storage="sf-$slug-data"
 [[ ${#legacy_storage} -gt 32 ]] || { echo "legacy storage fixture is not over the Azure limit" >&2; exit 1; }
-if WO_DATA_DIR=/data PATH="$work/bin:$PATH" "$legacy_helper" "$slug" "$work/source" Dockerfile 8080 'example.invalid/prebuilt:latest' >"$work/legacy.out" 2>&1; then
+if WO_DATA_DIR=/data PATH="$work/bin:$PATH" "$legacy_helper" "$slug" "$work/source" Dockerfile 8080 "$prebuilt" >"$work/legacy.out" 2>&1; then
   echo 'legacy unshortened Azure Files alias unexpectedly deployed' >&2
   exit 1
 fi
-grep -Fq "Managed environment storage alias exceeds 32 characters: $legacy_storage" "$work/legacy.out"
+if ! grep -Fq "Managed environment storage alias exceeds 32 characters: $legacy_storage" "$work/legacy.out"; then
+  echo 'legacy helper failed for an unexpected reason:' >&2
+  sed -n '1,80p' "$work/legacy.out" >&2
+  exit 1
+fi
 
-storage_output=$(WO_DATA_DIR=/data PATH="$work/bin:$PATH" "$helper" "$slug" "$work/source" Dockerfile 8080 'example.invalid/prebuilt:latest')
+storage_output=$(WO_DATA_DIR=/data PATH="$work/bin:$PATH" "$helper" "$slug" "$work/source" Dockerfile 8080 "$prebuilt")
 storage_actual=$(sed -n 's/^== durable share \([^ ]*\) for \/data$/\1/p' <<<"$storage_output")
 storage_expected="sf-${slug:0:21}-$(printf '%s' "$slug" | sha1sum | cut -c1-6)"
 storage_expected=${storage_expected//--/-}
