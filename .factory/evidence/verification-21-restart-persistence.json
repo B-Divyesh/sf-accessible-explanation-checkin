@@ -1,0 +1,11 @@
+{
+  "checked_at": "2026-09-05T23:35:00Z",
+  "revision": "sf-accessible-explanation-9c1a54--0000151",
+  "replica_replaced": true,
+  "student_reads_after_restart": 10,
+  "review_reads_after_restart": 10,
+  "receipt_reads_after_restart": 10,
+  "saved_teacher_review_persisted": true,
+  "test_record_deleted": true,
+  "result": "PASS"
+}

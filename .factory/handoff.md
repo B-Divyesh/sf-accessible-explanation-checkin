@@ -1,104 +1,72 @@
-# Accessible Explanation Check-in — repair 17 handoff
+# Verify student explanation check-ins — verification 21 handoff
 
 ## Result
 
-**PASS — release blocker closed.** The live image, immutable ACR digest, health
-response, and mandatory topology claim now identify the same implementation.
+**FAIL — one critical deployment-identity finding; zero untested claims.**
 
-- Implementation SHA: `8f2956bf5bafed7b9d0b27b53b92bf9cf3abd6bd`
-- Evidence/documentation SHA: `a200f12fc26bd876f198d0e220f72433ef2e8d41`
-- Live revision: `sf-accessible-explanation-9c1a54--0000150`
-- Image digest: `sha256:ee3d2502c582b78f2a6c56b26930bf80da33c9afaafe71fefa85dc1296a9d863`
+- Implementation candidate: `8f2956bf5bafed7b9d0b27b53b92bf9cf3abd6bd`
+- Repair documentation: `bd999e723236f2583b9a7e2fb239df3a798cc898`
+- Current checkout head: `633f153e48e82764d412329b7089ae88ae062db6`
+- Live revision checked: `sf-accessible-explanation-9c1a54--0000151`
+- Full report: [verification-21.md](verification-21.md)
 
-This handoff update is a later report-only commit. It does not require another
-product image; `scripts/resolve-product-candidate.sh` still resolves the exact
-implementation SHA above.
+The live service now runs immutable digest `sha256:b96f54e3…` and `/health`
+reports `633f153…`. Candidate `8f2956bf…` resolves to digest
+`sha256:ee3d2502…`. Therefore `npm run verify:live-topology`, the final command
+in the declared durable-deployment claim, fails. This reopens verification
+20's blocker after repair 17's successful revision `0000150` deployment.
 
-## What changed
+The live JS, CSS, and hero asset hashes match the clean candidate build. No
+user-facing product-code regression was found. Product code was not changed.
 
-The deployment wrapper previously resolved the right product commit for its
-checks but gave raw repository `HEAD` to the image builder. It now builds from
-a clean detached clone of the resolved candidate and uses that SHA throughout
-deployment verification. Regression tests cover a later report-only commit.
+## What was checked
 
-The live topology gate now supports the fleet helper's immutable image form. It
-resolves this product candidate's ACR tag to a digest and compares that digest
-with the running revision. A digest mismatch and a matching digest are both
-covered. `graphify-out` is excluded from the Docker build context.
+- Fresh phone and desktop first screens state the job, teacher audience, first
+  sample action, and result before scrolling.
+- The one-click demo has three realistic explanations, a persistent sample
+  label, reset, CSV, offline reload, and full disposal on exit. It makes no API
+  request and does not touch real records.
+- Real create, invalid input, 1,200/1,201 prompt boundary, student submission,
+  receipt, teacher review, reload, voice boundary, voice deletion, and complete
+  deletion paths passed. Every QA-created record was deleted.
+- An actual replica restart preserved student, review, receipt, and saved
+  teacher-review state. The service has one healthy ready replica and `/data`
+  is mounted.
+- All public routes, legal pages, links, route titles, focus restoration,
+  keyboard paths, 200% text, reduced motion, both themes, the deliberate 404,
+  privacy requests, service-worker state, and offline demo passed.
+- Axe found no serious or critical issue. Factory URL checks passed without
+  console errors.
+- A 150-request burst returned 30 HTTP 429 responses, all with `Retry-After`.
+- Lighthouse mobile: Performance 99, Accessibility 100, Best Practices 100,
+  SEO 100; LCP 1.181 s, TBT 123 ms, CLS 0, transfer 39,445 bytes.
+- All earlier verification, review, polish, and repair findings were inspected.
+  Only deployment identity has recurred.
 
-The live audit now saves cold phone and desktop first screens and removes every
-real verification check-in after testing it. Product behavior and scope were
-otherwise preserved.
+## Clean-checkout commands
 
-Full finding and evidence details are in [repair-17.md](repair-17.md).
-
-## Verification
-
-From a clean detached clone of the pushed implementation SHA:
-
-- `npm ci`: passed, 0 vulnerabilities.
-- `npm run test:all-claims`: all 27 declared commands passed.
-- `npm test`: passed, including 5 Vitest and 18 Rust tests.
-- `npm run build`: passed and produced `dist/`; initial JS is 12.76 KB gzip and
-  CSS is 5.20 KB gzip.
-- `cargo fmt --all -- --check`: passed.
-- `cargo clippy --all-targets --locked -- -D warnings`: passed.
-- `cargo build --release --locked`: passed.
-- `npm run test:e2e`: desktop and 390 px mobile shards passed.
-
-The durable deployment check observed 24/24 successful student, review, and
-receipt reads before and after revision replacement. The saved response and
-review remained present. The final topology is one healthy, active, running,
-ready replica with min/max 1/1 and the fleet-created share mounted at `/data`.
-
-Fresh live phone and desktop checks passed the first screen, sample demo,
-reset, demo exit, offline reload, real workflow, deletion, invalid and boundary
-paths, route titles, links, legal pages, expected 404, focus, reduced motion,
-200% text, light/dark themes, privacy requests, headers, and console checks.
-The real audit fixtures were deleted afterward.
-
-Axe found no serious or critical issue on seven routes in both themes. Factory
-`verify-url.sh` passed. A 150-request burst returned 30 HTTP 429 responses, and
-every 429 included `Retry-After`.
-
-Lighthouse 12.8.2 mobile scores were Performance 100, Accessibility 100, Best
-Practices 100, and SEO 100. LCP was 1.128 s, total blocking time 13 ms, CLS 0,
-and first-load transfer 39,470 bytes.
-
-Primary evidence:
-
-- [Live audit](evidence/repair-17-live-check.json)
-- [Live topology](evidence/repair-17-live-topology.json)
-- [Rate limit](evidence/repair-17-rate-limit.json)
-- [Lighthouse](evidence/repair-17-lighthouse-mobile.json)
-- [Factory URL check](evidence/repair-17-url/verify.json)
-- [Phone first screen](evidence/repair-17-live-home-mobile.png)
-- [Desktop first screen](evidence/repair-17-live-home-desktop.png)
-- [Populated demo](evidence/repair-17-live-demo-mobile.png)
-
-## Run locally
+From a detached checkout of `8f2956bf…`:
 
 ```sh
 npm ci
+npm run test:all-claims
 npm test
 npm run build
-npm run test:e2e
-npm run test:all-claims
 cargo fmt --all -- --check
 cargo clippy --all-targets --locked -- -D warnings
 cargo build --release --locked
+npm run test:container-identity
+npm run test:runtime-policy
+npm run test:e2e
 ```
 
-Start the production server with `PORT=8080 cargo run --release --locked`.
-Without `/data`, local durable files use the repository `data/` directory.
+Everything passed except the final live identity assertion inside
+`npm run test:all-claims`. The manifest reached all 27 claims: 26 passed and
+`durable-deployment-policy` failed. Untested claim count is zero.
 
-## Earlier findings and remaining work
+## Next step
 
-All verification 1–20, review 1–8, and polish 1–8 records were inspected. The
-round-eight disposition remains documented in [polish-8.md](polish-8.md). No
-earlier finding regressed, and verification 20's image-identity blocker is now
-closed.
-
-No product gap remains from this work order. Classroom Plus remains the
-registered $39 one-time offer; the free workflow remains complete. Public offer
-metadata and the catalog description were copied to `/work/.evidence`.
+Restore the live app to the immutable digest for candidate `8f2956bf…`, prevent
+report/Graphify commits from replacing that image, and rerun all 27 declared
+claim commands from a clean checkout. A product-code repair is not indicated by
+this verification.

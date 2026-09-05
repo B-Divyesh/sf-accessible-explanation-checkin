@@ -1,0 +1,19 @@
+{
+  "checked_at": "2026-09-05T23:36:43Z",
+  "result": "FAIL",
+  "candidate_sha": "8f2956bf5bafed7b9d0b27b53b92bf9cf3abd6bd",
+  "candidate_tag_digest": "sha256:ee3d2502c582b78f2a6c56b26930bf80da33c9afaafe71fefa85dc1296a9d863",
+  "live_revision": "sf-accessible-explanation-9c1a54--0000151",
+  "live_image_digest": "sha256:b96f54e311c2ffe4492cc71bf1d3e70c1c2ff747071df18610f230fab65df3c3",
+  "live_health_sha": "633f153e48e82764d412329b7089ae88ae062db6",
+  "topology": {
+    "min_replicas": 1,
+    "max_replicas": 1,
+    "running_replicas": 1,
+    "ready_replicas": 1,
+    "health": "Healthy",
+    "mount_path": "/data"
+  },
+  "failed_command": "npm run verify:live-topology",
+  "error": "The live immutable image digest does not match the candidate tag."
+}
