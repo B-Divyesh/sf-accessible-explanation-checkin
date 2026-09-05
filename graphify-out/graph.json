@@ -720,7 +720,7 @@
       "label": "expectAccessible()",
       "_callable": true,
       "_origin": "ast",
-      "community": 16,
+      "community": 19,
       "file_type": "code",
       "norm_label": "expectaccessible()",
       "source_file": "frontend/tests/app.spec.ts",
@@ -1728,30 +1728,10 @@
       "source_location": "L1"
     },
     {
-      "id": "test",
-      "label": "@playwright/test",
-      "_origin": "ast",
-      "community": 16,
-      "confidence": "EXTRACTED",
-      "file_type": "code",
-      "norm_label": "@playwright/test",
-      "source_file": "@playwright/test"
-    },
-    {
-      "id": "frontend_tests_app_spec",
-      "label": "app.spec.ts",
-      "_origin": "ast",
-      "community": 16,
-      "file_type": "code",
-      "norm_label": "app.spec.ts",
-      "source_file": "frontend/tests/app.spec.ts",
-      "source_location": "L1"
-    },
-    {
       "id": "scripts_test_nonroot_runtime",
       "label": "test-nonroot-runtime.sh",
       "_origin": "ast",
-      "community": 17,
+      "community": 16,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1765,7 +1745,7 @@
       "id": "scripts_test_nonroot_runtime_cleanup",
       "label": "cleanup()",
       "_origin": "ast",
-      "community": 17,
+      "community": 16,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1779,7 +1759,7 @@
       "id": "scripts_test_nonroot_runtime_sh__entry",
       "label": "test-nonroot-runtime.sh script",
       "_origin": "ast",
-      "community": 17,
+      "community": 16,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1793,7 +1773,7 @@
       "id": "scripts_verify_live_topology",
       "label": "verify-live-topology.sh",
       "_origin": "ast",
-      "community": 18,
+      "community": 17,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1807,7 +1787,7 @@
       "id": "scripts_verify_live_topology_fail",
       "label": "fail()",
       "_origin": "ast",
-      "community": 18,
+      "community": 17,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1821,7 +1801,7 @@
       "id": "scripts_verify_live_topology_sh__entry",
       "label": "verify-live-topology.sh script",
       "_origin": "ast",
-      "community": 18,
+      "community": 17,
       "file_type": "code",
       "metadata": {
         "language": "bash",
@@ -1835,7 +1815,7 @@
       "id": "frontend_public_sw",
       "label": "sw.js",
       "_origin": "ast",
-      "community": 19,
+      "community": 18,
       "file_type": "code",
       "norm_label": "sw.js",
       "source_file": "frontend/public/sw.js",
@@ -1845,11 +1825,21 @@
       "id": "frontend_public_sw_shell",
       "label": "SHELL",
       "_origin": "ast",
-      "community": 19,
+      "community": 18,
       "file_type": "code",
       "norm_label": "shell",
       "source_file": "frontend/public/sw.js",
       "source_location": "L2"
+    },
+    {
+      "id": "frontend_tests_app_spec",
+      "label": "app.spec.ts",
+      "_origin": "ast",
+      "community": 19,
+      "file_type": "code",
+      "norm_label": "app.spec.ts",
+      "source_file": "frontend/tests/app.spec.ts",
+      "source_location": "L1"
     },
     {
       "id": "package_scripts",
@@ -10956,15 +10946,6 @@
       "weight": 1.0
     },
     {
-      "source": "frontend_tests_app_spec",
-      "target": "test",
-      "relation": "dynamic_import",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "frontend/tests/app.spec.ts"
-    },
-    {
       "source": "src_routes_apierror",
       "target": "intoresponse",
       "relation": "implements",
@@ -11102,5 +11083,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "63757a06cf7e8c8770a72f0adbcd2e8bc16f0f13"
+  "built_at_commit": "2f364f4a3a03c4ee2e2b1bdcaac47b4e411a5eec"
 }
